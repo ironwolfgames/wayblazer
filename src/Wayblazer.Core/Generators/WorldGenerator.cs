@@ -12,8 +12,11 @@ public class WorldGenerator
 	{
 		// Initialize name queues from config
 		_energyNames = new Queue<string>(config.EnergyNames);
-		_resourceNames = new Queue<string>(config.ResourceNames);
-		_compositeResourceNames = new Queue<string>(config.CompositeResourceNames);
+		_resourceNames = new Dictionary<ResourceKind, Queue<string>>();
+		foreach (var kvp in config.ResourceNames)
+		{
+			_resourceNames[kvp.Key] = new Queue<string>(kvp.Value);
+		}
 
 		var energies = GenerateEnergies(config);
 		var heatEnergy = energies.Single(e => e.Kind == EnergyKind.Heat);
@@ -108,7 +111,7 @@ public class WorldGenerator
 				var acquireActionInputs = new List<SystemObject>();
 				if (s_resourceKindEnvironmentalObjects.TryGetValue(resourceKind, out var environmentalObjectName))
 				{
-					var name = _resourceNames.Dequeue();
+					var name = _resourceNames[resourceKind].Dequeue();
 					resourceInfo = new ResourceInfo(name, resourceKind, 0);
 
 					var environmentalObject = new EnvironmentalObject($"{name} {environmentalObjectName}");
@@ -117,7 +120,7 @@ public class WorldGenerator
 				}
 				else if (resourceKind == ResourceKind.Gas)
 				{
-					var name = _resourceNames.Dequeue();
+					var name = _resourceNames[resourceKind].Dequeue();
 					resourceInfo = new ResourceInfo(name, resourceKind, 0);
 
 					acquireActionInputs.Add(airEnvironmentalObject);
@@ -177,7 +180,7 @@ public class WorldGenerator
 		var metalResources = new List<ResourceInfo>();
 		foreach (var ore in resources.Where(x => x.Kind == ResourceKind.Ore))
 		{
-			var smeltedMetalName = _resourceNames.Dequeue();
+			var smeltedMetalName = _resourceNames[ResourceKind.Composite].Dequeue();
 			var smeltedMetal = new ResourceInfo(smeltedMetalName, ResourceKind.Composite, 1);
 			metalResources.Add(smeltedMetal);
 
@@ -193,8 +196,8 @@ public class WorldGenerator
 
 	private List<ResourceInfo> GenerateLevelTwoResources(WorldGeneratorConfig config, List<EnergyInfo> energies, List<Action> actions, List<ResourceInfo> resources, List<ResourceInfo> metalResources, string compositeAction, Building factory)
 	{
-		if (_compositeResourceNames is null)
-			throw new InvalidOperationException("Composite resource names not initialized properly");
+		if (_resourceNames is null)
+			throw new InvalidOperationException("Resource names not initialized properly");
 
 		// generate level 2 composite resources
 		var levelTwoResources = new List<ResourceInfo>();
@@ -240,7 +243,7 @@ public class WorldGenerator
 				}
 			}
 
-			var name = _compositeResourceNames.Dequeue();
+			var name = _resourceNames[ResourceKind.Composite].Dequeue();
 			var composite = new ResourceInfo(name, ResourceKind.Composite, 2);
 			levelTwoResources.Add(composite);
 
@@ -254,20 +257,20 @@ public class WorldGenerator
 
 	private void GenerateHigherLevelCompositeResources(WorldGeneratorConfig config, List<EnergyInfo> energies, List<Action> actions, List<ResourceInfo> resources, Building factory, List<ResourceInfo> levelTwoResources, string compositeAction)
 	{
-		if (_compositeResourceNames is null)
-			throw new InvalidOperationException("Composite resource names not initialized properly");
+		if (_resourceNames is null)
+			throw new InvalidOperationException("Resource names not initialized properly");
 
 		var currentLevel = 2;
 		var currentLevelResources = levelTwoResources;
 		var compositeLevelMinimumResourceCount = 2 + RandomUtility.Next(4); // random target minimum level size [2,5]
-		while (currentLevelResources.Count > compositeLevelMinimumResourceCount && _compositeResourceNames.Any())
+		while (currentLevelResources.Count > compositeLevelMinimumResourceCount && _resourceNames[ResourceKind.Composite].Any())
 		{
 			currentLevel++;
 			var prevLevelCount = currentLevelResources.Count;
 			var nextLevelSize = RandomUtility.Next(Math.Max(1, prevLevelCount / 3), prevLevelCount + 1);
 			var nextLevelResources = new List<ResourceInfo>();
 
-			for (int i = 0; i < nextLevelSize && _compositeResourceNames.Any(); i++)
+			for (int i = 0; i < nextLevelSize && _resourceNames[ResourceKind.Composite].Any(); i++)
 			{
 				// Select 2-3 input resources from previous levels and optionally an energy
 				var inputCount = 2 + RandomUtility.Next(2);
@@ -292,7 +295,7 @@ public class WorldGenerator
 					}
 				}
 
-				var name = _compositeResourceNames.Dequeue();
+				var name = _resourceNames[ResourceKind.Composite].Dequeue();
 				var composite = new ResourceInfo(name, ResourceKind.Composite, currentLevel);
 				nextLevelResources.Add(composite);
 
@@ -365,6 +368,5 @@ public class WorldGenerator
 	};
 
 	private Queue<string>? _energyNames;
-	private Queue<string>? _resourceNames;
-	private Queue<string>? _compositeResourceNames;
+	private Dictionary<ResourceKind, Queue<string>>? _resourceNames;
 }

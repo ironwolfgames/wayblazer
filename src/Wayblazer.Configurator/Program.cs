@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Wayblazer.Core.Config;
 using Wayblazer.Core.Generators;
+using Wayblazer.Core.Models;
 using Wayblazer.Core.Utility;
 
 namespace Wayblazer.Configurator;
@@ -28,11 +29,11 @@ internal class Program
 		}
 	}
 
-	private static GeneratedNameConfig LoadNameConfig(string configFolderPath)
+	private static ResourceNameConfig LoadNameConfig(string configFolderPath)
 	{
 		var nameConfigFile = new FileInfo(Path.Combine(configFolderPath, "name-config.json"));
 		var nameConfig = nameConfigFile.Exists ?
-			JsonSerializer.Deserialize<GeneratedNameConfig>(File.ReadAllText(nameConfigFile.FullName)) :
+			JsonSerializer.Deserialize<ResourceNameConfig>(File.ReadAllText(nameConfigFile.FullName)) :
 			CreateDefaultNameConfig();
 
 		if (!nameConfigFile.Exists)
@@ -41,32 +42,29 @@ internal class Program
 		return nameConfig!;
 	}
 
-	private static GeneratedNameConfig CreateDefaultNameConfig()
+	private static ResourceNameConfig CreateDefaultNameConfig()
 	{
 		// Provide a default list of names for resources, energies, etc.
-		return new GeneratedNameConfig
+		return new ResourceNameConfig
 		{
-			Stems = new List<string>(),
-			Prefixes = new List<string>(),
-			Suffixes = new List<string>(),
-			UniqueNames = new List<string>
+			EnergyNames = new List<string> { "Flame", "Spark", "Aether", "Mana", "Essence" },
+			Names = new Dictionary<ResourceKind, List<string>>
 			{
-				// Energy names
-				"Flame", "Spark", "Aether", "Mana", "Essence",
-				// Resource names (metals, woods, grounds, gases)
-				"Iron", "Copper", "Silver", "Gold", "Steel", "Bronze", "Titanium", "Cobalt",
-				"Oak", "Pine", "Birch", "Maple", "Cedar", "Ash", "Willow", "Elm",
-				"Clay", "Sand", "Stone", "Granite", "Marble", "Basalt", "Limestone", "Slate",
-				"Oxygen", "Nitrogen", "Helium", "Argon", "Neon", "Xenon", "Krypton", "Radon",
-				// Composite resource names
-				"Alloy", "Compound", "Mixture", "Blend", "Fusion", "Synthesis", "Amalgam", "Composite",
-				"Crystal", "Gem", "Ingot", "Bar", "Plate", "Wire", "Sheet", "Powder",
-				"Ceramic", "Glass", "Plastic", "Rubber", "Fiber", "Fabric", "Polymer", "Resin",
-				"Catalyst", "Reagent", "Solvent", "Solution", "Emulsion", "Colloid", "Suspension", "Gel",
-				"Prismatic", "Radiant", "Luminous", "Ethereal", "Celestial", "Astral", "Cosmic", "Void",
-				"Arcane", "Mystic", "Enchanted", "Blessed", "Sacred", "Divine", "Holy", "Pure",
-				"Refined", "Forged", "Tempered", "Hardened", "Strengthened", "Enhanced", "Improved", "Superior",
-				"Advanced", "Complex", "Intricate", "Elaborate", "Sophisticated", "Perfected", "Masterwork", "Legendary"
+				[ResourceKind.Ore] = new List<string> { "Iron", "Copper", "Silver", "Gold", "Steel", "Bronze", "Titanium", "Cobalt" },
+				[ResourceKind.Wood] = new List<string> { "Oak", "Pine", "Birch", "Maple", "Cedar", "Ash", "Willow", "Elm" },
+				[ResourceKind.Ground] = new List<string> { "Clay", "Sand", "Stone", "Granite", "Marble", "Basalt", "Limestone", "Slate" },
+				[ResourceKind.Gas] = new List<string> { "Oxygen", "Nitrogen", "Helium", "Argon", "Neon", "Xenon", "Krypton", "Radon" },
+				[ResourceKind.Composite] = new List<string>
+				{
+					"Alloy", "Compound", "Mixture", "Blend", "Fusion", "Synthesis", "Amalgam", "Composite",
+					"Crystal", "Gem", "Ingot", "Bar", "Plate", "Wire", "Sheet", "Powder",
+					"Ceramic", "Glass", "Plastic", "Rubber", "Fiber", "Fabric", "Polymer", "Resin",
+					"Catalyst", "Reagent", "Solvent", "Solution", "Emulsion", "Colloid", "Suspension", "Gel",
+					"Prismatic", "Radiant", "Luminous", "Ethereal", "Celestial", "Astral", "Cosmic", "Void",
+					"Arcane", "Mystic", "Enchanted", "Blessed", "Sacred", "Divine", "Holy", "Pure",
+					"Refined", "Forged", "Tempered", "Hardened", "Strengthened", "Enhanced", "Improved", "Superior",
+					"Advanced", "Complex", "Intricate", "Elaborate", "Sophisticated", "Perfected", "Masterwork", "Legendary"
+				}
 			}
 		};
 	}

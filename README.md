@@ -28,7 +28,7 @@ You are sent to a new world to discover its natural resources and report back on
   - Use resources to research and then build stronger, better tools/machines and upgrades for your main tools.
   - Repeat until you have the ability to meet the requirements for building a portal
 
-### Characteristics of Resources
+### Kinds and Characteristics of Resources
 
 - Energy (heat, electrical, magic, etc.)
   - Smelting Level: 0-5 (rating for how well it can smelt various ores into metals)
