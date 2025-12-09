@@ -1,88 +1,36 @@
 {
   "Seed": 42,
-  "WordGeneratorConfig": {
-    "WordComponents": {
-      "CsV": [
-        {
-          "Component": "su",
-          "Rank": 8
-        },
-        {
-          "Component": "fra",
-          "Rank": 21
-        }
-      ],
-      "VCm": [
-        {
-          "Component": "od",
-          "Rank": 6
-        },
-        {
-          "Component": "ac",
-          "Rank": 6
-        }
-      ],
-      "CmV": [
-        {
-          "Component": "ma",
-          "Rank": 6
-        },
-        {
-          "Component": "ja",
-          "Rank": 21
-        }
-      ],
-      "VCe": [
-        {
-          "Component": "od",
-          "Rank": 6
-        },
-        {
-          "Component": "am",
-          "Rank": 6
-        }
-      ],
-      "CmVCm": [
-        {
-          "Component": "trost",
-          "Rank": 51
-        },
-        {
-          "Component": "ddow",
-          "Rank": 61
-        }
-      ],
-      "VCmV": [
-        {
-          "Component": "uxu",
-          "Rank": 56
-        },
-        {
-          "Component": "icoa",
-          "Rank": 67
-        }
-      ],
-      "CsVCm": [
-        {
-          "Component": "lon",
-          "Rank": 11
-        },
-        {
-          "Component": "cirr",
-          "Rank": 27
-        }
-      ],
-      "CmVCe": [
-        {
-          "Component": "swas",
-          "Rank": 41
-        },
-        {
-          "Component": "kais",
-          "Rank": 60
-        }
-      ]
-    }
+  "EnergyNames": [
+    "Flame"
+  ],
+  "ResourceNames": {
+    "Ore": [
+      "Silver"
+    ],
+    "Ground": [
+      "Granite"
+    ],
+    "Wood": [
+      "Cedar"
+    ],
+    "Gas": [
+      "Radon"
+    ],
+    "Composite": [
+      "Cosmic",
+      "Ethereal",
+      "Suspension",
+      "Astral",
+      "Resin",
+      "Intricate",
+      "Synthesis",
+      "Mystic",
+      "Pure",
+      "Powder",
+      "Plastic",
+      "Amalgam",
+      "Void"
+    ]
   },
   "HasElectricalEnergy": false,
   "MagicEnergyCount": 0,

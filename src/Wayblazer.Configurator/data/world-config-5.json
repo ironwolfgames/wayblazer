@@ -1,159 +1,116 @@
 {
   "Seed": 42,
-  "WordGeneratorConfig": {
-    "WordComponents": {
-      "CsV": [
-        {
-          "Component": "spa",
-          "Rank": 21
-        },
-        {
-          "Component": "je",
-          "Rank": 21
-        },
-        {
-          "Component": "sco",
-          "Rank": 31
-        },
-        {
-          "Component": "ske",
-          "Rank": 31
-        }
-      ],
-      "VCm": [
-        {
-          "Component": "ot",
-          "Rank": 6
-        },
-        {
-          "Component": "eb",
-          "Rank": 6
-        },
-        {
-          "Component": "ag",
-          "Rank": 6
-        },
-        {
-          "Component": "og",
-          "Rank": 6
-        }
-      ],
-      "CmV": [
-        {
-          "Component": "gu",
-          "Rank": 8
-        },
-        {
-          "Component": "spo",
-          "Rank": 21
-        },
-        {
-          "Component": "mmu",
-          "Rank": 23
-        },
-        {
-          "Component": "swa",
-          "Rank": 36
-        }
-      ],
-      "VCe": [
-        {
-          "Component": "os",
-          "Rank": 6
-        },
-        {
-          "Component": "ed",
-          "Rank": 6
-        },
-        {
-          "Component": "ad",
-          "Rank": 6
-        },
-        {
-          "Component": "ass",
-          "Rank": 31
-        }
-      ],
-      "CmVCm": [
-        {
-          "Component": "gab",
-          "Rank": 11
-        },
-        {
-          "Component": "drub",
-          "Rank": 43
-        },
-        {
-          "Component": "cress",
-          "Rank": 56
-        },
-        {
-          "Component": "ccasm",
-          "Rank": 61
-        }
-      ],
-      "VCmV": [
-        {
-          "Component": "aki",
-          "Rank": 8
-        },
-        {
-          "Component": "iggi",
-          "Rank": 34
-        },
-        {
-          "Component": "eeli",
-          "Rank": 57
-        },
-        {
-          "Component": "osea",
-          "Rank": 61
-        }
-      ],
-      "CsVCm": [
-        {
-          "Component": "tumm",
-          "Rank": 28
-        },
-        {
-          "Component": "smif",
-          "Rank": 37
-        },
-        {
-          "Component": "drip",
-          "Rank": 57
-        },
-        {
-          "Component": "foofl",
-          "Rank": 75
-        }
-      ],
-      "CmVCe": [
-        {
-          "Component": "pift",
-          "Rank": 62
-        },
-        {
-          "Component": "kulb",
-          "Rank": 68
-        },
-        {
-          "Component": "frimm",
-          "Rank": 77
-        },
-        {
-          "Component": "ffaim",
-          "Rank": 80
-        }
-      ]
-    }
+  "EnergyNames": [
+    "Aether",
+    "Mana",
+    "Essence",
+    "Flame",
+    "Spark"
+  ],
+  "ResourceNames": {
+    "Ore": [
+      "Iron",
+      "Cobalt",
+      "Steel"
+    ],
+    "Ground": [
+      "Clay",
+      "Limestone",
+      "Stone",
+      "Sand",
+      "Granite",
+      "Basalt",
+      "Marble"
+    ],
+    "Wood": [
+      "Maple",
+      "Cedar",
+      "Oak",
+      "Birch",
+      "Pine"
+    ],
+    "Gas": [
+      "Krypton",
+      "Helium",
+      "Nitrogen",
+      "Argon",
+      "Radon",
+      "Neon",
+      "Xenon"
+    ],
+    "Composite": [
+      "Forged",
+      "Glass",
+      "Luminous",
+      "Sacred",
+      "Ceramic",
+      "Powder",
+      "Amalgam",
+      "Ethereal",
+      "Advanced",
+      "Resin",
+      "Holy",
+      "Fusion",
+      "Intricate",
+      "Legendary",
+      "Gel",
+      "Wire",
+      "Suspension",
+      "Tempered",
+      "Perfected",
+      "Colloid",
+      "Fiber",
+      "Solvent",
+      "Sheet",
+      "Strengthened",
+      "Astral",
+      "Prismatic",
+      "Enchanted",
+      "Bar",
+      "Alloy",
+      "Gem",
+      "Fabric",
+      "Divine",
+      "Elaborate",
+      "Improved",
+      "Arcane",
+      "Plastic",
+      "Rubber",
+      "Sophisticated",
+      "Enhanced",
+      "Radiant",
+      "Void",
+      "Crystal",
+      "Composite",
+      "Catalyst",
+      "Complex",
+      "Masterwork",
+      "Plate",
+      "Pure",
+      "Polymer",
+      "Hardened",
+      "Cosmic",
+      "Ingot",
+      "Reagent",
+      "Mixture",
+      "Solution",
+      "Blessed",
+      "Compound",
+      "Synthesis",
+      "Blend",
+      "Mystic",
+      "Celestial",
+      "Refined",
+      "Emulsion",
+      "Superior"
+    ]
   },
-  "HasElectricalEnergy": false,
-  "MagicEnergyCount": 2,
+  "HasElectricalEnergy": true,
+  "MagicEnergyCount": 3,
   "ResourceKindCounts": {
-    "Ore": 7,
-    "Ground": 3,
-    "Wood": 7,
-    "Gas": 6
+    "Ore": 3,
+    "Ground": 7,
+    "Wood": 5,
+    "Gas": 7
   }
 }

@@ -1,111 +1,65 @@
 {
   "Seed": 42,
-  "WordGeneratorConfig": {
-    "WordComponents": {
-      "CsV": [
-        {
-          "Component": "ke",
-          "Rank": 6
-        },
-        {
-          "Component": "bo",
-          "Rank": 6
-        }
-      ],
-      "VCm": [
-        {
-          "Component": "ir",
-          "Rank": 7
-        },
-        {
-          "Component": "ebl",
-          "Rank": 21
-        }
-      ],
-      "CmV": [
-        {
-          "Component": "ssi",
-          "Rank": 22
-        },
-        {
-          "Component": "gri",
-          "Rank": 32
-        }
-      ],
-      "VCe": [
-        {
-          "Component": "et",
-          "Rank": 6
-        },
-        {
-          "Component": "um",
-          "Rank": 8
-        }
-      ],
-      "CmVCm": [
-        {
-          "Component": "crapr",
-          "Rank": 56
-        },
-        {
-          "Component": "goosm",
-          "Rank": 75
-        },
-        {
-          "Component": "ccaw",
-          "Rank": 81
-        }
-      ],
-      "VCmV": [
-        {
-          "Component": "ugru",
-          "Rank": 36
-        },
-        {
-          "Component": "etwe",
-          "Rank": 42
-        },
-        {
-          "Component": "oupo",
-          "Rank": 56
-        }
-      ],
-      "CsVCm": [
-        {
-          "Component": "lostr",
-          "Rank": 46
-        },
-        {
-          "Component": "gress",
-          "Rank": 51
-        },
-        {
-          "Component": "yab",
-          "Rank": 56
-        }
-      ],
-      "CmVCe": [
-        {
-          "Component": "ddir",
-          "Rank": 27
-        },
-        {
-          "Component": "skig",
-          "Rank": 47
-        },
-        {
-          "Component": "ruxt",
-          "Rank": 68
-        }
-      ]
-    }
+  "EnergyNames": [
+    "Essence",
+    "Spark"
+  ],
+  "ResourceNames": {
+    "Ore": [
+      "Titanium",
+      "Silver"
+    ],
+    "Ground": [
+      "Sand",
+      "Marble"
+    ],
+    "Wood": [
+      "Oak",
+      "Maple"
+    ],
+    "Gas": [
+      "Oxygen",
+      "Nitrogen"
+    ],
+    "Composite": [
+      "Gel",
+      "Amalgam",
+      "Perfected",
+      "Suspension",
+      "Plastic",
+      "Cosmic",
+      "Colloid",
+      "Bar",
+      "Enchanted",
+      "Prismatic",
+      "Synthesis",
+      "Wire",
+      "Advanced",
+      "Blend",
+      "Intricate",
+      "Composite",
+      "Enhanced",
+      "Complex",
+      "Forged",
+      "Sheet",
+      "Fusion",
+      "Blessed",
+      "Tempered",
+      "Resin",
+      "Fiber",
+      "Astral",
+      "Ethereal",
+      "Masterwork",
+      "Polymer",
+      "Reagent"
+    ]
   },
-  "HasElectricalEnergy": false,
+  "HasElectricalEnergy": true,
   "MagicEnergyCount": 0,
   "ResourceKindCounts": {
-    "Ore": 1,
+    "Ore": 2,
     "Ground": 2,
-    "Wood": 1,
+    "Wood": 2,
     "Gas": 2
   }
 }
