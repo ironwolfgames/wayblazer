@@ -1,0 +1,143 @@
+{
+  "Seed": 42,
+  "WordGeneratorConfig": {
+    "WordComponents": {
+      "CsV": [
+        {
+          "Component": "de",
+          "Rank": 6
+        },
+        {
+          "Component": "ha",
+          "Rank": 6
+        },
+        {
+          "Component": "sca",
+          "Rank": 31
+        }
+      ],
+      "VCm": [
+        {
+          "Component": "ab",
+          "Rank": 6
+        },
+        {
+          "Component": "or",
+          "Rank": 6
+        },
+        {
+          "Component": "ih",
+          "Rank": 7
+        }
+      ],
+      "CmV": [
+        {
+          "Component": "ni",
+          "Rank": 7
+        },
+        {
+          "Component": "ru",
+          "Rank": 8
+        },
+        {
+          "Component": "tre",
+          "Rank": 31
+        }
+      ],
+      "VCe": [
+        {
+          "Component": "ik",
+          "Rank": 7
+        },
+        {
+          "Component": "ash",
+          "Rank": 31
+        },
+        {
+          "Component": "ind",
+          "Rank": 32
+        }
+      ],
+      "CmVCm": [
+        {
+          "Component": "kecr",
+          "Rank": 41
+        },
+        {
+          "Component": "bloq",
+          "Rank": 51
+        },
+        {
+          "Component": "ggonn",
+          "Rank": 51
+        },
+        {
+          "Component": "bbusl",
+          "Rank": 53
+        }
+      ],
+      "VCmV": [
+        {
+          "Component": "adio",
+          "Rank": 66
+        },
+        {
+          "Component": "emoa",
+          "Rank": 66
+        },
+        {
+          "Component": "istia",
+          "Rank": 82
+        },
+        {
+          "Component": "eeggu",
+          "Rank": 83
+        }
+      ],
+      "CsVCm": [
+        {
+          "Component": "gonn",
+          "Rank": 26
+        },
+        {
+          "Component": "riss",
+          "Rank": 27
+        },
+        {
+          "Component": "grufr",
+          "Rank": 53
+        },
+        {
+          "Component": "cescr",
+          "Rank": 56
+        }
+      ],
+      "CmVCe": [
+        {
+          "Component": "kosh",
+          "Rank": 36
+        },
+        {
+          "Component": "muck",
+          "Rank": 38
+        },
+        {
+          "Component": "daud",
+          "Rank": 60
+        },
+        {
+          "Component": "slall",
+          "Rank": 61
+        }
+      ]
+    }
+  },
+  "HasElectricalEnergy": true,
+  "MagicEnergyCount": 1,
+  "ResourceKindCounts": {
+    "Ore": 3,
+    "Ground": 4,
+    "Wood": 4,
+    "Gas": 3
+  }
+}

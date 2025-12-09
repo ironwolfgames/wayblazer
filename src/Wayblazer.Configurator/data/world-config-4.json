@@ -1,0 +1,119 @@
+{
+  "Seed": 42,
+  "WordGeneratorConfig": {
+    "WordComponents": {
+      "CsV": [
+        {
+          "Component": "fo",
+          "Rank": 6
+        },
+        {
+          "Component": "swa",
+          "Rank": 41
+        }
+      ],
+      "VCm": [
+        {
+          "Component": "al",
+          "Rank": 6
+        },
+        {
+          "Component": "ib",
+          "Rank": 7
+        }
+      ],
+      "CmV": [
+        {
+          "Component": "mma",
+          "Rank": 21
+        },
+        {
+          "Component": "sle",
+          "Rank": 21
+        },
+        {
+          "Component": "fle",
+          "Rank": 21
+        }
+      ],
+      "VCe": [
+        {
+          "Component": "es",
+          "Rank": 6
+        },
+        {
+          "Component": "op",
+          "Rank": 6
+        },
+        {
+          "Component": "osk",
+          "Rank": 31
+        }
+      ],
+      "CmVCm": [
+        {
+          "Component": "cepl",
+          "Rank": 26
+        },
+        {
+          "Component": "spebb",
+          "Rank": 51
+        },
+        {
+          "Component": "griw",
+          "Rank": 72
+        }
+      ],
+      "VCmV": [
+        {
+          "Component": "adoi",
+          "Rank": 61
+        },
+        {
+          "Component": "eskee",
+          "Rank": 76
+        },
+        {
+          "Component": "ummea",
+          "Rank": 78
+        }
+      ],
+      "CsVCm": [
+        {
+          "Component": "rufr",
+          "Rank": 28
+        },
+        {
+          "Component": "stopr",
+          "Rank": 41
+        },
+        {
+          "Component": "hutw",
+          "Rank": 48
+        }
+      ],
+      "CmVCe": [
+        {
+          "Component": "nek",
+          "Rank": 11
+        },
+        {
+          "Component": "xir",
+          "Rank": 57
+        },
+        {
+          "Component": "rott",
+          "Rank": 66
+        }
+      ]
+    }
+  },
+  "HasElectricalEnergy": false,
+  "MagicEnergyCount": 0,
+  "ResourceKindCounts": {
+    "Ore": 2,
+    "Ground": 3,
+    "Wood": 2,
+    "Gas": 3
+  }
+}

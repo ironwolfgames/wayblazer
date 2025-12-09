@@ -1,0 +1,42 @@
+{
+	// Use IntelliSense to learn about possible attributes.
+	// Hover to view descriptions of existing attributes.
+	// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "World",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/src/IronGenerator.World/bin/Debug/net9.0/IronGenerator.World.dll",
+			"args": [
+				"--config-file-template",
+				"${workspaceFolder}/src/IronGenerator.Configurator/data/world-config-N.json",
+				"--world-file-template",
+				"${workspaceFolder}/src/IronGenerator.World/Output/world-N.json",
+				">",
+				"${workspaceFolder}/src/IronGenerator.World/Output/output.txt",
+			],
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"console": "internalConsole"
+		},
+		{
+			"name": "Configurator",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/src/IronGenerator.Configurator/bin/Debug/net9.0/IronGenerator.Configurator.dll",
+			"args": [
+				"--config-folder-path",
+				"${workspaceFolder}/src/IronGenerator.Configurator/data",
+				"--seed",
+				"42",
+			],
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"console": "internalConsole"
+		}
+	]
+}
