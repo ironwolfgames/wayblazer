@@ -37,7 +37,7 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 | **5h - 6h** | **VS Tech Tree Definition**<br>1. Create a static C\# class `TechTreeData.cs` to hold the entire VS structure (list of `TechNode` objects).<br>2. Define the core VS nodes (noting Tier 1 vs Tier 2+):<br>    - **Node 1: Gas Siphon Tool:** ID: "Unlock\_GasSiphon" (Cost: 50 Analysis). **Effect:** Allows harvesting Catalyst Ore (implemented in Sprint 8).<br>    - **Node 2: Planetary Survey:** ID: "Unlock\_Observatory" (Cost: 25 Analysis, Prereq: N/A).<br>    - **Node 3: Advanced Compositing:** ID: "Unlock\_GasInjector" (Cost: 10 Compositing, 10 Smelting).<br>    - **Node 4: Portal Construction:** ID: "Unlock\_PortalBuild" (Cost: 50 Total Points, Prereq: "Unlock\_GasInjector").<br>3. **Note on Tier 1 Tech:** The Field Lab and Basic Furnace are freely available (Tier 1 tech requires no research unlock). Only Tier 2+ machines require research as defined above. |
 | **6h - 7h** | **Knowledge Manager Integration**<br>1. In `KnowledgeManager.cs`, add a new field: `public HashSet<string> UnlockedNodes = new();`<br>2. Add a method `public bool IsNodeUnlocked(string id)`. |
 
-### Task 3: Research Logic and Prerequisites (5 Hours)
+### Task 3: Research Logic and Prerequisites (4 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
@@ -46,7 +46,7 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 | **9h - 10h**| **The Unlock Function**<br>1. Connect the `Button_Research.Pressed` signal to a method `OnResearchPressed()`.<br>2. In this method:<br>    - Call `KnowledgeManager.TrySpendPoints(Costs)`.<br>    - If successful, add the node ID to `KnowledgeManager.UnlockedNodes`.<br>    - Call `CheckState()` again to update the UI (now showing "Unlocked"). |
 | **10h - 11h**| **Art/Sound: UI Polish**<br>1. Create placeholder icons for the four VS Tech Nodes (e.g., a microscope for Analysis, a furnace icon for Smelting, a blueprint for Portal).<br>2. Create sound effects for **"UI Open"** (soft futuristic tone), **"Unlock Success"** (chime/jingle), and **"Unlock Fail"** (a soft error buzz). |
 
-### Task 4: Gating the Machines (4 Hours)
+### Task 4: Gating the Machines (5 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
