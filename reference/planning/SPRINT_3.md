@@ -1,4 +1,4 @@
-# ⛏️ Sprint 3: Resource Engine & ProcGen V1 (16 Hours)
+# ⛏️ Sprint 3: Resource Engine & ProcGen V1 (18 Hours)
 
 ## Summary
 
@@ -15,7 +15,7 @@ The player can successfully land, harvest one type of wood and two types of ore,
 
 -----
 
-## Task Breakdown (16 Hours)
+## Task Breakdown (18 Hours)
 
 ### Task 1: Singleton and Resource Initialization (3 Hours)
 
