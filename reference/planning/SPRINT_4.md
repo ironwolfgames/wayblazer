@@ -41,7 +41,7 @@ The player can effectively use the Hand Scanner (Right Click hold from Sprint 3)
 | **7h - 8h** | **Scanner Activation Logic**<br>1. Create a public variable `ScannerUIManager _scannerUI;` and initialize it in `_Ready()`.<br>2. In the scanning section of `_PhysicsProcess(double delta)`:<br>    - If the player is holding Right-Click AND is overlapping a `ResourceNode`:<br>        - Call `_scannerUI.UpdateResourceData(overlappingResource);`<br>        - Call `_scannerUI.UpdatePlanetaryData(...)`<br>        - Call `_scannerUI.ShowScanPanel();`<br>    - ELSE IF the player is NOT holding Right-Click, call `_scannerUI.HideScanPanel();`. |
 | **8h - 9h** | **Scan Range Check**<br>1. Refine the logic to ensure the player must be within a short distance of the resource node (e.g., within 20 pixels) to scan it.<br>2. Provide clear visual feedback (e.g., a momentary green glow/highlight) on the resource node that is successfully being scanned. |
 
-### Task 4: UI Polish and Animations (4 Hours)
+### Task 4: UI Polish and Animations (3 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
@@ -49,7 +49,7 @@ The player can effectively use the Hand Scanner (Right Click hold from Sprint 3)
 | **10h - 11h**| **Panel Animation**<br>1. Add an `AnimationPlayer` node to `ScannerUI.tscn`.<br>2. Create two short (0.3 second) animation tracks: **"Show"** (fades opacity from 0 to 1, or slides the panel in) and **"Hide"** (does the reverse).<br>3. In `ScannerUIManager.cs`, replace `Visible = true/false` with `_animationPlayer.Play("Show")` or `_animationPlayer.Play("Hide")`. |
 | **11h - 12h**| **Code Documentation**<br>1. Add XML documentation comments (`/// <summary>`) to all public methods and properties in `ScannerUIManager.cs` and `PlayerController.cs`.<br>2. Ensure the logic linking the player's input to the UI update is clean and easy to follow. |
 
-### Task 5: Review and Testing (3 Hours)
+### Task 5: Review and Testing (4 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
