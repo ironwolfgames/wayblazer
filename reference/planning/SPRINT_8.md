@@ -27,7 +27,7 @@ This sprint implements the **Gas Injector** machine. This machine is crucial for
 | **1h - 2h** | **Gas Siphon Tool Implementation**<br>1. Instead of a temporary mechanism, create a proper **Gas Siphon Tool** unlock system.<br>2. Create a C\# class `Tool.cs` to represent player tools. Add a tool tracking system to `KnowledgeManager`: `public HashSet<string> UnlockedTools = new();`<br>3. Implement tool unlock: When player has $\ge 50$ **Analysis Tech Points**, they can "research" or "craft" the Gas Siphon from the Research UI or a simple crafting menu.<br>4. Deduct 50 points and set: `KnowledgeManager.Instance.UnlockedTools.Add("GasSiphon");`<br>5. **Better Immersion:** This creates a proper progression gate rather than a hacky workaround. |
 | **2h - 3h** | **Art/Sound: Catalyst Ore & Siphon**<br>1. Create the final 2.5D sprite asset for **"Catalyst Ore"** (it should look distinct from Base Ore—e.g., bright purple or glowing).<br>2. Create a unique, high-pitched **"Siphon/Thermal" sound effect** for harvesting this ore, distinct from the dull thud of the Kinetic Mine. |
 
-### Task 2: Gas Injector Scene and Interaction (4 Hours)
+### Task 2: Gas Injector Scene and Interaction (3 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
@@ -44,7 +44,7 @@ This sprint implements the **Gas Injector** machine. This machine is crucial for
 | **8h - 9h** | **Compositing Implementation**<br>1. Implement the compositing calculation in `CompositeMaterial.CalculateProperties()` (defined in Sprint 1).<br>2. Apply the formula: `FinalStrength = PrimaryIngredient.Properties[Strength].Value + ModifierIngredient.Properties[Strength].Value`<br>3. Store this final composite property set in the Composite Alloy instance.<br>4. **Verification:** With Base Metal at 4.2 and Catalyst at 4.0, Final Strength = 8.2, which exceeds the 8.0 requirement. ✓ |
 | **9h - 10h**| **Compositing Completion and Knowledge**<br>1. Implement `FinishCompositing()` when the timer ends. Reset state.<br>2. **Output:** Call `InventoryManager.AddItem("Composite Alloy", 1)`.<br>3. **Knowledge Gain:** `KnowledgeManager.Instance.TechPoints["Compositing"] += 10;` (New **Compositing Tech Point** category). |
 
-### Task 4: UI/UX Feedback and Testing (5 Hours)
+### Task 4: UI/UX Feedback and Testing (6 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
