@@ -78,7 +78,7 @@ This defines the ultimate goal and the mathematical deduction.
 | **12h - 13h**| **Portal Requirement Class**<br>1. Create `PortalRequirement.cs`. Define a C\# class `PortalRequirement`.<br>2. Add a dictionary to store the requirements: `public Dictionary<ResourcePropertyType, float> RequiredStats = new();`<br>3. Add fields to store the World Constants (for reference): `public PlanetaryConstants WorldContext;` |
 | **13h - 14h**| **Deduction Formula Implementation**<br>1. Implement `public void SetRequirements(PlanetaryConstants constants)`:<br>2. **VS Logic:** Implement the primary deduction formula from the GDD:<br>    - **Foundation Strength:** `RequiredStats[Strength] = constants.GravimetricShear * 2.5f;` (Target: 8.0)<br>    - **Gate Resistance:** `RequiredStats[Resistance] = constants.CorrosiveIndex * 1.5f;` (Target: 3.0)<br>3. This ensures the requirements are generated *from* the world properties. |
 
-### Task 8: Simple Unit Test and Review (1 Hour)
+### Task 8: Simple Unit Test and Review (2 Hours)
 
 Verify the core deduction math works using Godot's built-in testing capabilities.
 
