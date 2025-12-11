@@ -1,4 +1,4 @@
-public struct ResourceProperty
+public class ResourceProperty
 {
 	public ResourcePropertyType Type;
 	public float Value;
