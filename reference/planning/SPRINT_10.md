@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 10: Portal Construction & UI (16 Hours)**. This sprint focuses on the final engineering steps: using the expertly crafted materials to construct the ultimate goal—the **Portal Foundation**.
-
------
-
 # 🏗️ Sprint 10: Portal Construction & UI (16 Hours)
 
 ## Summary
@@ -37,16 +33,16 @@ This sprint implements the physical construction of the **Portal Foundation**. T
 
 | Duration | Steps |
 | :--- | :--- |
-| **4h - 5h** | **PortalManager Script**<br>1. Create a C\# script `PortalManager.cs` and attach it to the `PortalFoundation` node.<br>2. Define state: `public bool FoundationBuilt = false;`<br>3. Add a list to track required materials: `private Dictionary<string, int> RequiredMaterials = new() { { "Composite Alloy", 20 } };` (The VS requires 20 units). |
-| **5h - 6h** | **Submission Panel UI**<br>1. Once the `PortalFoundation` is placed, pressing Left-Click while near it should open a second modal: **SubmissionUI.tscn**.<br>2. This UI lists the required item: "Composite Alloy: 0/20".<br>3. Add a `Button` labeled **"Submit Alloy"**. |
-| **6h - 7h** | **Submission Logic**<br>1. Connect the `Submit Alloy` button to a method in `PortalManager.cs`.<br>2. This method should attempt to take all available **Composite Alloy** from the player's inventory (up to the required 20 units).<br>3. `InventoryManager.TryRemoveItem("Composite Alloy", amount)`. Update the Submission UI count. |
+| **4h - 5h** | **PortalManager Script**<br>1. Create a C\# script `PortalManager.cs` and attach it to the `PortalFoundation` node.<br>2. Define state: `public bool FoundationBuilt = false;`<br>3. Add a list to track required materials: `private Dictionary<string, int> RequiredMaterials = new() { { "Composite Alloy", 5 } };`<br>4. **Note:** Reduced from 20 to 5 units for VS to avoid tedious grinding. The focus is on the deduction puzzle, not resource accumulation. |
+| **5h - 6h** | **Submission Panel UI**<br>1. Once the `PortalFoundation` is placed, pressing Left-Click while near it should open a second modal: **SubmissionUI.tscn**.<br>2. This UI lists the required item: "Composite Alloy: 0/5".<br>3. Add a `Button` labeled **"Submit Alloy"**. |
+| **6h - 7h** | **Submission Logic**<br>1. Connect the `Submit Alloy` button to a method in `PortalManager.cs`.<br>2. This method should attempt to take all available **Composite Alloy** from the player's inventory (up to the required 5 units).<br>3. `InventoryManager.TryRemoveItem("Composite Alloy", amount)`. Update the Submission UI count.<br>4. **Important:** All submitted units are of the same type (Composite Alloy) with identical properties, so we only need to check ONE unit's properties against requirements. |
 | **7h - 8h** | **Art/Sound: Construction Assets**<br>1. Create the final 2.5D sprite asset for the **Portal Foundation** (an industrial, heavily armored base).<br>2. Create sound effects for **"Construction Mode Toggle"** (a clean UI click) and **"Material Submission"** (a heavy, automated loading sound). |
 
 ### Task 3: Property Verification (4 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
-| **8h - 9h** | **Verification Method**<br>1. In `PortalManager.cs`, implement a method `VerifyMaterialProperties()`. This runs immediately after the required 20 units of alloy have been submitted.<br>2. Retrieve the *actual* properties of the submitted **Composite Alloy** (e.g., Strength $\approx 8.2$). Since the alloy is singular, we check its stats. |
+| **8h - 9h** | **Verification Method**<br>1. In `PortalManager.cs`, implement a method `VerifyMaterialProperties()`. This runs immediately after the required 5 units of alloy have been submitted.<br>2. Retrieve the properties of the **Composite Alloy** type from the resource definitions (since all submitted units are identical in the VS, we check one representative sample).<br>3. **Clarification:** We're checking that the Composite Alloy recipe/type meets requirements, not averaging or pooling properties from multiple units. |
 | **9h - 10h**| **Requirement Check**<br>1. Retrieve the *required* portal properties (from Sprint 6): `float requiredStrength = KnowledgeManager.GetCalculatedPortalStrengthRequirement();` (e.g., $8.0$ in the VS).<br>2. Implement the critical check:<br>    - `if (submittedAlloy.Properties[Strength].Value >= requiredStrength)`<br>    - If true, the material is adequate: `FoundationBuilt = true;`. Display success message. |
 | **10h - 11h**| **Failure State Logic**<br>1. If the check is **false** (e.g., the player mistakenly submitted a low-strength alloy), display a large error message:<br>    - "FOUNDATION FAILURE: Material Strength [X] too low for Planetary Shear Requirement [Y]\! Resources Lost."<br>2. The player must then go back and craft the correct alloy to try again. (For the VS, this forces them to understand the deduction loop). |
 | **11h - 12h**| **Visual Status Update**<br>1. If `FoundationBuilt` is true, change the sprite of `PortalFoundation.tscn` to a **"Construction Complete"** state (e.g., the ring is sealed, lights turn on).<br>2. Hide the Submission UI, as this step is finished. |
@@ -55,12 +51,7 @@ This sprint implements the physical construction of the **Portal Foundation**. T
 
 | Duration | Steps |
 | :--- | :--- |
-| **12h - 13h**| **End-to-End Test (Success)**<br>1. Start with the Composite Alloy in inventory. Build/Place the Foundation.<br>2. Submit the 20 Composite Alloys.<br>3. Verify the `VerifyMaterialProperties()` check passes (8.2 $\ge$ 8.0).<br>4. Confirm the Foundation sprite changes, and the `FoundationBuilt` state is true. |
+| **12h - 13h**| **End-to-End Test (Success)**<br>1. Start with at least 5 Composite Alloy in inventory. Build/Place the Foundation.<br>2. Submit the 5 Composite Alloys.<br>3. Verify the `VerifyMaterialProperties()` check passes (8.2 $\ge$ 8.0).<br>4. Confirm the Foundation sprite changes, and the `FoundationBuilt` state is true. |
 | **13h - 14h**| **End-to-End Test (Failure Mock)**<br>1. **Debug Injection:** Temporarily inject a **low-strength material** (e.g., Base Metal Bar) into the inventory, labeled as the "Composite Alloy."<br>2. Submit the low-strength material and verify the `VerifyMaterialProperties()` check fails (e.g., 4.2 $< 8.0$).<br>3. Confirm the failure message appears, demonstrating the deduction risk. |
 | **14h - 15h**| **UI/UX Polish**<br>1. Ensure the Construction UI is intuitive and doesn't conflict with the Scanner UI.<br>2. Add a simple **VFX** to the final built foundation (e.g., a subtle energy aura). |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 10 Complete: Portal Foundation Placement, Material Submission, and Property Verification Logic." |
-
------
-
-**Status:** **Sprint 10 Complete.**
-*Ready to begin Sprint 11: Simulation Core & Win State.*

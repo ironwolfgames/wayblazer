@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 5: Field Lab & Analysis Logic (16 Hours)**. This sprint introduces the first crucial **Tier 1 Technology** required for the game's core deduction loop: transitioning from vague data to precise, numerical analysis.
-
------
-
 # 🔬 Sprint 5: Field Lab & Analysis Logic (16 Hours)
 
 ## Summary
@@ -36,8 +32,8 @@ This sprint implements the **Field Lab**, the player's first major technological
 | Duration | Steps |
 | :--- | :--- |
 | **3h - 4h** | **Knowledge Tracking Manager**<br>1. Create a new C\# class `KnowledgeManager.cs`. Make it a singleton.<br>2. Define a dictionary: `public Dictionary<string, bool> DataUnlocked = new();` (Key: ResourceName, Value: True/False).<br>3. Define a dictionary for Tech Points: `public Dictionary<string, int> TechPoints = new();` (Key: "Analysis", "Harvesting", etc., Value: Points). |
-| **4h - 5h** | **The Analysis Process**<br>1. In `FieldLabManager.cs`, create a method `StartAnalysis()`.<br>2. **VS Logic:** This is a simple, instant process for the VS:<br>    - **Unlock Data:** `KnowledgeManager.Instance.DataUnlocked[InputResource.Name] = true;`<br>    - **Gain Knowledge:** `KnowledgeManager.Instance.TechPoints["Analysis"] += 10;`<br>3. Print a debug message: "Analysis Complete: Data for [ResourceName] Unlocked\!" |
-| **5h - 6h** | **Resource Disposal**<br>1. After analysis, the resource is spent. The Field Lab needs a visual output (a screen or light) to show the analysis result.<br>2. Create a small label on the Field Lab scene to show the analysis result for 5 seconds (e.g., "BASE ORE: STRENGTH 2.1"). |
+| **4h - 5h** | **The Analysis Process**<br>1. In `FieldLabManager.cs`, create a method `StartAnalysis()`.<br>2. **VS Logic with Timer:** Instead of instant completion, add a 1-2 second timer for better game feel:<br>    - Set a state flag: `IsAnalyzing = true`<br>    - Start a timer (e.g., 1.5 seconds)<br>    - Display a visual indicator (spinning icon, progress bar, or pulsing animation) during analysis<br>    - When timer completes, call `FinishAnalysis()`<br>3. In `FinishAnalysis()`:<br>    - **Unlock Data:** `KnowledgeManager.Instance.DataUnlocked[InputResource.Name] = true;`<br>    - **Gain Knowledge:** `KnowledgeManager.Instance.TechPoints["Analysis"] += 10;`<br>    - Print a debug message: "Analysis Complete: Data for [ResourceName] Unlocked\!" |
+| **5h - 6h** | **Resource Disposal and Output Display**<br>1. After analysis completes, the resource is spent (consumed by the analysis process).<br>2. The Field Lab displays a **temporary result** on its screen/label showing the exact values (e.g., "BASE ORE: STRENGTH 2.1") for 5 seconds.<br>3. **Important:** This temporary display on the Field Lab PLUS the permanent unlock in `KnowledgeManager` means:<br>    - The player sees immediate feedback from the machine<br>    - The Scanner UI will now show precise values for this resource type permanently (implemented in Task 3)<br>4. After the 5-second display, clear the Field Lab's output label. |
 | **6h - 7h** | **Art/Sound: Field Lab Assets**<br>1. Create the final 2.5D sprite asset for the **Field Lab** (a table or device with an input port and a screen).<br>2. Create sound effects for **"Resource Deposit"** (a click/thud) and **"Analysis Complete"** (a computer chime). |
 
 ### Task 3: Displaying Precise Data (4 Hours)
@@ -58,8 +54,3 @@ This sprint implements the **Field Lab**, the player's first major technological
 | **13h - 14h**| **Art/Sound: Polish**<br>1. Add a simple **VFX** for the Field Lab's analysis (e.g., a looping energy effect during the analysis screen time).<br>2. Add an ambient hum sound effect that plays when the Field Lab is placed and idle. |
 | **14h - 15h**| **Final Review and Testing**<br>1. Test the full cycle: Harvest $\rightarrow$ Interact $\rightarrow$ Inventory decreases $\rightarrow$ Points increase $\rightarrow$ Scanner UI updates.<br>2. Ensure that analyzing **Base Ore** does *not* unlock the data for **Catalyst Ore** (the system must be material-specific). |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 5 Complete: Field Lab Tier 1 Tech, Precise Data Analysis, and Knowledge Tracking." |
-
------
-
-**Status:** **Sprint 5 Complete.**
-*Ready to begin Sprint 6: Planetary Analysis & Deduction Input.*

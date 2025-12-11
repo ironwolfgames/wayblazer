@@ -1,16 +1,12 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 4: Interaction & Scanner UI (16 Hours)**.
-
------
-
 # 🖱️ Sprint 4: Interaction & Scanner UI (16 Hours)
 
 ## Summary
 
-In this sprint, we enhance the player's primary interaction tool—the **Hand Scanner**—and implement the structure for displaying detailed environmental information. We move the scanning feedback from a temporary debug message (Sprint 3) to a dedicated, persistent UI element, laying the groundwork for the more advanced analysis machines in future sprints.
+In this sprint, we enhance the player's primary interaction tool—the **Hand Scanner**—by refining the UI panel that was introduced in Sprint 3. We move from the simple overlay to a dedicated, comprehensive Scanner UI panel with sections for both Resource Data and Planetary Constants, laying the groundwork for the more advanced analysis machines in future sprints.
 
 ## 🎯 Goal
 
-The player can effectively use the Hand Scanner (Right Click) to display the **Vague Descriptions** of a resource and the **Planetary Constants** (though still hardcoded to the VS values) in a clean, dedicated UI panel.
+The player can effectively use the Hand Scanner (Right Click hold from Sprint 3) to display the **Vague Descriptions** of a resource and the **Planetary Constants** (though still hardcoded to the VS values) in a clean, dedicated UI panel with smooth animations.
 
 ## 💻 Tech Stack Focus
 
@@ -41,7 +37,7 @@ The player can effectively use the Hand Scanner (Right Click) to display the **V
 
 | Duration | Steps |
 | :--- | :--- |
-| **6h - 7h** | **Player Input Refinement**<br>1. In Godot's Input Map, ensure the **"RightClick"** action is defined.<br>2. In `PlayerController.cs`, modify the Right-Click logic (from Sprint 3) to be **hold-based** rather than **press-based**.<br>3. When `Input.IsActionPressed("RightClick")` is true, perform the scan and keep the panel visible. |
+| **6h - 7h** | **Player Input Refinement**<br>1. In Godot's Input Map, ensure the **"RightClick"** action is defined (already set up in Sprint 3).<br>2. In `PlayerController.cs`, refine the Right-Click hold logic from Sprint 3 to integrate with the new dedicated Scanner UI panel.<br>3. **Note:** The hold-to-scan mechanism is already implemented; this task focuses on connecting it to the enhanced UI. |
 | **7h - 8h** | **Scanner Activation Logic**<br>1. Create a public variable `ScannerUIManager _scannerUI;` and initialize it in `_Ready()`.<br>2. In the scanning section of `_PhysicsProcess(double delta)`:<br>    - If the player is holding Right-Click AND is overlapping a `ResourceNode`:<br>        - Call `_scannerUI.UpdateResourceData(overlappingResource);`<br>        - Call `_scannerUI.UpdatePlanetaryData(...)`<br>        - Call `_scannerUI.ShowScanPanel();`<br>    - ELSE IF the player is NOT holding Right-Click, call `_scannerUI.HideScanPanel();`. |
 | **8h - 9h** | **Scan Range Check**<br>1. Refine the logic to ensure the player must be within a short distance of the resource node (e.g., within 20 pixels) to scan it.<br>2. Provide clear visual feedback (e.g., a momentary green glow/highlight) on the resource node that is successfully being scanned. |
 
@@ -61,8 +57,3 @@ The player can effectively use the Hand Scanner (Right Click) to display the **V
 | **13h - 14h**| **Y-Sort and Z-Ordering Check**<br>1. Place a resource node near the player's collision shape.<br>2. Verify that the `ScannerUI` panel (a `CanvasLayer`) is drawn **above** the game world, player, and all sprites. The UI should never be clipped by the game world geometry. |
 | **14h - 15h**| **Final Code Review and Cleanup**<br>1. Check for any unnecessary `GD.Print()` calls used during debugging.<br>2. Ensure the C\# code adheres to naming conventions (PascalCase for methods, camelCase for local variables). |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 4 Complete: Dedicated Scanner UI, Hold-to-Scan, and Planetary Data Display." |
-
------
-
-**Status:** **Sprint 4 Complete.**
-*Ready to begin Sprint 5: Field Lab & Analysis Logic.*

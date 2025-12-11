@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 11: Simulation Core & Win State (16 Hours)**. This sprint introduces the final Tier 3 technology and the system that confirms the entire deduction and engineering process, leading to the Vertical Slice's win condition.
-
------
-
 # 🤖 Sprint 11: Simulation Core & Win State (16 Hours)
 
 ## Summary
@@ -37,7 +33,7 @@ This sprint implements the **Simulation Core**, the player's final piece of tech
 | Duration | Steps |
 | :--- | :--- |
 | **3h - 4h** | **Simulation Formula Check**<br>1. In `SimulationManager.cs`, create a method `RunChecks()`.<br>2. **Required Strength:** Get the required strength: `float requiredS = KnowledgeManager.GetCalculatedPortalStrengthRequirement();`<br>3. **Actual Strength:** Get the strength of the submitted material (e.g., from a property stored in `PortalManager.cs` after submission).<br>4. **Primary Test:** `bool strengthPass = actualS >= requiredS - 0.01f;` (Use a small tolerance for floating point comparisons). |
-| **4h - 5h** | **Secondary (Placeholder) Test**<br>1. For completeness, implement a second check based on another constant (e.g., Corrosive Index vs. Material Resistance).<br>2. `float requiredR = GameManager.WorldConstants.CorrosiveIndex * 1.5f;` (The deduction formula).<br>3. `bool resistancePass = actualR >= requiredR - 0.01f;`<br>4. **Overall Result:** `bool finalPass = strengthPass && resistancePass;` |
+| **4h - 5h** | **Secondary Check (Simplified for VS)**<br>1. For a complete deduction puzzle, implement a second check based on another constant (e.g., Corrosive Index vs. Material Resistance).<br>2. `float requiredR = GameManager.WorldConstants.CorrosiveIndex * 1.5f;` (The deduction formula).<br>3. `bool resistancePass = actualR >= requiredR - 0.01f;`<br>4. **Overall Result:** `bool finalPass = strengthPass && resistancePass;`<br>5. **Note on Third Property:** The GDD mentions Toughness/Tectonics as a potential third check. For VS simplicity, we use only two properties (Strength and Resistance). A third check could be added if time permits, but is not critical for demonstrating the deduction mechanics. |
 | **5h - 6h** | **Simulation Time and Result**<br>1. In `StartSimulation()`, set `IsSimulating = true` and start a timer (e.g., 4.0 seconds).<br>2. When the timer finishes, call `RunChecks()`. Set `LastSimPassed = finalPass`. Display the results via the UI (see Task 3). |
 | **6h - 7h** | **Art/Sound: Core Assets**<br>1. Create the final 2.5D sprite asset for the **Simulation Core** (needs a clear visual state for "idle" and "running simulation").<br>2. Create sound effects for **"Simulation Start"** (a dramatic power-up tone) and a looping **"Simulation Process"** sound (fast, frantic computer noise). |
 
@@ -59,8 +55,3 @@ This sprint implements the **Simulation Core**, the player's final piece of tech
 | **13h - 14h**| **Activation and Transition**<br>1. In `PlayerController.cs`, if the player presses "ActivatePortal" while near the successful Foundation:<br>    - Play a final, powerful **Portal Activation Sound** (a deep whoosh/energy surge).<br>    - Use `GetTree().ChangeSceneToFile("res://WinScene.tscn")` to transition the player out of the game world. |
 | **14h - 15h**| **Full Cycle Final Test**<br>1. Play the game from start: Deduced requirements $\rightarrow$ Gathered and refined $\rightarrow$ Built Foundation (Sprint 10 pass) $\rightarrow$ Start Simulation.<br>2. Verify the simulation passes, the Report UI is correct, and the "Activate Portal" prompt appears.<br>3. Press F and confirm the transition to the **Win Scene**. |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 11 Complete: Simulation Core Tier 3 Tech, Full Deduction Verification, and VS Win State Implemented." |
-
------
-
-**Status:** **Sprint 11 Complete.**
-*Ready to begin Sprint 12: Aesthetic Polish & Juiciness.*

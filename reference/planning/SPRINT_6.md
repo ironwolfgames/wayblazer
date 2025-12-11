@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 6: Planetary Analysis & Deduction Input (16 Hours)**. This sprint introduces the **Tier 2 Technology** needed to solve the main puzzle: accurately measuring the *Planetary Constants* that dictate the Portal's requirements.
-
------
-
 # 🔭 Sprint 6: Planetary Analysis & Deduction Input (16 Hours)
 
 ## Summary
@@ -36,7 +32,7 @@ This sprint implements the **Planetary Observatory** (our stand-in for the Gravi
 | Duration | Steps |
 | :--- | :--- |
 | **3h - 4h** | **Knowledge Manager - Constant Storage**<br>1. In `KnowledgeManager.cs` (or create a new specialized `WorldKnowledge.cs`), define a storage structure for **measured** constants:<br>    - `public Dictionary<string, bool> ConstantsMeasured = new();`<br>    - `public float MeasuredGravity = 0.0f;` (Initial guess is 0). |
-| **4h - 5h** | **The Calibration Process**<br>1. In `ObservatoryManager.cs`, implement the `StartCalibration()` logic:<br>    - Set `IsCalibrated = true;`<br>    - Access the true gravity value: `float trueGravity = GameManager.WorldConstants.GravimetricShear;`<br>    - Store the measured value: `KnowledgeManager.Instance.MeasuredGravity = trueGravity;`<br>    - Set the status: `KnowledgeManager.Instance.ConstantsMeasured["Gravity"] = true;` |
+| **4h - 5h** | **The Calibration Process with Timer**<br>1. In `ObservatoryManager.cs`, implement the `StartCalibration()` logic:<br>    - Set a state flag: `IsCalibrating = true`<br>    - Start a timer (e.g., 3-5 seconds) with visual/audio feedback for better pacing<br>    - Display a calibration animation (dish spinning, lights pulsing, etc.)<br>    - When timer completes, call `FinishCalibration()`<br>2. In `FinishCalibration()`:<br>    - Set `IsCalibrated = true;`<br>    - Access the true gravity value: `float trueGravity = GameManager.WorldConstants.GravimetricShear;`<br>    - Store the measured value: `KnowledgeManager.Instance.MeasuredGravity = trueGravity;`<br>    - Set the status: `KnowledgeManager.Instance.ConstantsMeasured["Gravity"] = true;`<br>3. **Note:** Adding a calibration timer instead of instant measurement improves game feel and pacing. |
 | **5h - 6h** | **Portal Requirement Calculation**<br>1. In the `KnowledgeManager` or `GameManager`, add a method `public float GetCalculatedPortalStrengthRequirement()`.<br>2. IF `KnowledgeManager.ConstantsMeasured["Gravity"]` is true, return: `MeasuredGravity * 2.5f;`<br>3. ELSE, return a high, punishing value (e.g., 99.0f) or simply the original hardcoded target (8.0f) to show the requirement is **unknown**. |
 | **6h - 7h** | **Art/Sound: Observatory Assets**<br>1. Create the final 2.5D sprite asset for the **Planetary Observatory** (e.g., a dish antenna or tripod sensor).<br>2. Create sound effects for **"Calibration Start"** (a whirring/charging sound) and **"Measurement Complete"** (a distinct computer report sound). |
 
@@ -58,8 +54,3 @@ This sprint implements the **Planetary Observatory** (our stand-in for the Gravi
 | **13h - 14h**| **Refining Tech Point Display**<br>1. Update the HUD to show the cost for the next Tier 2 tech (Observatory).<br>2. E.g., "Next Tech (Observatory): 25/25 Analysis Points." The cost should glow green when the player can afford it. |
 | **14h - 15h**| **Final Review and Testing**<br>1. Verify the full loop: Field Lab (Tier 1) grants points, points unlock Observatory (Tier 2), Observatory measures gravity, gravity updates the numerical requirements on the HUD.<br>2. Ensure the tech point deduction happens correctly and prevents building if the points are insufficient. |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 6 Complete: Planetary Observatory Tier 2 Tech, Gravity Measurement, and Deduction Input Implemented." |
-
------
-
-**Status:** **Sprint 6 Complete.**
-*Ready to begin Sprint 7: Basic Crafting & Inventory.*

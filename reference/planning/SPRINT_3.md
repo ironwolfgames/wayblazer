@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 3: Resource Engine & ProcGen V1 (16 Hours)**.
-
------
-
 # ⛏️ Sprint 3: Resource Engine & ProcGen V1 (16 Hours)
 
 ## Summary
@@ -33,8 +29,8 @@ The player can successfully land, harvest one type of wood and two types of ore,
 
 | Duration | Steps |
 | :--- | :--- |
-| **3h - 4h** | **InventoryManager Class**<br>1. Create a new C\# class `InventoryManager.cs`. Make it a singleton (like `GameManager`).<br>2. Define the storage dictionary: `public Dictionary<string, int> ResourceCounts = new();` (key is resource name, value is count).<br>3. Implement `public event Action OnInventoryUpdated;` for UI updates. |
-| **4h - 5h** | **AddItem and RemoveItem Methods**<br>1. Implement `public void AddItem(string resourceName, int amount = 1)`:<br>    - Check if `resourceName` exists; if not, add it with the amount.<br>    - If it exists, increment the count.<br>    - Call `OnInventoryUpdated?.Invoke();` at the end.<br>2. Implement `public bool TryRemoveItem(string resourceName, int amount)`: Checks count, decrements, and returns `false` if not enough. |
+| **3h - 4h** | **InventoryManager Class**<br>1. Create a new C\# class `InventoryManager.cs`. Make it a singleton (like `GameManager`).<br>2. Define the storage dictionary: `public Dictionary<string, int> ResourceCounts = new();` (key is resource name, value is count).<br>3. Define inventory capacity: `public const int MaxInventorySlots = 999;` (effectively unlimited for VS, but structure is in place for future limits).<br>4. Implement `public event Action OnInventoryUpdated;` for UI updates. |
+| **4h - 5h** | **AddItem and RemoveItem Methods**<br>1. Implement `public void AddItem(string resourceName, int amount = 1)`:<br>    - Check total item count. If adding would exceed capacity, display a "Inventory Full" message and return early.<br>    - Check if `resourceName` exists; if not, add it with the amount.<br>    - If it exists, increment the count.<br>    - Call `OnInventoryUpdated?.Invoke();` at the end.<br>2. Implement `public bool TryRemoveItem(string resourceName, int amount)`: Checks count, decrements, and returns `false` if not enough. |
 | **5h - 6h** | **Player Harvest Integration**<br>1. In `PlayerController.cs`, modify the Left-Click/Harvest logic (from Sprint 2).<br>2. When a `ResourceNode` is clicked and destroyed, call: `InventoryManager.Instance.AddItem(resourceNode.ResourceData.Name, 1);`<br>3. Verify in the Godot debug console that the dictionary in `InventoryManager` correctly updates. |
 
 ### Task 3: Basic HUD and Inventory UI (4 Hours)
@@ -54,15 +50,17 @@ The player can successfully land, harvest one type of wood and two types of ore,
 | **11h - 12h**| **Hand Scanner UI Feedback**<br>1. Create a small overlay UI panel (e.g., top-center) that will only show when the player is scanning.<br>2. When a node is scanned, call `resourceNode.ResourceData.Properties[Strength].VagueDescription;` (e.g., "High Integrity").<br>3. Display the **Vague Description** and **Name** of the resource on the overlay panel for 2 seconds, then hide it. |
 | **12h - 13h**| **Vague Deduction Test**<br>1. Run the game and scan the Base Ore (Strength $\approx 2.0$, shows "Low Integrity").<br>2. Scan the Catalyst Ore (Strength $\approx 4.0$, shows "Medium Integrity").<br>3. This confirms the initial deduction loop: *Player observes vague properties and knows "Low" isn't enough for the required "\>8.0".* |
 
-### Task 5: Aesthetic and Review (3 Hours)
+### Task 5: Save/Load System (3 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
-| **13h - 14h**| **Art/Sound: Harvesting FX**<br>1. Create a simple **"mining" sound effect** (e.g., a metallic impact) to play when the Left-Click/Harvest action is successful.<br>2. Create a simple **VFX** (e.g., small dust particles) to spawn and disappear where the resource node was harvested.<br>3. Create a short, subtle **"scan successful" sound** for the Hand Scanner action. |
-| **14h - 15h**| **Code Review and Tuning**<br>1. Review the C\# singleton implementations to ensure no memory leaks or improper initialization order.<br>2. Tune the player's harvesting animation speed and the time it takes to destroy a resource node to feel satisfying (e.g., a 0.5-second hold before the resource is harvested). |
-| **15h - 16h**| **Final Playtest and Commit**<br>1. Play the entire loop: Land $\rightarrow$ Scan (get vague data) $\rightarrow$ Harvest Wood $\rightarrow$ Harvest both Ores $\rightarrow$ Check Inventory and HUD.<br>2. Confirm the hardcoded portal target is visible.<br>3. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 3 Complete: Resource Engine, Inventory, and Hand Scanner Deduction." |
+| **13h - 14h**| **Save System Design**<br>1. Create a new C\# class `SaveManager.cs` as a singleton.<br>2. Define a save data structure: `public class SaveData` with fields for:<br>    - Player position (`Vector2`)<br>    - Inventory contents (`Dictionary<string, int>`)<br>    - Tech points and unlocked nodes (`Dictionary<string, int>`, `HashSet<string>`)<br>    - World seed (for regenerating the same world) |
+| **14h - 15h**| **Save and Load Methods**<br>1. Implement `public void SaveGame(string filePath)`:<br>    - Collect data from GameManager, InventoryManager, and PlayerController.<br>    - Serialize to JSON using `System.Text.Json` or Godot's built-in serialization.<br>    - Write to file in user data directory.<br>2. Implement `public void LoadGame(string filePath)`:<br>    - Read file, deserialize, and restore game state. |
+| **15h - 16h**| **Integration and Testing**<br>1. Add save/load hooks: Save on quit, load on start if save file exists.<br>2. Add a simple keybind (e.g., F5 to quick save, F9 to quick load) for testing.<br>3. Test: Harvest resources, save, restart game, load, verify inventory persists.<br>4. **Note:** This basic system prevents having to replay from start during development and testing. |
 
------
+### Task 6: Aesthetic and Review (2 Hours)
 
-**Status:** **Sprint 3 Complete.**
-*Ready to begin Sprint 4: Interaction & Scanner UI.*
+| Duration | Steps |
+| :--- | :--- |
+| **16h - 17h**| **Art/Sound: Harvesting FX**<br>1. Create a simple **"mining" sound effect** (e.g., a metallic impact) to play when the Left-Click/Harvest action is successful.<br>2. Create a simple **VFX** (e.g., small dust particles) to spawn and disappear where the resource node was harvested.<br>3. Create a short, subtle **"scan successful" sound** for the Hand Scanner action (plays when right-click is held on a valid target). |
+| **17h - 18h**| **Final Playtest and Commit**<br>1. Play the entire loop: Land → Scan (get vague data) → Harvest Wood → Harvest both Ores → Check Inventory and HUD.<br>2. Test save/load functionality with a partial playthrough.<br>3. Confirm the hardcoded portal target is visible.<br>4. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 3 Complete: Resource Engine, Inventory, Hand Scanner, and Save System." |

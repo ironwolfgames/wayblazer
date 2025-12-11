@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 9: ProcGen Tech Tree V2 & Unlocks (16 Hours)**. This sprint formalizes the technology progression by implementing a dedicated **Research UI** and the logic for spending accumulated **Knowledge/Tech Points** to unlock new abilities and machines, fulfilling a key design pillar.
-
------
-
 # 🎓 Sprint 9: ProcGen Tech Tree V2 & Unlocks (16 Hours)
 
 ## Summary
@@ -38,7 +34,7 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 | Duration | Steps |
 | :--- | :--- |
 | **4h - 5h** | **TechNode Data Class**<br>1. Create a C\# class `TechNode.cs` (or struct) to hold the definition of one unlockable item.<br>2. Fields needed:<br>    - `public string ID;` (e.g., "Unlock\_GasInjector")<br>    - `public string DisplayName;`<br>    - `public Dictionary<string, int> Costs;` (e.g., {"Analysis", 10}, {"Smelting", 5})<br>    - `public string PrerequisiteID;` (ID of the node that must be unlocked first) |
-| **5h - 6h** | **VS Tech Tree Definition**<br>1. Create a static C\# class `TechTreeData.cs` to hold the entire VS structure (list of `TechNode` objects).<br>2. Define the four core VS nodes:<br>    - **Node 1: Base Analysis V2:** ID: "Unlock\_PreciseAnalysis" (Cost: 15 Analysis). **Effect:** Allows Field Lab to show precise data (currently unlocked by default in S5).<br>    - **Node 2: Planetary Survey:** ID: "Unlock\_Observatory" (Cost: 25 Analysis, Prereq: N/A).<br>    - **Node 3: Advanced Compositing:** ID: "Unlock\_GasInjector" (Cost: 10 Compositing, 10 Smelting).<br>    - **Node 4: Portal Construction:** ID: "Unlock\_PortalBuild" (Cost: 50 Total Points, Prereq: "Unlock\_GasInjector"). |
+| **5h - 6h** | **VS Tech Tree Definition**<br>1. Create a static C\# class `TechTreeData.cs` to hold the entire VS structure (list of `TechNode` objects).<br>2. Define the core VS nodes (noting Tier 1 vs Tier 2+):<br>    - **Node 1: Gas Siphon Tool:** ID: "Unlock\_GasSiphon" (Cost: 50 Analysis). **Effect:** Allows harvesting Catalyst Ore (implemented in Sprint 8).<br>    - **Node 2: Planetary Survey:** ID: "Unlock\_Observatory" (Cost: 25 Analysis, Prereq: N/A).<br>    - **Node 3: Advanced Compositing:** ID: "Unlock\_GasInjector" (Cost: 10 Compositing, 10 Smelting).<br>    - **Node 4: Portal Construction:** ID: "Unlock\_PortalBuild" (Cost: 50 Total Points, Prereq: "Unlock\_GasInjector").<br>3. **Note on Tier 1 Tech:** The Field Lab and Basic Furnace are freely available (Tier 1 tech requires no research unlock). Only Tier 2+ machines require research as defined above. |
 | **6h - 7h** | **Knowledge Manager Integration**<br>1. In `KnowledgeManager.cs`, add a new field: `public HashSet<string> UnlockedNodes = new();`<br>2. Add a method `public bool IsNodeUnlocked(string id)`. |
 
 ### Task 3: Research Logic and Prerequisites (5 Hours)
@@ -59,8 +55,3 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 | **13h - 14h**| **System Integration Test**<br>1. Run the game. Try to place the **Observatory** and **Gas Injector** (should fail/block).<br>2. Open the Research UI (Tab key). Confirm the point totals are correct and the nodes are locked.<br>3. Farm enough points (using Field Lab, Furnace, Injector).<br>4. Unlock "Planetary Survey" (points decrease, button changes to "UNLOCKED").<br>5. Confirm the Observatory can now be built/activated. |
 | **14h - 15h**| **Final Review and Cleanup**<br>1. Ensure all `TechNodeUI` instances correctly refresh their state when a node is unlocked (since unlocking one might meet the prereq for another).<br>2. Check for potential recursive calls or infinite loops in the prerequisite checks. |
 | **15h - 16h**| **Commit Code**<br>1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 9 Complete: Functional ProcGen Tech Tree UI, Cost/Prerequisite Gating, and Machine Unlocks." |
-
------
-
-**Status:** **Sprint 9 Complete.**
-*Ready to begin Sprint 10: Portal Construction & UI.*

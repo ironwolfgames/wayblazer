@@ -1,7 +1,3 @@
-This detailed breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 1: Project Setup & Data Core (16 Hours)**.
-
------
-
 # ⚙️ Sprint 1: Project Setup & Data Core (16 Hours)
 
 ## Summary
@@ -34,7 +30,7 @@ This class defines a single measurable quality (e.g., "Strength") and its value.
 
 | Duration | Steps |
 | :--- | :--- |
-| **2h - 3h** | **Create Enumerator and Base Class**<br>1. In the `Scripts` folder, create `Enums.cs`. Define `enum ResourcePropertyType { Strength, Resistance, Toughness, Conductivity, Reactivity }`.<br>2. Create `ResourceProperty.cs`. Define a C\# `struct` named `ResourceProperty` (use `struct` for performance and value semantics). |
+| **2h - 3h** | **Create Enumerator and Base Class**<br>1. In the `Scripts` folder, create `Enums.cs`. Define `enum ResourcePropertyType { Strength, Resistance, Toughness, Conductivity, Reactivity }`.<br>2. Create `ResourceProperty.cs`. Define a C\# `struct` named `ResourceProperty`. *(Note: Consider using `class` instead if the struct becomes large with the VagueDescription string. For VS simplicity, struct is acceptable.)* |
 | **3h - 4h** | **Define Fields and Helper Methods**<br>1. Add the following fields to `ResourceProperty`:<br>    - `public ResourcePropertyType Type;`<br>    - `public float Value;`<br>    - `public string VagueDescription;` (e.g., "High Integrity")<br>2. Implement a constructor `public ResourceProperty(ResourcePropertyType type, float value)` that sets `Type` and `Value`.<br>3. Implement a private method `SetVagueDescription()` inside the constructor: `if (Value > 7.0f) { VagueDescription = "High"; } else if (Value < 3.0f) { VagueDescription = "Low"; } else { VagueDescription = "Medium"; }` |
 
 ### Task 3: Data Structure - Raw Resource (2 Hours)
@@ -53,7 +49,7 @@ This handles the combining of materials, the core of the engineering puzzle.
 | Duration | Steps |
 | :--- | :--- |
 | **6h - 7h** | **Composite Class Definition**<br>1. Create `CompositeMaterial.cs`. This class should inherit from `RawResource`.<br>2. Add tracking fields for its inputs:<br>    - `public RawResource PrimaryIngredient;`<br>    - `public RawResource ModifierIngredient;`<br>    - `public float StrengthModifier;` (to track the effect of gas/additive). |
-| **7h - 8h** | **Implement Calculation Logic**<br>1. Implement a method `public void CalculateProperties()`.<br>2. **VS Logic:** The Composite's final Strength will be the sum of its ingredients' strength, plus a multiplier from a gas.<br>   - `float baseStrength = PrimaryIngredient.Properties[Strength].Value + ModifierIngredient.Properties[Strength].Value;`<br>   - `float finalStrength = baseStrength * StrengthModifier;`<br>3. Set the Composite's Strength property using this calculated value. |
+| **7h - 8h** | **Implement Calculation Logic**<br>1. Implement a method `public void CalculateProperties()`.<br>2. **VS Logic:** The Composite's final Strength will be the sum of its ingredients' strength, plus a multiplier from a gas.<br>   - `float baseStrength = PrimaryIngredient.Properties[Strength].Value + ModifierIngredient.Properties[Strength].Value;`<br>   - `float finalStrength = baseStrength * StrengthModifier;`<br>3. Set the Composite's Strength property using this calculated value.<br>4. **IMPORTANT:** Pre-calculate exact values needed for VS to ensure Base Metal (Strength ~4.2) + Catalyst (Strength ~4.0) = 8.2+ when combined, meeting the Portal requirement of 8.0. Document these hardcoded values for use in Sprints 7-8. |
 
 ### Task 5: Data Structure - Planetary Constants (2 Hours)
 
@@ -82,17 +78,11 @@ This defines the ultimate goal and the mathematical deduction.
 | **12h - 13h**| **Portal Requirement Class**<br>1. Create `PortalRequirement.cs`. Define a C\# class `PortalRequirement`.<br>2. Add a dictionary to store the requirements: `public Dictionary<ResourcePropertyType, float> RequiredStats = new();`<br>3. Add fields to store the World Constants (for reference): `public PlanetaryConstants WorldContext;` |
 | **13h - 14h**| **Deduction Formula Implementation**<br>1. Implement `public void SetRequirements(PlanetaryConstants constants)`:<br>2. **VS Logic:** Implement the primary deduction formula from the GDD:<br>    - **Foundation Strength:** `RequiredStats[Strength] = constants.GravimetricShear * 2.5f;` (Target: 8.0)<br>    - **Gate Resistance:** `RequiredStats[Resistance] = constants.CorrosiveIndex * 1.5f;` (Target: 3.0)<br>3. This ensures the requirements are generated *from* the world properties. |
 
-### Task 8: Simple Unit Test and Review (2 Hours)
+### Task 8: Simple Unit Test and Review (1 Hour)
 
-Verify the core deduction math works outside of the Godot environment.
+Verify the core deduction math works using Godot's built-in testing capabilities.
 
 | Duration | Steps |
 | :--- | :--- |
-| **14h - 15h**| **Unit Test Project (C\#/.NET)**<br>1. Create a separate C\# Console Application project in the solution (e.g., `Wayblazer.Tests`).<br>2. Reference the main Godot C\# assembly (`Wayblazer`).<br>3. Write a single function `TestPortalDeductionMath()`: |
-| | a. Instantiate `PlanetaryConstants` and call `GenerateWorld()`.<br>b. Instantiate `PortalRequirement` and call `SetRequirements()`.<br>c. Instantiate a `CompositeMaterial` and manually set its properties to a known "passing" value (e.g., Strength 9.0) and a "failing" value (e.g., Strength 7.0).<br>d. Use a simple `if` check (`if (composite.Properties[Strength].Value > required.RequiredStats[Strength])`) to confirm the pass/fail logic is mathematically correct. |
-| **15h - 16h**| **Code Review and Cleanup**<br>1. Review all C\# code for consistent naming conventions and commenting.<br>2. Delete the temporary Console Test project if it's no longer needed, or commit it as a verification tool.<br>3. **Commit Code:** Commit all changes to the Version Control System (VCS) with the message: "Sprint 1 Complete: Initial Data Core Architecture." |
-
------
-
-**Status:** **Sprint 1 Complete.**
-*Ready to begin Sprint 2: Grid, Player Movement & Voxel Data.*
+| **14h - 15h**| **In-Game Debug Testing**<br>1. Instead of creating a separate console project, use Godot's built-in GDScript testing or simple C\# debug assertions.<br>2. Create a test method in `GameManager.cs` called `DebugTestPortalMath()` that runs on startup in debug mode.<br>3. Test the portal deduction math:<br>    - Instantiate `PlanetaryConstants` and call `GenerateWorld(1)`.<br>    - Instantiate `PortalRequirement` and call `SetRequirements()`.<br>    - Create test composite materials with known "passing" (Strength 8.5) and "failing" (Strength 7.0) values.<br>    - Use `GD.Print()` or `Debug.Assert()` to verify pass/fail logic is correct.<br>4. This approach is simpler and keeps all testing within the Godot environment. |
+| **15h - 16h**| **Code Review and Cleanup**<br>1. Review all C\# code for consistent naming conventions and commenting.<br>2. Ensure all VS hardcoded values are documented (Base Ore: Strength 2.1, Catalyst Ore: Strength 4.0, etc.).<br>3. **Commit Code:** Commit all changes to the Version Control System (VCS) with the message: "Sprint 1 Complete: Initial Data Core Architecture." |

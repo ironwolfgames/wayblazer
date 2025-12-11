@@ -1,7 +1,3 @@
-This breakdown is formatted as a GitHub Issue, providing a junior developer with clear, tutorial-style instructions to complete **Sprint 12: Aesthetic Polish & Juiciness (16 Hours)**. This final sprint elevates the Vertical Slice from a functional prototype to a polished, professional demo, ensuring the core deduction and engineering loop *feels* impactful and satisfying.
-
------
-
 # ✨ Sprint 💖 12: Aesthetic Polish & Juiciness (16 Hours)
 
 ## Summary
@@ -44,23 +40,18 @@ This final sprint is dedicated to polish. We will integrate final art, audio, mu
 
 | Duration | Steps |
 | :--- | :--- |
-| **6h - 7h** | **Screen Shake for Impact**<br>1. In `PlayerController.cs` (or a dedicated `CameraShake.cs` script), implement a function `ShakeCamera(float duration, float magnitude)`. This uses `Camera2D.Offset` to apply a random, high-frequency movement.<br>2. Apply a small shake (e.g., 0.1s, mag 3) when **Smelting/Compositing** finishes.<br>3. Apply a medium shake (e.g., 0.3s, mag 5) on **Simulation SUCCESS/FAIL** to emphasize the result. |
+| **6h - 7h** | **Screen Shake for Impact (Subtle)**<br>1. In `PlayerController.cs` (or a dedicated `CameraShake.cs` script), implement a function `ShakeCamera(float duration, float magnitude)`. This uses `Camera2D.Offset` to apply a random, high-frequency movement.<br>2. Apply a **subtle** shake (e.g., 0.1s, mag 1-2) when **Smelting/Compositing** finishes. *(Note: Keep it subtle to avoid annoyance during batch production.)*<br>3. Apply a medium shake (e.g., 0.3s, mag 5) on **Simulation SUCCESS/FAIL** to emphasize the result.<br>4. **Optional:** Consider making shake intensity a setting if time permits. |
 | **7h - 8h** | **Particle Effects (VFX)**<br>1. Create and integrate final particle systems for key events:<br>    - **Resource Collection:** Small, bright particles that fly from the resource node to the player's position on harvest.<br>    - **Smelting:** Plumes of smoke/heat that puff out when the Furnace timer resets. |
 | **8h - 9h** | **UI Feedback & Responsiveness**<br>1. Implement simple color transitions/flashes for successful actions:<br>    - When an item is added to the inventory, the corresponding inventory label should briefly flash **Green**.<br>    - When a research node is unlocked, the **Tech Points** label that paid for it should briefly flash **Red** (to show points spent). |
 | **9h - 10h**| **Machine Interaction Prompts**<br>1. Refine all interaction prompts (`[E] Deposit Ore`, `[F] Activate Portal`) to use a clean font, have a small background panel, and fade in/out smoothly when the player enters/exits the machine's interaction range. |
 
-### Task 4: Win State Polish and Final Review (6 Hours)
+### Task 4: Tutorial, Bug Fixing & Final Review (6 Hours)
 
 | Duration | Steps |
 | :--- | :--- |
-| **10h - 11h**| **Portal Activation Sequence**<br>1. Enhance the `Portal Activation` transition (from Sprint 11):<br>    - When "Activate Portal" is pressed, the screen should immediately fade to white (using a `ColorRect` and `AnimationPlayer`).<br>    - Play the final, powerful sound effect (energy surge).<br>2. This provides a dramatic climax before the `WinScene`. |
-| **11h - 12h**| **Simulation Report Readability**<br>1. Review the `SimulationReportUI.tscn` (from Sprint 11). Ensure the **Red/Green** color coding is highly visible and the font size for the **FINAL STATUS** is large and commanding. |
-| **12h - 13h**| **VS Demo Walkthrough Tuning**<br>1. Conduct a full, timed walkthrough of the entire Vertical Slice (Start $\rightarrow$ Gather $\rightarrow$ Analyze $\rightarrow$ Engineer $\rightarrow$ Simulate $\rightarrow$ Win).<br>2. Adjust game pacing (e.g., harvest speeds, smelt timers, point costs) to ensure the demo takes a suitable duration (e.g., 10-15 minutes of continuous play). |
-| **13h - 14h**| **Performance Check**<br>1. Run the profiler in Godot. Ensure no major performance bottlenecks exist, especially with particle systems or complex UI updates. Optimize any identified slow spots. |
-| **14h - 15h**| **Final Code and Comment Review**<br>1. Ensure all temporary debug code, placeholder logic (like the simplified Gas Siphon), and `GD.Print` calls are removed or commented out.<br>2. Review all C\# scripts one last time for clarity and consistency. |
-| **15h - 16h**| **Final Commit**<br>1. **Tag Repository:** Create a final Git tag (e.g., `VS_1.0_Final`).<br>2. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 12 Complete: Aesthetic Polish, Juiciness, Final Audio/Art Integration, and Vertical Slice Finalized." |
-
------
-
-**Status:** **Sprint 12 Complete. Vertical Slice Finalized.**
-*The Wayblazer Vertical Slice is now complete and ready for demonstration.*
+| **10h - 11h**| **Basic Tutorial Tooltips**<br>1. Add contextual tooltips/hints for first-time interactions:<br>    - When player first approaches a resource node: "Hold Right-Click to scan, Left-Click to harvest"<br>    - When player first approaches Field Lab: "Deposit resources here to analyze their exact properties"<br>    - When player first opens Research UI: "Spend Tech Points to unlock new machines and tools"<br>2. Use simple pop-up labels that appear once and can be dismissed. |
+| **11h - 12h**| **Portal Activation Sequence**<br>1. Enhance the `Portal Activation` transition (from Sprint 11):<br>    - When "Activate Portal" is pressed, the screen should immediately fade to white (using a `ColorRect` and `AnimationPlayer`).<br>    - Play the final, powerful sound effect (energy surge).<br>2. This provides a dramatic climax before the `WinScene`. |
+| **12h - 13h**| **Bug Fixing Buffer**<br>1. Reserve time for fixing bugs discovered during final testing.<br>2. Common areas to check: UI state consistency, machine state machines (prevent double-activation), inventory edge cases (full inventory, zero resources).<br>3. Test edge cases: What if player tries to submit wrong materials? What if they spam interact buttons? |
+| **13h - 14h**| **Optional: Pause Menu & Settings**<br>1. **If time permits:** Add a basic pause menu (ESC key) with Resume/Quit options.<br>2. **If time permits:** Add a simple settings menu with volume sliders for Music and SFX.<br>3. **Note:** These are nice-to-have for demo purposes but not critical for VS functionality. |
+| **14h - 15h**| **Final Code and Comment Review**<br>1. Ensure all temporary debug code and `GD.Print` calls are removed or commented out.<br>2. Review all C\# scripts one last time for clarity and consistency.<br>3. Verify all hardcoded VS values are documented in `VSResourcePresets.cs` for reference. |
+| **15h - 16h**| **Final Commit**<br>1. **Tag Repository:** Create a final Git tag (e.g., `VS_1.0_Final`).<br>2. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 12 Complete: Tutorial Tooltips, Bug Fixes, Polish, and Vertical Slice Finalized." |
