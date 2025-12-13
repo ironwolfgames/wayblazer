@@ -34,15 +34,17 @@ A set of fully defined, functional C\# classes (not necessarily Godot nodes yet)
 
 #### Time Log
 
-**1: Project Setup and Godot Configuration:** 120 mins (Actual: 10 mins)
-**2: Data Structure - Resource Property:** 120 mins (Actual: 10 mins)
-**3: Data Structure - Raw Resource:** 120 mins (Actual: 10 mins)
-**4: Data Structure - Composite Material:** 120 mins (Actual: 15 mins)
-**5: Data Structure - Planetary Constants:** 120 mins (Actual: 5 mins)
-**6: Acquire Placeholder Tileset and Sprite Sheets:** 120 mins (Actual: 15 mins)
-**7: Data Structure - Portal Requirement:** 120 mins (Actual: 20 mins)
-**8: Simple Unit Test and Review:** 120 mins (Actual: 35 mins)
-**Total:** 16 hrs (Actual: 2 hrs)
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Project Setup and Godot Configuration | 120 mins | 10 mins |
+| 2: Data Structure - Resource Property | 120 mins | 10 mins |
+| 3: Data Structure - Raw Resource | 120 mins | 10 mins |
+| 4: Data Structure - Composite Material | 120 mins | 15 mins |
+| 5: Data Structure - Planetary Constants | 120 mins | 5 mins |
+| 6: Acquire Placeholder Tileset and Sprite Sheets | 120 mins | 15 mins |
+| 7: Data Structure - Portal Requirement | 120 mins | 20 mins |
+| 8: Simple Unit Test and Review | 120 mins | 35 mins |
+| Total | 16 hrs | 2 hrs |
 
 -----
 
@@ -209,12 +211,15 @@ A playable scene where the character can move around a basic, generated world co
 
 #### Time Log
 
-**1: Godot TileMap and Tileset Setup:** 180 mins (Actual: 20 mins)
-**2: World Generation and Rendering:** 180 mins (Actual: 20 mins)
-**3: Player Controller and Scene Setup:** 240 mins (Actual: -)
-**4: Resource Node Linking:** 180 mins (Actual: -)
-**5: Aesthetic & Review:** 180 mins (Actual: -)
-**Total:** 16 hrs (Actual: 40 mins)
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Godot TileMap and Tileset Setup | 180 mins | 20 mins |
+| 2: World Generation and Rendering | 180 mins | 20 mins |
+| 3: Player Controller and Scene Setup | 240 mins | |
+| 3.5: Camera Bounds and Playability | 60 mins | |
+| 4: Resource Node Linking | 180 mins | |
+| 5: Aesthetic & Review | 180 mins | |
+| Total | 16 hrs | 40 mins |
 
 -----
 
@@ -394,6 +399,38 @@ public partial class PlayerController : CharacterBody2D
 }
 ```
 
+#### Task 3.5: Camera Bounds and Playability (1 Hour)
+
+**Implementing Map Constraints (0h - 1h)**
+
+1.  Open `PlayerController.cs`.
+2.  Add a reference to the `TileMap` to determine world boundaries.
+3.  In `_Ready()`, find the `Camera2D` child node and set its limits based on the map size.
+
+<!-- end list -->
+
+```csharp
+public override void _Ready()
+{
+    // Find the camera node
+    Camera2D camera = GetNode<Camera2D>("Camera2D");
+
+    // Hardcoded world size for VS (64x64 tiles * 64px per tile)
+    // In a full implementation, you would get this dynamically from the TileMap
+    int worldPixelSize = 64 * 64;
+
+    // Set camera limits so the player can't see the "void"
+    camera.LimitLeft = 0;
+    camera.LimitTop = 0;
+    camera.LimitRight = worldPixelSize;
+    camera.LimitBottom = worldPixelSize;
+
+    GD.Print("Camera limits set to world bounds.");
+}
+```
+
+4.  **Test:** Run the game and walk to the edge of the map. The camera should stop moving when it hits the edge, keeping the black void off-screen.
+
 ### Task 4: Resource Node Linking (3 Hours)
 
 #### Resource Node Scene Creation (10h - 11h)
@@ -450,7 +487,8 @@ public partial class ResourceNode : Area2D
 }
 ```
 
-9. Build the project (F6) to ensure it compiles.
+9. Build the project (F6) to ensure it compiles.\
+
 #### Instantiate Resource Nodes During World Generation (11h - 12h)
 
 1. Open `WorldGenerator.cs` in your IDE.
@@ -654,13 +692,16 @@ The player can successfully land, harvest one type of wood and two types of ore,
 
 #### Time Log
 
-**1: Singleton and Resource Initialization:** 180 mins (Actual: -)
-**2: Inventory Manager Implementation:** 180 mins (Actual: -)
-**3: Basic HUD and Inventory UI:** 240 mins (Actual: -)
-**4: Hand Scanner and Vague Deduction:** 180 mins (Actual: -)
-**5: Save/Load System:** 180 mins (Actual: -)
-**6: Aesthetic & Review:** 120 mins (Actual: -)
-**Total:** 18 hrs (Actual: -)
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Singleton and Resource Initialization | 180 mins | |
+| 2: Inventory Manager Implementation | 180 mins | |
+| 3: Basic HUD and Inventory UI | 240 mins | |
+| 4: Hand Scanner and Vague Deduction | 180 mins | |
+| 5: Save/Load System | 180 mins | |
+| 6: Objective System | 120 mins | |
+| 7: Aesthetic & Review | 120 mins | |
+| Total | 20 hrs | |
 
 -----
 
@@ -1142,7 +1183,220 @@ if (Input.IsActionJustPressed("ui_home")) // F1 key
 2. Scan the Catalyst Ore (Strength $\approx 4.0$, shows "Medium Integrity").
 3. This confirms the initial deduction loop: *Player observes vague properties and knows "Low" isn't enough for the required "\>8.0".*
 
-### Task 5: Aesthetic and Review (3 Hours)
+#### Task 5: Save/Load System (3 Hours)
+
+**Create Save Data Structure (0h - 1h)**
+
+1.  Create a new script `SaveData.cs` in `Scripts`. This is a plain C\# class (not a Godot Node) that acts as a data container.
+2.  Define the fields you need to persist.
+
+<!-- end list -->
+
+```csharp
+using Godot;
+using System;
+using System.Collections.Generic;
+
+// Serializable container for game state
+public partial class SaveData : GodotObject
+{
+    // Inventory: Item Name -> Count
+    public Godot.Collections.Dictionary<string, int> Inventory { get; set; } = new();
+
+    // Knowledge: Tech Point Type -> Amount
+    public Godot.Collections.Dictionary<string, int> TechPoints { get; set; } = new();
+
+    // Unlocked Tech IDs
+    public Godot.Collections.Array<string> UnlockedTechs { get; set; } = new();
+
+    // World Seed (to regenerate the same planet)
+    public int WorldSeed { get; set; } = 1;
+}
+```
+
+**Implement Save Manager (1h - 2h)**
+
+1.  Create `SaveManager.cs` in `Scripts`. Inherit from `Node`.
+2.  Implement `SaveGame()` and `LoadGame()` using Godot's `FileAccess` and JSON serialization.
+
+<!-- end list -->
+
+```csharp
+using Godot;
+using System;
+
+public partial class SaveManager : Node
+{
+    public static SaveManager Instance { get; private set; }
+    private const string SavePath = "user://savegame.json";
+
+    public override void _EnterTree()
+    {
+        if (Instance == null) Instance = this;
+        else QueueFree();
+    }
+
+    public void SaveGame()
+    {
+        SaveData data = new SaveData();
+
+        // 1. Gather data from Singletons
+        // Note: You must cast C# Dictionaries to Godot.Collections.Dictionary if using Godot's JSON
+        // Or manually copy values. For VS simplicity:
+        foreach(var item in InventoryManager.Instance.ResourceCounts)
+        {
+            data.Inventory.Add(item.Key, item.Value);
+        }
+
+        // (Repeat for KnowledgeManager points...)
+
+        // 2. Serialize to JSON
+        string jsonString = Json.Stringify(data);
+
+        // 3. Write to file
+        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
+        file.StoreString(jsonString);
+        GD.Print("Game Saved to " + ProjectSettings.GlobalizePath(SavePath));
+    }
+
+    public void LoadGame()
+    {
+        if (!FileAccess.FileExists(SavePath))
+        {
+            GD.Print("No save file found.");
+            return;
+        }
+
+        using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Read);
+        string jsonString = file.GetAsText();
+
+        // Parse JSON
+        var json = new Json();
+        Error error = json.Parse(jsonString);
+        if (error != Error.Ok) return;
+
+        var dataDict = json.Data.AsGodotDictionary();
+
+        // Restore Inventory
+        var invData = dataDict["Inventory"].AsGodotDictionary<string, int>();
+        InventoryManager.Instance.ResourceCounts.Clear();
+        foreach(var item in invData)
+        {
+            InventoryManager.Instance.AddItem(item.Key, item.Value);
+        }
+
+        GD.Print("Game Loaded.");
+    }
+}
+```
+
+3.  **Register as Autoload:** Add `SaveManager.cs` to Project Settings \> Autoload.
+
+**Hook up Auto-Save (2h - 3h)**
+
+1.  In `GameManager.cs`, add the `_Notification` method to detect when the user quits.
+
+<!-- end list -->
+
+```csharp
+public override void _Notification(int what)
+{
+    if (what == NotificationWMCloseRequest)
+    {
+        SaveManager.Instance.SaveGame();
+        GetTree().Quit(); // Confirm quit
+    }
+}
+```
+
+2.  **Test:** Gather some resources. Close the window. Re-open. Call `SaveManager.Instance.LoadGame()` in `GameManager._Ready()` and verify your inventory is restored.
+
+#### Task 6: Objective System (2 Hours)
+
+**Objective Manager Setup (0h - 1h)**
+
+1.  Create `ObjectiveManager.cs` in `Scripts`.
+2.  Implement a simple tracker for the current goal.
+
+<!-- end list -->
+
+```csharp
+using Godot;
+using System;
+
+public partial class ObjectiveManager : Node
+{
+    public static ObjectiveManager Instance { get; private set; }
+
+    // UI Label reference
+    private Label _objectiveLabel;
+
+    // Current Goal State
+    public string CurrentObjectiveText { get; private set; } = "Land on Planet";
+
+    public override void _EnterTree()
+    {
+        if (Instance == null) Instance = this;
+        else QueueFree();
+    }
+
+    public void RegisterUI(Label label)
+    {
+        _objectiveLabel = label;
+        UpdateUI();
+    }
+
+    public void SetObjective(string text)
+    {
+        CurrentObjectiveText = text;
+        UpdateUI();
+
+        // Play a notification sound or animation here
+        GD.Print($"New Objective: {text}");
+    }
+
+    private void UpdateUI()
+    {
+        if (_objectiveLabel != null)
+        {
+            _objectiveLabel.Text = $"CURRENT OBJECTIVE:\n{CurrentObjectiveText}";
+        }
+    }
+}
+```
+
+3.  **Register as Autoload:** Add to Project Settings \> Autoload.
+
+**UI Integration (1h - 2h)**
+
+1.  Open `HUD.tscn`.
+2.  Add a `Label` node to the **Top-Left** corner. Name it `ObjectiveLabel`.
+3.  Add a script to the HUD root (or reuse `InventoryUI.cs` if attached to root):
+
+<!-- end list -->
+
+```csharp
+public override void _Ready()
+{
+    // ... existing code ...
+    Label objLabel = GetNode<Label>("ObjectiveLabel");
+    ObjectiveManager.Instance.RegisterUI(objLabel);
+
+    // Set initial tutorial objective
+    ObjectiveManager.Instance.SetObjective("Harvest 5 Soft Wood to calibrate sensors.");
+}
+```
+
+4.  **Hook Logic:** In `InventoryManager.cs`, inside `AddItem`:
+    ```csharp
+    // Simple tutorial check
+    if (resourceName == "Soft Wood" && ResourceCounts["Soft Wood"] >= 5)
+    {
+        ObjectiveManager.Instance.SetObjective("Locate and Scan Base Ore.");
+    }
+    ```
+
+### Task 7: Aesthetic and Review (3 Hours)
 
 #### Art/Sound: Harvesting FX (13h - 14h)
 
@@ -1178,16 +1432,95 @@ The player can effectively use the Hand Scanner (Right Click) to display the **V
 
 #### Time Log
 
-**1: Dedicated Scanner UI Panel:** 180 mins (Actual: -)
-**2: Scanner UI Manager Script:** 180 mins (Actual: -)
-**3: Player Controller Integration:** 180 mins (Actual: -)
-**4: UI Polish and Animations:** 180 mins (Actual: -)
-**5: Review and Testing:** 240 mins (Actual: -)
-**Total:** 16 hrs (Actual: -)
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 0: Game State & Input Management | 120 | |
+| 1: Dedicated Scanner UI Panel | 180 mins | |
+| 2: Scanner UI Manager Script | 180 mins | |
+| 3: Player Controller Integration | 180 mins | |
+| 4: UI Polish and Animations | 180 mins | |
+| 5: Review and Testing | 240 mins | |
+| Total | 18 hrs | |
 
 -----
 
 ## Task Breakdown (16 Hours)
+
+#### Task 0: Game State & Input Management (2 Hours)
+
+**GameStateManager Setup (0h - 1h)**
+
+1.  Create `GameStateManager.cs`. This handles whether the player can move or if the mouse is free for UI.
+
+<!-- end list -->
+
+```csharp
+using Godot;
+
+public partial class GameStateManager : Node
+{
+    public static GameStateManager Instance { get; private set; }
+
+    public enum GameState { Gameplay, UI_Focus, Cutscene }
+    public GameState CurrentState { get; private set; } = GameState.Gameplay;
+
+    public override void _EnterTree()
+    {
+        if (Instance == null) Instance = this;
+        else QueueFree();
+    }
+
+    public void SetState(GameState newState)
+    {
+        CurrentState = newState;
+
+        switch (newState)
+        {
+            case GameState.Gameplay:
+                // Lock mouse, enable player movement
+                Input.MouseMode = Input.MouseModeEnum.Captured;
+                GetTree().CallGroup("Player", "SetInputEnabled", true);
+                break;
+
+            case GameState.UI_Focus:
+                // Unlock mouse, disable player movement
+                Input.MouseMode = Input.MouseModeEnum.Visible;
+                GetTree().CallGroup("Player", "SetInputEnabled", false);
+                break;
+        }
+    }
+}
+```
+
+2.  **Register as Autoload.**
+
+**Player Controller Integration (1h - 2h)**
+
+1.  Open `PlayerController.cs`.
+2.  Add the `SetInputEnabled` method and modify `_PhysicsProcess`.
+
+<!-- end list -->
+
+```csharp
+private bool _inputEnabled = true;
+
+public void SetInputEnabled(bool enabled)
+{
+    _inputEnabled = enabled;
+    // Reset velocity so player doesn't "slide" if disabled while moving
+    if (!enabled) Velocity = Vector2.Zero;
+}
+
+public override void _PhysicsProcess(double delta)
+{
+    if (!_inputEnabled) return; // Stop processing movement if in UI mode
+
+    // ... existing movement code ...
+}
+```
+
+3.  **Add to Group:** In `PlayerController._Ready()`, add `AddToGroup("Player");`.
+4.  **Usage:** When you open the Scanner UI or Research UI in later tasks, call `GameStateManager.Instance.SetState(GameStateManager.GameState.UI_Focus)`. When closing, set back to `Gameplay`.
 
 ### Task 1: Dedicated Scanner UI Panel (3 Hours)
 
@@ -3051,7 +3384,8 @@ This final sprint is dedicated to polish. We will integrate final art, audio, mu
 | 1: Art Asset Integration | 180 |  |
 | 2: Audio & Music Integration | 180 | |
 | 3: Visual Juice and Feedback | 240 | |
-| 4: Tutorial, Bug Fixing & Final Review | 360 | |
+| 4: Build Configuration & Export | 60 | |
+| 5: Tutorial, Bug Fixing & Final Review | 360 | |
 | **Total** | **16 hrs** | **-** |
 
 -----
@@ -3131,7 +3465,29 @@ This final sprint is dedicated to polish. We will integrate final art, audio, mu
 
 1. Refine all interaction prompts (`[E] Deposit Ore`, `[F] Activate Portal`) to use a clean font, have a small background panel, and fade in/out smoothly when the player enters/exits the machine's interaction range.
 
-### Task 4: Win State Polish and Final Review (6 Hours)
+#### Task 4: Build Configuration & Export (1 Hour)
+
+**Project Settings Polish (0h - 0.5h)**
+
+1.  Go to **Project \> Project Settings**.
+2.  **Display \> Window:**
+      * **Viewport Width/Height:** Set to standard (e.g., 1920x1080 or 1280x720).
+      * **Mode:** Windowed or Exclusive Fullscreen.
+      * **Stretch \> Mode:** `canvas_items` (Crucial for pixel art/2D to scale correctly without blur).
+      * **Stretch \> Aspect:** `keep` (Adds black bars if ratio differs) or `expand`.
+3.  **Application \> Config:** Set the `Icon` to your final `icon.svg` or `.png`.
+
+**Export Templates (0.5h - 1h)**
+
+1.  Go to **Project \> Export**.
+2.  Click **Add...** and select **Windows Desktop**.
+3.  If explicit export templates are missing, click **Manage Export Templates** and download the ones matching your Godot version.
+4.  **Configuration:**
+      * **Embed PCK:** Check this to create a single `.exe` file (easier for sharing the Vertical Slice).
+5.  Click **Export Project**, create a `Builds` folder, and save as `Wayblazer_VS.exe`.
+6.  **Run the .exe** to verify the game runs outside the editor.
+
+### Task 5: Win State Polish and Final Review (6 Hours)
 
 #### Portal Activation Sequence (10h - 11h)
 
