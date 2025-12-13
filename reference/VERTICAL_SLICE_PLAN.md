@@ -138,6 +138,17 @@ A playable scene where the character can move around a basic, generated world co
   * **Godot Engine (C\# API):** `TileMap`, `CharacterBody2D`, and basic scene setup.
   * **C\# / .NET:** World generation logic and data linking.
 
+#### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Godot TileMap and Tileset Setup | 180 | 20 |
+| 2: World Generation and Rendering | 180 | 20 |
+| 3: Player Controller and Scene Setup | 240 | |
+| 4: Resource Node Linking | 180 | |
+| 5: Aesthetic & Review | 180 | |
+| **Total** | **16 hrs** | **40 mins** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -198,6 +209,18 @@ The player can successfully land, harvest one type of wood and two types of ore,
   * **Godot Engine (C\# API):** Singleton management, Input handling, UI integration.
   * **C\# / .NET:** Random number generation for resource properties, Inventory Management class.
 
+#### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Singleton and Resource Initialization | 180 | |
+| 2: Inventory Manager Implementation | 180 | |
+| 3: Basic HUD and Inventory UI | 240 | |
+| 4: Hand Scanner and Vague Deduction | 180 | |
+| 5: Save/Load System | 180 | |
+| 6: Aesthetic & Review | 120 | |
+| **Total** | **18 hrs** | **-** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -257,6 +280,17 @@ The player can effectively use the Hand Scanner (Right Click) to display the **V
 
   * **Godot Engine (C\# API):** UI design, AnimationPlayer for UI transitions, and input binding.
   * **C\# / .NET:** Data formatting for display, constant access.
+
+#### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Dedicated Scanner UI Panel | 180 | |
+| 2: Scanner UI Manager Script | 180 | |
+| 3: Player Controller Integration | 180 | |
+| 4: UI Polish and Animations | 180 | |
+| 5: Review and Testing | 240 | |
+| **Total** | **16 hrs** | **-** |
 
 -----
 
@@ -320,6 +354,16 @@ This sprint implements the **Field Lab**, the player's first major technological
   * **Godot Engine (C\# API):** Static/Global Machine interaction, State management (Resource Input/Output).
   * **C\# / .NET:** Data linking, Knowledge tracking (for future Tech Tree unlocks).
 
+#### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Field Lab Scene and Interaction | 180 | |
+| 2: Analysis Logic and Knowledge Tracking | 240 | |
+| 3: Displaying Precise Data | 240 | |
+| 4: UI/UX Feedback and Polish | 300 | |
+| **Total** | **16 hrs** | **-** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -376,6 +420,16 @@ This sprint implements the **Planetary Observatory** (our stand-in for the Gravi
 
   * **Godot Engine (C\# API):** Machine placement, Tier 2 Tech Point consumption.
   * **C\# / .NET:** Deduction math execution, data storage for measured constants.
+
+#### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Planetary Observatory Scene and Logic | 180 | |
+| 2: Implementing the Deduction Input  | 240 | |
+| 3: Displaying Precise Planetary Data | 240 | |
+| 4: UI/UX Feedback and Polish | 300 | |
+| **Total** | **16 hrs** | **-** |
 
 -----
 
@@ -434,6 +488,16 @@ This sprint focuses on the first stage of resource transformation: converting mi
   * **Godot Engine (C\# API):** Machine interaction, simple machine state management (Idle, Heating, Smelting).
   * **C\# / .NET:** Crafting logic, resource consumption, and property inheritance.
 
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Basic Smelting Furnace Scene and Interaction | 180 |  |
+| 2: Smelting Logic and State Management | 240 | |
+| 3: Inventory UI and Raw vs. Processed | 240 | |
+| 4: Player Progression and Testing | 300 | |
+| **Total** | **16 hrs** | **-** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -490,6 +554,16 @@ This sprint implements the **Gas Injector** machine. This machine is crucial for
 
   * **Godot Engine (C\# API):** New resource acquisition method, advanced machine input validation.
   * **C\# / .NET:** Property calculation for composite materials, Tech Point consumption/gain.
+
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Acquiring the Modifying Element | 180 |  |
+| 2: Gas Injector Scene and Interaction | 180 | |
+| 3: Compositing Logic | 240 | |
+| 4: UI/UX Feedback and Testing | 360 | |
+| **Total** | **16 hrs** | **-** |
 
 -----
 
@@ -549,6 +623,16 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
   * **Godot Engine (C\# API):** Pop-up window management, custom UI control structures, button logic.
   * **C\# / .NET:** Data structure for Tech Nodes, prerequisite checking.
 
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Research Station UI Scene Setup | 240 |  |
+| 2: Implementing the Tech Tree Data Structure | 180 | |
+| 3: Research Logic and Prerequisites | 240 | |
+| 4: Gating the Machines | 300 | |
+| **Total** | **16 hrs** | **-** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -606,6 +690,16 @@ This sprint implements the physical construction of the **Portal Foundation**. T
 
   * **Godot Engine (C\# API):** Placement system refinement (ghosting), dedicated modal UI.
   * **C\# / .NET:** Final verification of material properties against world requirements.
+
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Portal Foundation Scene and Construction UI | 240 |  |
+| 2: Material Submission Logic | 240 | |
+| 3: Property Verification | 240 | |
+| 4: Player Progression and Testing | 240 | |
+| **Total** | **16 hrs** | **-** |
 
 -----
 
@@ -665,6 +759,16 @@ This sprint implements the **Simulation Core**, the player's final piece of tech
   * **Godot Engine (C\# API):** Complex modal UI for detailed report, Win State scene transition.
   * **C\# / .NET:** Final deduction logic, floating point tolerance checks.
 
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Simulation Core Scene and Integration | 180 |  |
+| 2: Implementing the Simulation Logic | 240 | |
+| 3: Simulation Report UI | 240 | |
+| 4: Win State Implementation | 300 | |
+| **Total** | **16 hrs** | **-** |
+
 -----
 
 ## Task Breakdown (16 Hours)
@@ -722,6 +826,16 @@ This final sprint is dedicated to polish. We will integrate final art, audio, mu
 
   * **Godot Engine (C\# API):** `AnimationPlayer`, `AudioStreamPlayer`, `Camera2D` (for shake).
   * **Art/Sound:** Final integration of all developed assets.
+
+### Time Log
+
+| Task | Estimate (mins) | Actual (mins) |
+| --- | --- | --- |
+| 1: Art Asset Integration | 180 |  |
+| 2: Audio & Music Integration | 180 | |
+| 3: Visual Juice and Feedback | 240 | |
+| 4: Tutorial, Bug Fixing & Final Review | 360 | |
+| **Total** | **16 hrs** | **-** |
 
 -----
 
