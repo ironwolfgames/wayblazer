@@ -23,8 +23,8 @@ public partial class WorldGenerator : TileMapLayer
 		{
 			for (var y = 0; y < WORLD_SIZE; y++)
 			{
-				// Randomly assign an environment type (0-4 for now, can be expanded)
-				_worldData[x, y] = random.Next(0, 5);
+				// Randomly assign an environment type (0-1 for now, can be expanded)
+				_worldData[x, y] = random.Next(0, 2);
 			}
 		}
 
@@ -47,7 +47,7 @@ public partial class WorldGenerator : TileMapLayer
 
 				// SetCell parameters: layer, coords, source_id, atlas_coords
 				// Using source_id 0 and atlas coords based on tile type
-				_tileMapLayer.SetCell(new Vector2I(x, y), 0, new Vector2I(tileType, 0));
+				_tileMapLayer.SetCell(new Vector2I(x, y), tileType, new Vector2I(1, 1));
 			}
 		}
 

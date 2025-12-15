@@ -1,0 +1,71 @@
+[gd_scene load_steps=11 format=3 uid="uid://5krfvebi2375"]
+
+[ext_resource type="Texture2D" uid="uid://dfqqwytd2apmk" path="res://Assets/TinySwords/Terrain/Resources/Trees/Tree4.png" id="1_7uank"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6ykse"]
+atlas = ExtResource("1_7uank")
+region = Rect2(0, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qetrm"]
+atlas = ExtResource("1_7uank")
+region = Rect2(192, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_casv8"]
+atlas = ExtResource("1_7uank")
+region = Rect2(384, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fc1l0"]
+atlas = ExtResource("1_7uank")
+region = Rect2(576, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xjwsv"]
+atlas = ExtResource("1_7uank")
+region = Rect2(768, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a7djg"]
+atlas = ExtResource("1_7uank")
+region = Rect2(960, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8k2qn"]
+atlas = ExtResource("1_7uank")
+region = Rect2(1152, 0, 192, 192)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_e1wq7"]
+atlas = ExtResource("1_7uank")
+region = Rect2(1344, 0, 192, 192)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_n1j57"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6ykse")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qetrm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_casv8")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fc1l0")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xjwsv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a7djg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8k2qn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_e1wq7")
+}],
+"loop": true,
+"name": &"default",
+"speed": 16.0
+}]
+
+[node name="BirchTree" type="AnimatedSprite2D"]
+sprite_frames = SubResource("SpriteFrames_n1j57")
+frame_progress = 0.023781128
