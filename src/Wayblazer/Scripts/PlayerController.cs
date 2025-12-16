@@ -1,10 +1,9 @@
 using Godot;
-using System;
 
 public partial class PlayerController : CharacterBody2D
 {
-	// Movement speed in pixels per second
-	public const float Speed = 300.0f;
+	[Export]
+	public float Speed = 300.0f;
 
 	public override void _PhysicsProcess(double delta)
 	{
