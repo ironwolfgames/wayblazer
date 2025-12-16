@@ -1,6 +1,6 @@
 [gd_scene load_steps=11 format=3 uid="uid://cd3tthhrnbtrs"]
 
-[ext_resource type="Texture2D" uid="uid://wmr6187ie54o" path="res://Assets/TinySwords/Terrain/Resources/Trees/Tree2.png" id="1_3lwgm"]
+[ext_resource type="Texture2D" uid="uid://dr1728uyi13ct" path="res://Assets/TinySwords/Terrain/Resources/Wood/Trees/Tree2.png" id="1_3lwgm"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_u2qbr"]
 atlas = ExtResource("1_3lwgm")
@@ -68,4 +68,4 @@ animations = [{
 
 [node name="FirTree" type="AnimatedSprite2D"]
 sprite_frames = SubResource("SpriteFrames_5dx46")
-frame_progress = 0.45888793
+frame_progress = 0.22118916
