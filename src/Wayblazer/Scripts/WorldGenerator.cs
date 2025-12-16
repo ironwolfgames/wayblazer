@@ -54,7 +54,7 @@ public partial class WorldGenerator : TileMapLayer
 		GD.Print($"World rendered: {WORLD_SIZE}x{WORLD_SIZE} tiles");
 	}
 
-	private const int WORLD_SIZE = 50;
+	private const int WORLD_SIZE = 48;
 	private int[,] _worldData = new int[WORLD_SIZE, WORLD_SIZE];
 	private TileMapLayer? _tileMapLayer;
 }
