@@ -11,7 +11,7 @@ public partial class PlayerController : CharacterBody2D
 		var velocity = Velocity;
 
 		// Get the input direction and handle the movement/deceleration.
-		var direction = Input.GetVector("ui_left", "ui_right", "ui_up", "ui_down");
+		var direction = Input.GetVector("player_left", "player_right", "player_up", "player_down");
 		if (direction != Vector2.Zero)
 		{
 			velocity = direction * Speed;
