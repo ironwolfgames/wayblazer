@@ -1,13 +1,17 @@
 using System;
-using System.Collections.Generic;
+using Godot;
+using Godot.Collections;
 
 namespace Wayblazer;
 
-public class CompositeResource(string name, List<RawResource> inputs) : RawResource(name, CalculateProperties(inputs))
+[GlobalClass]
+public partial class CompositeResource(string name, Array<RawResource> inputs) : RawResource(name, ResourceKind.Composite, CalculateProperties(inputs))
 {
-	public List<RawResource> Inputs { get; private set; } = inputs;
+	public Array<RawResource> Inputs { get; private set; } = inputs;
 
-	private static Dictionary<ResourcePropertyType, ResourceProperty> CalculateProperties(List<RawResource> inputs)
+	public CompositeResource() : this("", new Array<RawResource>()) { }
+
+	private static Dictionary<ResourcePropertyType, ResourceProperty> CalculateProperties(Array<RawResource> inputs)
 	{
 		var combinedProperties = new Dictionary<ResourcePropertyType, ResourceProperty>();
 		foreach (var input in inputs)

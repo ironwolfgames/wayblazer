@@ -1,9 +1,19 @@
-using System.Collections.Generic;
+using Godot;
+using Godot.Collections;
 
 namespace Wayblazer;
 
-public class RawResource(string name, Dictionary<ResourcePropertyType, ResourceProperty> properties)
+[GlobalClass]
+public partial class RawResource(string name, ResourceKind resourceKind, Dictionary<ResourcePropertyType, ResourceProperty> properties) : Resource
 {
-	public string Name { get; private set; } = name;
-	public Dictionary<ResourcePropertyType, ResourceProperty> Properties { get; private set; } = properties;
+	[Export]
+	public string Name { get; set; } = name;
+
+	[Export]
+	public ResourceKind ResourceKind { get; set; } = resourceKind;
+
+	[Export]
+	public Dictionary<ResourcePropertyType, ResourceProperty> Properties { get; set; } = properties;
+
+	public RawResource() : this("", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>()) { }
 }

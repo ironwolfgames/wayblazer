@@ -1,0 +1,53 @@
+[gd_resource type="SpriteFrames" load_steps=8 format=3 uid="uid://diy1nojpegjf1"]
+
+[ext_resource type="Texture2D" uid="uid://kvyjd8i4rkli" path="res://Assets/TinySwords/Terrain/Resources/Gold/Gold Resource/Gold_Resource_Highlight.png" id="1_ukisf"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cm18w"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_54sdk"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(128, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_pt7fh"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(256, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_42wea"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(384, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_bfe6q"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(512, 0, 128, 128)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_5ttaa"]
+atlas = ExtResource("1_ukisf")
+region = Rect2(640, 0, 128, 128)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_cm18w")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_54sdk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_pt7fh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_42wea")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_bfe6q")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_5ttaa")
+}],
+"loop": true,
+"name": &"default",
+"speed": 12.0
+}]

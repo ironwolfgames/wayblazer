@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using Xunit;
+using Godot.Collections;
 
 namespace Wayblazer.Tests;
 
@@ -8,7 +7,7 @@ public class CompositeResourceTests
 	[Fact]
 	public void Constructor_CreatesCompositeResourceWithName()
 	{
-		var inputs = new List<RawResource>
+		var inputs = new Array<RawResource>
 		{
 			CreateTestRawResource("Iron", ResourcePropertyType.Strength, 5f),
 			CreateTestRawResource("Carbon", ResourcePropertyType.Toughness, 3f)
@@ -25,7 +24,7 @@ public class CompositeResourceTests
 	{
 		var iron = CreateTestRawResource("Iron", ResourcePropertyType.Strength, 5f);
 		var carbon = CreateTestRawResource("Carbon", ResourcePropertyType.Strength, 3f);
-		var inputs = new List<RawResource> { iron, carbon };
+		var inputs = new Array<RawResource> { iron, carbon };
 
 		var composite = new CompositeResource("Steel", inputs);
 
@@ -38,15 +37,15 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_ConductivityCombination_TakesMaximumWithBoost()
 	{
-		var copper = new RawResource("Copper", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var copper = new RawResource("Copper", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 10f) }
 		});
-		var silver = new RawResource("Silver", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var silver = new RawResource("Silver", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 8f) }
 		});
-		var inputs = new List<RawResource> { copper, silver };
+		var inputs = new Array<RawResource> { copper, silver };
 
 		var composite = new CompositeResource("Alloy", inputs);
 
@@ -57,15 +56,15 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_ReactivityCombination_MultipliesAndHalves()
 	{
-		var resourceA = new RawResource("A", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceA = new RawResource("A", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 4f) }
 		});
-		var resourceB = new RawResource("B", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceB = new RawResource("B", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 6f) }
 		});
-		var inputs = new List<RawResource> { resourceA, resourceB };
+		var inputs = new Array<RawResource> { resourceA, resourceB };
 
 		var composite = new CompositeResource("Composite", inputs);
 
@@ -76,15 +75,15 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_ResistanceCombination_TakesMinimumWithBoost()
 	{
-		var resourceA = new RawResource("A", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceA = new RawResource("A", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 8f) }
 		});
-		var resourceB = new RawResource("B", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceB = new RawResource("B", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 5f) }
 		});
-		var inputs = new List<RawResource> { resourceA, resourceB };
+		var inputs = new Array<RawResource> { resourceA, resourceB };
 
 		var composite = new CompositeResource("Composite", inputs);
 
@@ -95,15 +94,15 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_StrengthCombination_AddsValues()
 	{
-		var resourceA = new RawResource("A", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceA = new RawResource("A", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 7f) }
 		});
-		var resourceB = new RawResource("B", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceB = new RawResource("B", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 3f) }
 		});
-		var inputs = new List<RawResource> { resourceA, resourceB };
+		var inputs = new Array<RawResource> { resourceA, resourceB };
 
 		var composite = new CompositeResource("Composite", inputs);
 
@@ -114,15 +113,15 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_ToughnessCombination_AddsAndMultiplies()
 	{
-		var resourceA = new RawResource("A", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceA = new RawResource("A", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 4f) }
 		});
-		var resourceB = new RawResource("B", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceB = new RawResource("B", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 6f) }
 		});
-		var inputs = new List<RawResource> { resourceA, resourceB };
+		var inputs = new Array<RawResource> { resourceA, resourceB };
 
 		var composite = new CompositeResource("Composite", inputs);
 
@@ -133,17 +132,17 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_CombinesMultiplePropertyTypes()
 	{
-		var resourceA = new RawResource("A", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceA = new RawResource("A", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 5f) },
 			{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 3f) }
 		});
-		var resourceB = new RawResource("B", new Dictionary<ResourcePropertyType, ResourceProperty>
+		var resourceB = new RawResource("B", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>
 		{
 			{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 4f) },
 			{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 6f) }
 		});
-		var inputs = new List<RawResource> { resourceA, resourceB };
+		var inputs = new Array<RawResource> { resourceA, resourceB };
 
 		var composite = new CompositeResource("Composite", inputs);
 
@@ -157,7 +156,7 @@ public class CompositeResourceTests
 	public void CompositeResource_WithSingleInput_PreservesProperties()
 	{
 		var iron = CreateTestRawResource("Iron", ResourcePropertyType.Strength, 7f);
-		var inputs = new List<RawResource> { iron };
+		var inputs = new Array<RawResource> { iron };
 
 		var composite = new CompositeResource("PureIron", inputs);
 
@@ -168,7 +167,7 @@ public class CompositeResourceTests
 	[Fact]
 	public void CompositeResource_WithThreeInputs_CombinesCorrectly()
 	{
-		var inputs = new List<RawResource>
+		var inputs = new Array<RawResource>
 		{
 			CreateTestRawResource("A", ResourcePropertyType.Strength, 2f),
 			CreateTestRawResource("B", ResourcePropertyType.Strength, 3f),
@@ -188,6 +187,6 @@ public class CompositeResourceTests
 		{
 			{ propertyType, new ResourceProperty(propertyType, value) }
 		};
-		return new RawResource(name, properties);
+		return new RawResource(name, ResourceKind.Ore, properties);
 	}
 }

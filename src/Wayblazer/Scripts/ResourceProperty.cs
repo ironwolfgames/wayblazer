@@ -1,10 +1,20 @@
+using Godot;
+
 namespace Wayblazer;
 
-public class ResourceProperty
+[GlobalClass]
+public partial class ResourceProperty : Resource
 {
-	public ResourcePropertyType Type { get; private set; }
-	public float Value { get; private set; }
-	public string VagueDescription { get; private set; }
+	[Export]
+	public ResourcePropertyType Type { get; set; }
+
+	[Export]
+	public float Value { get; set; }
+
+	[Export]
+	public string VagueDescription { get; set; }
+
+	public ResourceProperty() : this(ResourcePropertyType.Strength, 0.0f) { }
 
 	public ResourceProperty(ResourcePropertyType type, float value)
 	{

@@ -1,3 +1,4 @@
+using Godot.Collections;
 
 namespace Wayblazer.Tests;
 
@@ -12,7 +13,7 @@ public class RawResourceTests
 			{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 7f) }
 		};
 
-		var resource = new RawResource(name, properties);
+		var resource = new RawResource(name, ResourceKind.Ore, properties);
 
 		Assert.Equal(name, resource.Name);
 		Assert.Equal(properties, resource.Properties);
@@ -29,7 +30,7 @@ public class RawResourceTests
 			{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 3f) }
 		};
 
-		var resource = new RawResource(name, properties);
+		var resource = new RawResource(name, ResourceKind.Ore, properties);
 
 		Assert.Equal(name, resource.Name);
 		Assert.Equal(3, resource.Properties.Count);
@@ -44,7 +45,7 @@ public class RawResourceTests
 		var name = "EmptyResource";
 		var properties = new Dictionary<ResourcePropertyType, ResourceProperty>();
 
-		var resource = new RawResource(name, properties);
+		var resource = new RawResource(name, ResourceKind.Ore, properties);
 
 		Assert.Equal(name, resource.Name);
 		Assert.Empty(resource.Properties);

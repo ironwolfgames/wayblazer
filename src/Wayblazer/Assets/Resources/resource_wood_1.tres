@@ -1,0 +1,67 @@
+[gd_resource type="SpriteFrames" load_steps=10 format=3 uid="uid://kfmyblg6of74"]
+
+[ext_resource type="Texture2D" uid="uid://dw3dtw1d5b7mw" path="res://Assets/TinySwords/Terrain/Resources/Wood/Trees/Tree1.png" id="1_jwdco"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_r16ih"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(0, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_rd7fx"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(192, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dg10i"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(384, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lhm25"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(576, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xe7mg"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(768, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oxwpp"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(960, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_kdjr6"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(1152, 0, 192, 256)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_sds2w"]
+atlas = ExtResource("1_jwdco")
+region = Rect2(1344, 0, 192, 256)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_r16ih")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_rd7fx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dg10i")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lhm25")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xe7mg")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oxwpp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_kdjr6")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_sds2w")
+}],
+"loop": true,
+"name": &"default",
+"speed": 16.0
+}]

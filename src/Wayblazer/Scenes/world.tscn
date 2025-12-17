@@ -1,12 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://c184ht1xrxrkd"]
+[gd_scene load_steps=9 format=3 uid="uid://c184ht1xrxrkd"]
 
 [ext_resource type="Texture2D" uid="uid://bld005lob5egg" path="res://Assets/TinySwords/Terrain/Tileset/Tilemap_color2.png" id="1_5a7ea"]
 [ext_resource type="Script" uid="uid://c1cieuvv0mwp7" path="res://Scripts/GameCamera.cs" id="1_k7acu"]
 [ext_resource type="Texture2D" uid="uid://b2f5vv8mtl3eq" path="res://Assets/TinySwords/Terrain/Tileset/Tilemap_Plains.png" id="2_8j60k"]
 [ext_resource type="Script" uid="uid://cqigde7ie3t0j" path="res://Scripts/WorldGenerator.cs" id="4_8j60k"]
 [ext_resource type="PackedScene" uid="uid://f6fg6kakkp1j" path="res://Scenes/player.tscn" id="5_fo5ed"]
-[ext_resource type="PackedScene" uid="uid://d2o4e7sb7gvkq" path="res://Scenes/pine_tree.tscn" id="5_k7acu"]
-[ext_resource type="PackedScene" uid="uid://cd3tthhrnbtrs" path="res://Scenes/fir_tree.tscn" id="6_5v1tr"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5ukr8"]
 texture = ExtResource("1_5a7ea")
@@ -139,147 +137,6 @@ script = ExtResource("4_8j60k")
 script = ExtResource("1_k7acu")
 WorldMapBaseLayer = NodePath("../WorldMapBaseLayer")
 PlayerCharacter = NodePath("../Player")
-
-[node name="EnvironmentalObjectsLayer" type="Node2D" parent="."]
-position = Vector2(512, 578)
-
-[node name="PineTree2" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(-169, -279)
-
-[node name="PineTree3" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(230, -139)
-
-[node name="FirTree" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(297, -70)
-
-[node name="PineTree" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(355, -119)
-
-[node name="PineTree27" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(885, 973)
-
-[node name="PineTree26" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(484, 880)
-
-[node name="PineTree25" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(244, 1426)
-
-[node name="PineTree24" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(-267, 892)
-
-[node name="PineTree23" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(40, 408)
-
-[node name="PineTree22" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(678, -287)
-
-[node name="PineTree21" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(594, -376)
-
-[node name="FirTree2" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(-105, -345)
-
-[node name="PineTree20" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1902, 1071)
-
-[node name="PineTree19" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(2231, 371)
-
-[node name="PineTree4" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1211, -321)
-
-[node name="PineTree5" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1086, -341)
-
-[node name="FirTree3" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(1153, -272)
-
-[node name="FirTree19" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(696, 1064)
-
-[node name="FirTree18" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(1466, 649)
-
-[node name="FirTree17" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(2052, 1241)
-
-[node name="FirTree16" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(2167, 240)
-
-[node name="FirTree4" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(658, -442)
-
-[node name="FirTree15" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(-151, 731)
-
-[node name="FirTree5" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(742, -353)
-
-[node name="FirTree6" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(104, 342)
-
-[node name="FirTree7" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(-203, 826)
-
-[node name="FirTree8" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(308, 1360)
-
-[node name="FirTree9" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(548, 814)
-
-[node name="FirTree10" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(949, 907)
-
-[node name="FirTree11" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(1966, 1005)
-
-[node name="FirTree12" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(2295, 305)
-
-[node name="FirTree13" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(1607, 656)
-
-[node name="PineTree6" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1543, 722)
-
-[node name="PineTree7" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(754, 1015)
-
-[node name="PineTree8" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(629, 995)
-
-[node name="PineTree9" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1524, 600)
-
-[node name="PineTree10" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1399, 580)
-
-[node name="PineTree11" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(2110, 1192)
-
-[node name="PineTree12" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(1985, 1172)
-
-[node name="PineTree13" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(2225, 191)
-
-[node name="PineTree14" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(2100, 171)
-
-[node name="PineTree15" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(-93, 682)
-
-[node name="PineTree16" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(-218, 662)
-
-[node name="PineTree17" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(71, 1448)
-
-[node name="PineTree18" parent="EnvironmentalObjectsLayer" instance=ExtResource("5_k7acu")]
-position = Vector2(-54, 1428)
-
-[node name="FirTree14" parent="EnvironmentalObjectsLayer" instance=ExtResource("6_5v1tr")]
-position = Vector2(13, 1497)
 
 [node name="Player" parent="." instance=ExtResource("5_fo5ed")]
 position = Vector2(600, 400)
