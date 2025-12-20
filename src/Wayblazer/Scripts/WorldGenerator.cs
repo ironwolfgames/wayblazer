@@ -1,6 +1,5 @@
 using Godot;
 using Godot.Collections;
-using System;
 
 namespace Wayblazer;
 
@@ -11,18 +10,14 @@ public partial class WorldGenerator : TileMapLayer
 		_resourceNodeScene = GD.Load<PackedScene>(Constants.Scenes.RESOURCE_NODE);
 
 		int seed = (int)GD.Randi();
-		_random = new Random(seed);
+		GlobalRandom.Seed(seed);
 
 		GenerateWorldData();
-		GD.Print($"World data generated with seed: {_random}");
+		GD.Print($"World data generated with seed: {seed}");
 
 		RenderWorld();
 	}
 
-	/// <summary>
-	/// Generates world data by randomly filling the array with environment types.
-	/// </summary>
-	/// <param name="seed">Random seed for generation</param>
 	public void GenerateWorldData()
 	{
 		for (var x = 0; x < WORLD_SIZE; x++)
@@ -30,11 +25,10 @@ public partial class WorldGenerator : TileMapLayer
 			for (var y = 0; y < WORLD_SIZE; y++)
 			{
 				// Randomly assign an environment type (0-1 for now, can be expanded)
-				_worldData[x, y] = _random.Next(0, 2);
+				_worldData[x, y] = GlobalRandom.Next(0, 2);
 			}
 		}
 
-		// Generate all available resources
 		_resources = new Dictionary<ResourceKind, Array<RawResource>>
 		{
 			{ ResourceKind.Ore, new Array<RawResource>()
@@ -125,11 +119,11 @@ public partial class WorldGenerator : TileMapLayer
 
 					if (tileType == 1)
 					{
-						resourceNode.ResourceData = _resources[ResourceKind.Ore][_random.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
+						resourceNode.ResourceData = _resources[ResourceKind.Ore][GlobalRandom.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
 					}
 					else
 					{
-						resourceNode.ResourceData = _resources[ResourceKind.Wood][_random.Next(0, _resources[ResourceKind.Wood].Count)].Duplicate() as RawResource;
+						resourceNode.ResourceData = _resources[ResourceKind.Wood][GlobalRandom.Next(0, _resources[ResourceKind.Wood].Count)].Duplicate() as RawResource;
 					}
 
 					AddChild(resourceNode);
@@ -144,6 +138,5 @@ public partial class WorldGenerator : TileMapLayer
 	private int[,] _worldData = new int[WORLD_SIZE, WORLD_SIZE];
 	private TileMapLayer? _tileMapLayer;
 	private PackedScene? _resourceNodeScene;
-	private Random _random;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 }

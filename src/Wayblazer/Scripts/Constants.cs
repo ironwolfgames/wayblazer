@@ -2,6 +2,8 @@ namespace Wayblazer;
 
 public static class Constants
 {
+	public const float INTERACTION_RANGE = 72.0f;
+
 	public static class NodeGroups
 	{
 		public const string RESOURCES = "Resources";

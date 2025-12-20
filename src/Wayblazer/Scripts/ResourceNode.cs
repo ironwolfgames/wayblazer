@@ -20,7 +20,9 @@ public partial class ResourceNode : Area2D
 				ResourceKind.Wood => GD.Load<SpriteFrames>(Constants.Sprites.RESOURCE_WOOD),
 			};
 
+			_animatedSprite.Frame = GlobalRandom.Next(0, _animatedSprite.SpriteFrames.GetFrameCount(_animatedSprite.Animation));
 			_animatedSprite.Play();
+
 			GD.Print($"Resource node created: {ResourceData.Name}");
 		}
 	}
