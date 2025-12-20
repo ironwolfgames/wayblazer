@@ -4,18 +4,18 @@
 
 | Status | Sprint | Estimated Time | Actual Time |
 | --- | --- | --- | ---- |
-| ✅ | [Sprint 1: Project Setup & Data Core #2](#️-sprint-1-project-setup--data-core-16-hours) | 16hrs | 2hrs |
-| 🟨 | [Sprint 2: Grid, Player Movement & Voxel Data #13](#️-sprint-2-grid-player-movement--voxel-data-16-hours) | 16hrs | |
-| ❌ | [Sprint 3: Resource Engine & ProcGen V1 #21](#️-sprint-3-resource-engine--procgen-v1-16-hours) | 18hrs | |
-| ❌ | [Sprint 4: Interaction & Scanner UI #20](#️-sprint-4-interaction--scanner-ui-16-hours) | 16hrs | |
-| ❌ | [Sprint 5: Field Lab & Analysis Logic #14](#-sprint-5-field-lab--analysis-logic-16-hours) | 16hrs | |
-| ❌ | [Sprint 6: Planetary Analysis & Deduction Input #15](#-sprint-6-planetary-analysis--deduction-input-16-hours) | 16hrs | |
-| ❌ | [Sprint 7: Basic Crafting & Inventory #17](#-sprint-7-basic-crafting--inventory-16-hours) | 16hrs | |
-| ❌ | [Sprint 8: Advanced Refining (Composition) #18](#-sprint-8-advanced-refining-composition-16-hours) | 16hrs | |
-| ❌ | [Sprint 9: ProcGen Tech Tree V2 & Unlocks #19](#-sprint-9-procgen-tech-tree-v2--unlocks-16-hours) | 16hrs | |
-| ❌ | [Sprint 10: Portal Construction & UI #16](#️-sprint-10-portal-construction--ui-16-hours) | 16hrs | |
-| ❌ | [Sprint 11: Simulation Core & Win State #12](#-sprint-11-simulation-core--win-state-16-hours) | 16hrs | |
-| ❌ | [Sprint 12: Aesthetic Polish & Juiciness #11](#-sprint-12-aesthetic-polish--juiciness-16-hours) | 16hrs | |
+| ✅ | [Sprint 1: Project Setup & Data Core #2](#sprint-1-project-setup--data-core-16-hours) | 16hrs | 2hrs |
+| 🟨 | [Sprint 2: Grid, Player Movement & Voxel Data #13](#sprint-2-grid-player-movement--voxel-data-16-hours) | 16hrs | |
+| ❌ | [Sprint 3: Resource Engine & ProcGen V1 #21](#️sprint-3-resource-engine--procgen-v1-16-hours) | 18hrs | |
+| ❌ | [Sprint 4: Interaction & Scanner UI #20](#️sprint-4-interaction--scanner-ui-16-hours) | 16hrs | |
+| ❌ | [Sprint 5: Field Lab & Analysis Logic #14](#sprint-5-field-lab--analysis-logic-16-hours) | 16hrs | |
+| ❌ | [Sprint 6: Planetary Analysis & Deduction Input #15](#sprint-6-planetary-analysis--deduction-input-16-hours) | 16hrs | |
+| ❌ | [Sprint 7: Basic Crafting & Inventory #17](#sprint-7-basic-crafting--inventory-16-hours) | 16hrs | |
+| ❌ | [Sprint 8: Advanced Refining (Composition) #18](#sprint-8-advanced-refining-composition-16-hours) | 16hrs | |
+| ❌ | [Sprint 9: ProcGen Tech Tree V2 & Unlocks #19](#sprint-9-procgen-tech-tree-v2--unlocks-16-hours) | 16hrs | |
+| ❌ | [Sprint 10: Portal Construction & UI #16](#️sprint-10-portal-construction--ui-16-hours) | 16hrs | |
+| ❌ | [Sprint 11: Simulation Core & Win State #12](#sprint-11-simulation-core--win-state-16-hours) | 16hrs | |
+| ❌ | [Sprint 12: Aesthetic Polish & Juiciness #11](#sprint-12-aesthetic-polish--juiciness-16-hours) | 16hrs | |
 
 ## Sprint 1: Project Setup & Data Core (16 Hours)
 
