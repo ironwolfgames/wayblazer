@@ -4,22 +4,35 @@
 
 | Status | Sprint | Estimated Time | Actual Time |
 | --- | --- | --- | ---- |
-| ✅ | [Sprint 1: Project Setup & Data Core #2](#️-sprint-1-project-setup--data-core-16-hours) | 16hrs | 2hrs |
-| 🟨 | [Sprint 2: Grid, Player Movement & Voxel Data #13](#️-sprint-2-grid-player-movement--voxel-data-16-hours) | 16hrs | |
-| ❌ | [Sprint 3: Resource Engine & ProcGen V1 #21](#️-sprint-3-resource-engine--procgen-v1-16-hours) | 18hrs | |
-| ❌ | [Sprint 4: Interaction & Scanner UI #20](#️-sprint-4-interaction--scanner-ui-16-hours) | 16hrs | |
-| ❌ | [Sprint 5: Field Lab & Analysis Logic #14](#-sprint-5-field-lab--analysis-logic-16-hours) | 16hrs | |
-| ❌ | [Sprint 6: Planetary Analysis & Deduction Input #15](#-sprint-6-planetary-analysis--deduction-input-16-hours) | 16hrs | |
-| ❌ | [Sprint 7: Basic Crafting & Inventory #17](#-sprint-7-basic-crafting--inventory-16-hours) | 16hrs | |
-| ❌ | [Sprint 8: Advanced Refining (Composition) #18](#-sprint-8-advanced-refining-composition-16-hours) | 16hrs | |
-| ❌ | [Sprint 9: ProcGen Tech Tree V2 & Unlocks #19](#-sprint-9-procgen-tech-tree-v2--unlocks-16-hours) | 16hrs | |
-| ❌ | [Sprint 10: Portal Construction & UI #16](#️-sprint-10-portal-construction--ui-16-hours) | 16hrs | |
-| ❌ | [Sprint 11: Simulation Core & Win State #12](#-sprint-11-simulation-core--win-state-16-hours) | 16hrs | |
-| ❌ | [Sprint 12: Aesthetic Polish & Juiciness #11](#-sprint-12-aesthetic-polish--juiciness-16-hours) | 16hrs | |
+| ✅ | Sprint 1: Project Setup & Data Core #2 | 16hrs | 2hrs |
+| ❌ | Sprint 2: Grid, Player Movement & Voxel Data #13 | 16hrs | |
+| ❌ | Sprint 3: Resource Engine & ProcGen V1 #21 | 18hrs | |
+| ❌ | Sprint 4: Interaction & Scanner UI #20 | 16hrs | |
+| ❌ | Sprint 5: Field Lab & Analysis Logic #14 | 16hrs | |
+| ❌ | Sprint 6: Planetary Analysis & Deduction Input #15 | 16hrs | |
+| ❌ | Sprint 7: Basic Crafting & Inventory #17 | 16hrs | |
+| ❌ | Sprint 8: Advanced Refining (Composition) #18 | 16hrs | |
+| ❌ | Sprint 9: ProcGen Tech Tree V2 & Unlocks #19 | 16hrs | |
+| ❌ | Sprint 10: Portal Construction & UI #16 | 16hrs | |
+| ❌ | Sprint 11: Simulation Core & Win State #12 | 16hrs | |
+| ❌ | Sprint 12: Aesthetic Polish & Juiciness #11 | 16hrs | |
 
-## Sprint 1: Project Setup & Data Core (16 Hours)
+# ⚙️ Sprint 1: Project Setup & Data Core (16 Hours)
 
-### Time Log
+## Summary
+
+This sprint establishes the C\# data architecture for the game's core deduction system. We will create the foundational classes for resources, planetary properties, and portal requirements. This data layer is the "Brain" of the game and must be logically sound before visual elements are built.
+
+## 🎯 Goal
+
+A set of fully defined, functional C\# classes (not necessarily Godot nodes yet) that can generate a unique world puzzle and the corresponding material solution.
+
+## 💻 Tech Stack Focus
+
+  * **Godot Engine:** Project creation and configuration.
+  * **C\# / .NET:** All core logic and data structures.
+
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -33,9 +46,170 @@
 | 8: Simple Unit Test and Review | 120 mins | 35 mins |
 | Total | 16 hrs | 2 hrs |
 
-## Sprint 2: Grid, Player Movement & Voxel Data (16 Hours)
+-----
 
-### Time Log
+## Task Breakdown (16 Hours)
+
+### Task 1: Project Setup and Godot Configuration (2 Hours)
+
+#### Create and Configure Godot Project (0h - 1h)
+
+1. Create a new Godot 4 project using the **C#** template.
+2. Set the renderer to **2D** or **Compatibility** (since we are using 2D for the VS).
+3. Create a top-level folder named `Scripts` to hold all C# files.
+4. Create a main scene (`World.tscn`) and save it.
+
+#### Editor Workflow Check (1h - 2h)
+
+1. Open the project in your IDE (e.g., Visual Studio Code or Rider).
+2. Verify that the Godot C# solution file (`.sln`) is loaded correctly and that C# scripts can be added and compiled without error. *Troubleshoot any .NET SDK path issues now.*
+
+### Task 2: Data Structure - Resource Property (2 Hours)
+
+This class defines a single measurable quality (e.g., "Strength") and its value.
+
+#### Create Enumerator and Base Class (2h - 3h)
+
+1. In the `Scripts` folder, create `Enums.cs`. Define `enum ResourcePropertyType { Strength, Resistance, Toughness, Conductivity, Reactivity }`.
+2. Create `ResourceProperty.cs`. Define a C# `struct` named `ResourceProperty` (use `struct` for performance and value semantics).
+
+#### Define Fields and Helper Methods (3h - 4h)
+
+1. Add the following fields to `ResourceProperty`:
+    - `public ResourcePropertyType Type;`
+    - `public float Value;`
+    - `public string VagueDescription;` (e.g., "High Integrity")
+2. Implement a constructor `public ResourceProperty(ResourcePropertyType type, float value)` that sets `Type` and `Value`.
+3. Implement a private method `SetVagueDescription()` inside the constructor: `if (Value > 7.0f) { VagueDescription = "High"; } else if (Value < 3.0f) { VagueDescription = "Low"; } else { VagueDescription = "Medium"; }`
+
+### Task 3: Data Structure - Raw Resource (2 Hours)
+
+This is the data object for all gatherable materials in the game.
+
+#### Create RawResource Class (4h - 5h)
+
+1. Create `RawResource.cs`. Define a C# class `RawResource`.
+2. Add core descriptive fields:
+    - `public string Name;` (e.g., "Dull Grey Ore")
+    - `public string Description;`
+    - `public int BaseHarvestDifficulty;` (1 for VS).
+
+#### Implement Property Storage (5h - 6h)
+
+1. Add the crucial storage field: `public Dictionary<ResourcePropertyType, ResourceProperty> Properties = new();`
+2. Implement a simple stub method `public void GenerateProperties(int seed)`:
+    - For the VS, hardcode the properties of one "Low Strength Ore" and one "High Strength Ore" using a simple random or fixed seed logic. (e.g., Low Strength Ore: Strength=2.0, Resistance=5.0. High Strength Ore: Strength=8.0, Resistance=2.0).
+
+### Task 4: Data Structure - Composite Material (2 Hours)
+
+This handles the combining of materials, the core of the engineering puzzle.
+
+#### Composite Class Definition (6h - 7h)
+
+1. Create `CompositeMaterial.cs`. This class should inherit from `RawResource`.
+2. Add tracking fields for its inputs:
+    - `public RawResource PrimaryIngredient;`
+    - `public RawResource ModifierIngredient;`
+    - `public float StrengthModifier;` (to track the effect of gas/additive).
+
+#### Implement Calculation Logic (7h - 8h)
+
+1. Implement a method `public void CalculateProperties()`.
+2. **VS Logic:** The Composite's final Strength will be the sum of its ingredients' strength, plus a multiplier from a gas.
+   - `float baseStrength = PrimaryIngredient.Properties[Strength].Value + ModifierIngredient.Properties[Strength].Value;`
+   - `float finalStrength = baseStrength * StrengthModifier;`
+3. Set the Composite's Strength property using this calculated value.
+
+### Task 5: Data Structure - Planetary Constants (2 Hours)
+
+This defines the unique puzzle for the current run (the "Puzzle Frame").
+
+#### Planetary Constants Class (8h - 9h)
+
+1. Create `PlanetaryConstants.cs`. Define a C# class `PlanetaryConstants`.
+2. Add float fields for the 3 key VS properties (from the GDD):
+    - `public float GravimetricShear;` (Range 0.5 - 5.0)
+    - `public float CorrosiveIndex;` (Range 0.0 - 14.0)
+    - `public float TectonicVolatility;` (Range 0.0 - 9.0)
+
+#### World Generation Logic (9h - 10h)
+
+1. Implement `public void GenerateWorld(int complexityLevel)`.
+2. For the VS, hardcode the Level 1 values for the first playthrough:
+    - `GravimetricShear = 3.2f;` (High but manageable)
+    - `CorrosiveIndex = 2.0f;` (Low)
+    - `TectonicVolatility = 1.0f;` (Low)
+3. This ensures every test run uses the same baseline puzzle.
+
+### Task 6: Acquire Placeholder Tileset and Sprite Sheets (2 Hours)
+
+Begin the visual design process to guide future art sprints.
+
+#### Placeholder Tileset (10h - 11h)
+
+1. Find tileset and add it to Godot project.
+
+#### Placeholder Sprite Sheets (11h - 12h)
+
+1. Find sprite sheet(s) for the player character (and other moving things?) and add it/them to Godot project.
+
+### Task 7: Data Structure - Portal Requirement (2 Hours)
+
+This defines the ultimate goal and the mathematical deduction.
+
+#### Portal Requirement Class (12h - 13h)
+
+1. Create `PortalRequirement.cs`. Define a C# class `PortalRequirement`.
+2. Add a dictionary to store the requirements: `public Dictionary<ResourcePropertyType, float> RequiredStats = new();`
+3. Add fields to store the World Constants (for reference): `public PlanetaryConstants WorldContext;`
+
+#### Deduction Formula Implementation (13h - 14h)
+
+1. Implement `public void SetRequirements(PlanetaryConstants constants)`:
+2. **VS Logic:** Implement the primary deduction formula from the GDD:
+    - **Foundation Strength:** `RequiredStats[Strength] = constants.GravimetricShear * 2.5f;` (Target: 8.0)
+    - **Gate Resistance:** `RequiredStats[Resistance] = constants.CorrosiveIndex * 1.5f;` (Target: 3.0)
+3. This ensures the requirements are generated *from* the world properties.
+
+### Task 8: Simple Unit Test and Review (2 Hours)
+
+Verify the core deduction math works outside of the Godot environment.
+
+#### Unit Test Project (C#/.NET) (14h - 15h)
+
+1. Create a separate C# Console Application project in the solution (e.g., `Wayblazer.Tests`).
+2. Reference the main Godot C# assembly (`Wayblazer`).
+3. Write a single function `TestPortalDeductionMath()`:
+
+a. Instantiate `PlanetaryConstants` and call `GenerateWorld()`.
+b. Instantiate `PortalRequirement` and call `SetRequirements()`.
+c. Instantiate a `CompositeMaterial` and manually set its properties to a known "passing" value (e.g., Strength 9.0) and a "failing" value (e.g., Strength 7.0).
+d. Use a simple `if` check (`if (composite.Properties[Strength].Value > required.RequiredStats[Strength])`) to confirm the pass/fail logic is mathematically correct.
+
+#### Code Review and Cleanup (15h - 16h)
+
+1. Review all C# code for consistent naming conventions and commenting.
+2. Delete the temporary Console Test project if it's no longer needed, or commit it as a verification tool.
+3. **Commit Code:** Commit all changes to the Version Control System (VCS) with the message: "Sprint 1 Complete: Initial Data Core Architecture."
+
+-----
+
+# 🗺️ Sprint 2: Grid, Player Movement & Voxel Data (16 Hours)
+
+## Summary
+
+This sprint focuses on establishing the physical presence of the game. We will set up the Godot `TileMap` for our 2.5D world, implement the player character, and link the procedural data created in Sprint 1 to the visual representation on the map.
+
+## 🎯 Goal
+
+A playable scene where the character can move around a basic, generated world composed of different tile types (Ground, Ore, Wood) and visually identify the resources they are standing on.
+
+## 💻 Tech Stack Focus
+
+  * **Godot Engine (C\# API):** `TileMap`, `CharacterBody2D`, and basic scene setup.
+  * **C\# / .NET:** World generation logic and data linking.
+
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -46,6 +220,216 @@
 | 4: Resource Node Linking | 180 mins | |
 | 5: Aesthetic & Review | 180 mins | |
 | Total | 16 hrs | 40 mins |
+
+-----
+
+## Task Breakdown (16 Hours)
+
+### Task 1: Godot TileMap and Tileset Setup (3 Hours)
+
+#### TileMap Node Setup (0h - 1h)
+
+1. In `World.tscn`, add a new `TileMap` node. Rename it to `WorldMap`.
+2. In the `TileMap` inspector, set the **Cell Size** to a square size appropriate for isometric/2D grid (e.g., **64x64** or **32x32**).
+3. Set the **Y Sort Enabled** property to **true** in the `WorldMap` node's transform settings. (Crucial for 2.5D depth illusion).
+
+#### Create Basic Tileset (1h - 2h)
+
+1. In the `TileMap` inspector, click the **Tile Set** property to create a **New TileSet** resource.
+2. Open the TileSet editor.
+3. Add **4 new Atlas sources** (use simple colored squares or the concept art from Sprint 1):
+    - `ID 0`: **Ground** (e.g., Green/Brown square).
+    - `ID 1`: **Ore Node** (e.g., Grey square).
+    - `ID 2`: **Wood Node** (e.g., Dark Green/Brown square).
+    - `ID 3`: **Water** (e.g., Blue square).
+
+#### Tilemap Rendering Script Stub (2h - 3h)
+
+1. Create a new C# script `WorldGenerator.cs` (Godot script attached to `WorldMap` node).
+2. Add a reference to the TileMap node: `private TileMap _tileMap;`
+3. In `_Ready()`, get the node: `_tileMap = GetNode<TileMap>(".");`
+4. Define a constant for world size: `const int WorldSize = 64;` (64x64 tiles for VS).
+
+### Task 2: World Generation and Rendering (3 Hours)
+
+#### ProcGen V1: Simple World Array (3h - 4h)
+
+1. In `WorldGenerator.cs`, define a private 2D array: `private int[,] _worldData = new int[WorldSize, WorldSize];`
+2. Implement a stub method `GenerateInitialWorld()`:
+    - Fill the entire array with `ID 0` (Ground).
+    - Use `GD.RandRange(0, 100)` to randomly place `ID 1` (Ore) and `ID 2` (Wood) nodes at a density of about 5% each.
+
+#### Render World to TileMap (4h - 5h)
+
+1. Implement a method `RenderWorld()`:
+    - Loop through `_worldData` from `x = 0` to `WorldSize` and `y = 0` to `WorldSize`.
+    - Use `_tileMap.SetCell(0, new Vector2I(x, y), 0, new Vector2I(_worldData[x, y], 0));` (Note: Ensure the source IDs match your TileSet setup).
+2. Call `GenerateInitialWorld()` and then `RenderWorld()` in `_Ready()`.
+
+#### World Context Link (5h - 6h)
+
+1. Create a `GameManager.cs` C# class (make it a singleton via `[GlobalClass]` for easy access).
+2. In `GameManager.cs`, create and initialize the C# data objects from Sprint 1: `public PlanetaryConstants Constants = new();` and `public PortalRequirement Required = new();`
+3. In `_Ready()` of `GameManager.cs`, call `Constants.GenerateWorld(1)` and `Required.SetRequirements(Constants)` to load the VS puzzle.
+
+### Task 3: Player Controller and Scene Setup (4 Hours)
+
+#### Player Scene Setup (6h - 7h)
+
+1. In the Godot editor, click **Scene > New Scene** from the menu.
+2. Click **Other Node** in the Create Root Node dialog, search for **CharacterBody2D**, and select it.
+3. With the root node selected, click the **Rename** icon (or press F2) and rename it to **Player**.
+4. Click **Scene > Save Scene** and save as `Player.tscn` in the `Scenes` folder.
+5. Right-click the **Player** node and select **Add Child Node**. Search for and add a **Sprite2D** node.
+6. In the Sprite2D's Inspector, drag a placeholder player texture (from Sprint 1) into the **Texture** property.
+7. Right-click the **Player** node again and add a **CollisionShape2D** child node.
+8. In the CollisionShape2D's Inspector, click the **Shape** property dropdown and select **New RectangleShape2D**.
+9. Click the newly created RectangleShape2D to expand its properties, and adjust the **Size** to roughly match your character sprite (e.g., Vector2(32, 48) for a 32x48 pixel character).
+10. Open `World.tscn`, right-click the root node, select **Instantiate Child Scene**, and choose `Player.tscn`. Position it in the center of the visible area.
+#### Basic Movement Script (7h - 8h)
+
+1. Select the **Player** root node in `Player.tscn`.
+2. In the Inspector, scroll to the top and click the **Attach Script** icon (looks like a scroll with a + sign).
+3. In the Attach Node Script dialog, ensure the **Language** is set to **C#**, and the **Path** is set to `Scripts/PlayerController.cs`. Click **Create**.
+4. In your IDE (VS Code/Rider), open the newly created `PlayerController.cs` file.
+5. Replace the default code with this beginner-friendly movement template:
+
+```csharp
+using Godot;
+using System;
+
+public partial class PlayerController : CharacterBody2D
+{
+    // Movement speed in pixels per second
+    private const float Speed = 200.0f;
+
+    // Called every physics frame (60 times per second by default)
+    public override void _PhysicsProcess(double delta)
+    {
+        // Get input direction using Godot's built-in UI actions
+        // This returns a normalized Vector2 (-1 to 1 on each axis)
+        Vector2 inputDirection = Input.GetVector(
+            "ui_left",   // A key or Left Arrow
+            "ui_right",  // D key or Right Arrow
+            "ui_up",     // W key or Up Arrow
+            "ui_down"    // S key or Down Arrow
+        );
+
+        // Set the velocity based on input and speed
+        Velocity = inputDirection * Speed;
+
+        // Apply the movement and handle collisions
+        MoveAndSlide();
+    }
+}
+```
+
+6. Save the file. Build the project by pressing **Build** in Godot's top menu (or press F6).
+7. Fix any compilation errors before proceeding.
+#### Movement Testing and Collision (8h - 9h)
+
+1. Press **F5** to run the game (or click the Play button). You should see your player character.
+2. Test movement using WASD or arrow keys. The character should move smoothly in all four directions.
+3. **Diagonal Movement Check:** Press two keys at once (e.g., W+D). The character should move diagonally. If the movement feels too fast diagonally, add this code after the `inputDirection` line:
+
+```csharp
+// Normalize diagonal movement to prevent faster diagonal speed
+inputDirection = inputDirection.Normalized();
+```
+
+4. **Setting Up TileMap Collisions** (if not done in Task 1):
+    - Open `World.tscn` and select the **WorldMap** TileMap node.
+    - Click the **TileSet** property in the Inspector to open the TileSet editor at the bottom.
+    - Select your Ground tile. In the middle panel, click the **Physics** tab.
+    - Click **Add Physics Layer** if no physics layer exists.
+    - Use the polygon tool to draw a collision shape around the tile (usually a rectangle for ground tiles).
+    - Save and test. The player should not be able to walk through tiles with collision enabled.
+#### Camera and Y-Sort Setup (9h - 10h)
+
+1. In `Player.tscn`, right-click the **Player** root node and select **Add Child Node**.
+2. Search for and add a **Camera2D** node.
+3. With the Camera2D selected, check these properties in the Inspector:
+    - **Enabled:** ON (checked)
+    - **Position Smoothing > Enabled:** ON (for smooth camera tracking)
+    - **Position Smoothing > Speed:** 5.0 (adjust for desired smoothness)
+4. **Implementing Y-Sort for 2.5D Depth:**
+    - In `PlayerController.cs`, add this line inside `_PhysicsProcess`, after `MoveAndSlide()`:
+
+```csharp
+// Update Z-index based on Y position for proper 2.5D layering
+// Objects lower on screen (higher Y value) should draw on top
+ZIndex = (int)Position.Y;
+```
+
+5. **Alternative Y-Sort Method** (for Godot 4.x with Y-Sort enabled on nodes):
+    - Select the **WorldMap** TileMap node in `World.tscn`.
+    - In the Inspector, under **Ordering**, set **Y Sort Enabled** to **ON**.
+    - Do the same for the **Player** node.
+    - This automatically handles Y-sorting without manual Z-index updates.
+6. **Testing Y-Sort:**
+    - Place a test sprite or tree in the world with a higher Y position than the player.
+    - Walk the player behind it (move up). The player should be drawn behind the tree.
+    - Walk the player in front of it (move down). The player should be drawn in front.
+7. Your complete `PlayerController.cs` should now look like this:
+
+```csharp
+using Godot;
+using System;
+
+public partial class PlayerController : CharacterBody2D
+{
+    private const float Speed = 200.0f;
+
+    public override void _PhysicsProcess(double delta)
+    {
+        // Get input direction from keyboard/gamepad
+        Vector2 inputDirection = Input.GetVector(
+            "ui_left", "ui_right", "ui_up", "ui_down"
+        );
+
+        // Set velocity based on input
+        Velocity = inputDirection * Speed;
+
+        // Move the character and handle collisions
+        MoveAndSlide();
+
+        // Update Z-index for proper 2.5D depth sorting
+        ZIndex = (int)Position.Y;
+    }
+}
+```
+
+#### Task 3.5: Camera Bounds and Playability (1 Hour)
+
+**Implementing Map Constraints (0h - 1h)**
+
+1.  Open `PlayerController.cs`.
+2.  Add a reference to the `TileMap` to determine world boundaries.
+3.  In `_Ready()`, find the `Camera2D` child node and set its limits based on the map size.
+
+<!-- end list -->
+
+```csharp
+public override void _Ready()
+{
+    // Find the camera node
+    Camera2D camera = GetNode<Camera2D>("Camera2D");
+
+    // Hardcoded world size for VS (64x64 tiles * 64px per tile)
+    // In a full implementation, you would get this dynamically from the TileMap
+    int worldPixelSize = 64 * 64;
+
+    // Set camera limits so the player can't see the "void"
+    camera.LimitLeft = 0;
+    camera.LimitTop = 0;
+    camera.LimitRight = worldPixelSize;
+    camera.LimitBottom = worldPixelSize;
+
+    GD.Print("Camera limits set to world bounds.");
+}
+```
+
+4.  **Test:** Run the game and walk to the edge of the map. The camera should stop moving when it hits the edge, keeping the black void off-screen.
 
 ### Task 4: Resource Node Linking (3 Hours)
 
@@ -291,22 +675,22 @@ if (_nearbyResource != null)
 1. Review all scripts for clean C# syntax and Godot C# best practices.
 2. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 2 Complete: Grid World, Player Movement, and Resource Voxel Linking."
 
-## Sprint 3: Resource Engine & ProcGen V1 (16 Hours)
+# ⛏️ Sprint 3: Resource Engine & ProcGen V1 (16 Hours)
 
-### Summary
+## Summary
 
 This sprint fully integrates the procedural data architecture (Sprint 1) with the physical world (Sprint 2). We will finalize the resource generation, implement the core harvesting mechanic, and build the foundational inventory manager and HUD necessary for the primary gameplay loop.
 
-### 🎯 Goal
+## 🎯 Goal
 
 The player can successfully land, harvest one type of wood and two types of ore, see the resources added to a working inventory, and get the first hints of the deduction puzzle via the Hand Scanner.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Singleton management, Input handling, UI integration.
   * **C\# / .NET:** Random number generation for resource properties, Inventory Management class.
 
-### Time Log
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -321,7 +705,7 @@ The player can successfully land, harvest one type of wood and two types of ore,
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Singleton and Resource Initialization (3 Hours)
 
@@ -1031,22 +1415,22 @@ public override void _Ready()
 2. Confirm the hardcoded portal target is visible.
 3. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 3 Complete: Resource Engine, Inventory, and Hand Scanner Deduction."
 
-## Sprint 4: Interaction & Scanner UI (16 Hours)
+# 🖱️ Sprint 4: Interaction & Scanner UI (16 Hours)
 
-### Summary
+## Summary
 
 In this sprint, we enhance the player's primary interaction tool—the **Hand Scanner**—and implement the structure for displaying detailed environmental information. We move the scanning feedback from a temporary debug message (Sprint 3) to a dedicated, persistent UI element, laying the groundwork for the more advanced analysis machines in future sprints.
 
-### 🎯 Goal
+## 🎯 Goal
 
 The player can effectively use the Hand Scanner (Right Click) to display the **Vague Descriptions** of a resource and the **Planetary Constants** (though still hardcoded to the VS values) in a clean, dedicated UI panel.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** UI design, AnimationPlayer for UI transitions, and input binding.
   * **C\# / .NET:** Data formatting for display, constant access.
 
-### Time Log
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -1060,7 +1444,7 @@ The player can effectively use the Hand Scanner (Right Click) to display the **V
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 #### Task 0: Game State & Input Management (2 Hours)
 
@@ -1242,24 +1626,24 @@ public override void _PhysicsProcess(double delta)
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 4 Complete: Dedicated Scanner UI, Hold-to-Scan, and Planetary Data Display."
 
-## Sprint 5: Field Lab & Analysis Logic (16 Hours)
+# 🔬 Sprint 5: Field Lab & Analysis Logic (16 Hours)
 
-### Summary
+## Summary
 
 This sprint implements the **Field Lab**, the player's first major technological advancement. The Field Lab allows the player to submit a raw resource and receive its **exact numerical property values**. This is the leap from "Low/Medium/High" (Scanner) to the hard numbers required for engineering the Portal solution.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Design, implement, and integrate the **Field Lab** machine.
   * Implement the core "Analysis" logic: spending one resource to gain *Knowledge* and the *exact numerical data* for that resource type.
   * Update the Scanner UI to display this precise data once unlocked.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Static/Global Machine interaction, State management (Resource Input/Output).
   * **C\# / .NET:** Data linking, Knowledge tracking (for future Tech Tree unlocks).
 
-### Time Log
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -1271,7 +1655,7 @@ This sprint implements the **Field Lab**, the player's first major technological
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Field Lab Scene and Interaction (3 Hours)
 
@@ -1643,24 +2027,24 @@ private void CompleteAnalysis()
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 5 Complete: Field Lab Tier 1 Tech, Precise Data Analysis, and Knowledge Tracking."
 
-## Sprint 6: Planetary Analysis & Deduction Input (16 Hours)
+# 🔭 Sprint 6: Planetary Analysis & Deduction Input (16 Hours)
 
-### Summary
+## Summary
 
 This sprint implements the **Planetary Observatory** (our stand-in for the Gravimeter/Planetary Analyzer). This machine is the player's primary tool for solving the **Portal Equation**. Building it allows the player to measure the hardcoded **Gravimetric Shear** value, which is then used to calculate the exact **Portal Strength Requirement**.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Design, implement, and integrate the **Planetary Observatory** machine.
   * Implement the core Planetary Analysis logic: spending Tech Points to gain the exact numerical value of **Gravimetric Shear**.
   * Update the Scanner UI's Planetary Data section to display this precise, measured value, completing the first half of the deduction loop.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Machine placement, Tier 2 Tech Point consumption.
   * **C\# / .NET:** Deduction math execution, data storage for measured constants.
 
-### Time Log
+#### Time Log
 
 | Task | Estimate (mins) | Actual (mins) |
 | --- | --- | --- |
@@ -1672,7 +2056,7 @@ This sprint implements the **Planetary Observatory** (our stand-in for the Gravi
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Planetary Observatory Scene and Logic (3 Hours)
 
@@ -2046,19 +2430,19 @@ private void UpdatePortalGoal()
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 6 Complete: Planetary Observatory Tier 2 Tech, Gravity Measurement, and Deduction Input Implemented."
 
-## Sprint 7: Basic Crafting & Inventory (16 Hours)
+# 🔥 Sprint 7: Basic Crafting & Inventory (16 Hours)
 
-### Summary
+## Summary
 
 This sprint focuses on the first stage of resource transformation: converting mined **Ore** into **Metal Bars** using the **Basic Furnace** (Smelting). This completes the basic gathering-processing loop necessary to start engineering materials for the Portal.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Design, implement, and integrate the **Basic Smelting Furnace** machine.
   * Implement the core Smelting logic: consuming **Ore** and **Wood** (as fuel) to produce a **Metal Bar**.
   * Update the Inventory Manager to handle the resulting processed materials.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Machine interaction, simple machine state management (Idle, Heating, Smelting).
   * **C\# / .NET:** Crafting logic, resource consumption, and property inheritance.
@@ -2075,7 +2459,7 @@ This sprint focuses on the first stage of resource transformation: converting mi
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Basic Smelting Furnace Scene and Interaction (3 Hours)
 
@@ -2179,19 +2563,19 @@ This sprint focuses on the first stage of resource transformation: converting mi
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 7 Complete: Basic Furnace, Smelting Logic, Property Inheritance, and Smelting Tech Points."
 
-## Sprint 8: Advanced Refining (Composition) (16 Hours)
+# 🧪 Sprint 8: Advanced Refining (Composition) (16 Hours)
 
-### Summary
+## Summary
 
 This sprint implements the **Gas Injector** machine. This machine is crucial for taking a basic refined material (like the **Base Metal Bar** from Sprint 7) and enhancing its properties by infusing it with a modifying element (**Catalyst Ore**), finally creating the high-strength **Composite Alloy** required to build the Portal Foundation.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Implement the **Gas Siphoning** mechanism to acquire the modifying element (**Catalyst Ore** in its raw form).
   * Design, implement, and integrate the **Gas Injector** machine (our stand-in for an alloying or compositing device).
   * Implement the core **Compositing Logic**: Base Metal + Catalyst Ore $\rightarrow$ Composite Alloy with boosted Strength.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** New resource acquisition method, advanced machine input validation.
   * **C\# / .NET:** Property calculation for composite materials, Tech Point consumption/gain.
@@ -2208,7 +2592,7 @@ This sprint implements the **Gas Injector** machine. This machine is crucial for
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Acquiring the Modifying Element (3 Hours)
 
@@ -2570,20 +2954,20 @@ ore.Properties[ResourcePropertyType.Strength] =
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 8 Complete: Gas Injector, Compositing Logic, and Required Composite Alloy Created."
 
-## Sprint 9: ProcGen Tech Tree V2 & Unlocks (16 Hours)
+# 🎓 Sprint 9: ProcGen Tech Tree V2 & Unlocks (16 Hours)
 
-### Summary
+## Summary
 
 This sprint fully implements the **ProcGen Tech Tree** as a functional system. We will create a dedicated UI window where the player can view their accumulated **Tech Points** (Analysis, Smelting, Compositing) and spend them to unlock higher-tier abilities or the construction schematics for new machines (like the **Gas Injector** and future **Simulation Core**).
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Create a dedicated, navigable **Research Station UI**.
   * Implement a structured data list of researchable **Tech Nodes** with prerequisites and costs.
   * Implement the core logic for spending Tech Points to unlock new abilities/machines.
   * Integrate the system to gate the **Gas Injector** and **Planetary Observatory** behind a research cost.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Pop-up window management, custom UI control structures, button logic.
   * **C\# / .NET:** Data structure for Tech Nodes, prerequisite checking.
@@ -2600,7 +2984,7 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Research Station UI Scene Setup (4 Hours)
 
@@ -2713,20 +3097,20 @@ This sprint fully implements the **ProcGen Tech Tree** as a functional system. W
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 9 Complete: Functional ProcGen Tech Tree UI, Cost/Prerequisite Gating, and Machine Unlocks."
 
-## Sprint 10: Portal Construction & UI (16 Hours)
+# 🏗️ Sprint 10: Portal Construction & UI (16 Hours)
 
-### Summary
+## Summary
 
 This sprint implements the physical construction of the **Portal Foundation**. The player must have the required **Composite Alloy** (Strength $> 8.0$) in their inventory and have unlocked the Portal construction schematic (from Sprint 9). We will implement a dedicated Construction UI for selecting the structure and the submission logic to consume the alloy.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Implement the **Portal Foundation** scene, which acts as the final construction site.
   * Implement a dedicated **Construction Placement UI** that checks for the **PortalBuild** unlock.
   * Implement the core construction logic: consuming the $\approx 8.2$ Strength **Composite Alloy**.
   * Verify that the placed material meets the **Portal Requirement** calculated in Sprint 6.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Placement system refinement (ghosting), dedicated modal UI.
   * **C\# / .NET:** Final verification of material properties against world requirements.
@@ -2743,7 +3127,7 @@ This sprint implements the physical construction of the **Portal Foundation**. T
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Portal Foundation Scene and Construction UI (4 Hours)
 
@@ -2844,20 +3228,20 @@ This sprint implements the physical construction of the **Portal Foundation**. T
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 10 Complete: Portal Foundation Placement, Material Submission, and Property Verification Logic."
 
-## Sprint 11: Simulation Core & Win State (16 Hours)
+# 🤖 Sprint 11: Simulation Core & Win State (16 Hours)
 
-### Summary
+## Summary
 
 This sprint implements the **Simulation Core**, the player's final piece of technology. This machine allows the player to run a "virtual test" on the constructed Portal Foundation (from Sprint 10) to verify its structural integrity against the Planet's forces *before* committing to powering it up. The successful simulation leads directly to the Vertical Slice's win state.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Design, implement, and integrate the **Simulation Core** machine.
   * Implement the core **Simulation Logic**: a full, real-time comparison of the constructed material's properties against the Planet's constants using the deduction formulas.
   * Create a clear visual and audio feedback loop for **PASS/FAIL** simulation results.
   * Define and implement the **Vertical Slice Win State**.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** Complex modal UI for detailed report, Win State scene transition.
   * **C\# / .NET:** Final deduction logic, floating point tolerance checks.
@@ -2874,7 +3258,7 @@ This sprint implements the **Simulation Core**, the player's final piece of tech
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Simulation Core Scene and Integration (3 Hours)
 
@@ -2975,20 +3359,20 @@ This sprint implements the **Simulation Core**, the player's final piece of tech
 
 1. **Commit Code:** Commit all changes to the VCS with the message: "Sprint 11 Complete: Simulation Core Tier 3 Tech, Full Deduction Verification, and VS Win State Implemented."
 
-## Sprint 12: Aesthetic Polish & Juiciness (16 Hours)
+# ✨ Sprint 💖 12: Aesthetic Polish & Juiciness (16 Hours)
 
-### Summary
+## Summary
 
 This final sprint is dedicated to polish. We will integrate final art, audio, music, and apply visual "juice" (particles, screen shake, UI responsiveness) to the core interactions established in Sprints 1-11. The goal is to maximize the impact of the Vertical Slice demonstration.
 
-### 🎯 Goal
+## 🎯 Goal
 
   * Integrate final 2.5D art assets for all machines and the portal.
   * Implement a simple background music loop and essential soundscapes.
   * Add VFX and screen shake to high-impact actions (Smelting complete, Simulation result, Portal Activation).
   * Ensure all UI elements are fully responsive and visually clean.
 
-### 💻 Tech Stack Focus
+## 💻 Tech Stack Focus
 
   * **Godot Engine (C\# API):** `AnimationPlayer`, `AudioStreamPlayer`, `Camera2D` (for shake).
   * **Art/Sound:** Final integration of all developed assets.
@@ -3006,7 +3390,7 @@ This final sprint is dedicated to polish. We will integrate final art, audio, mu
 
 -----
 
-### Task Breakdown (16 Hours)
+## Task Breakdown (16 Hours)
 
 ### Task 1: Art Asset Integration (3 Hours)
 
