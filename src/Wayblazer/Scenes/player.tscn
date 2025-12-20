@@ -274,3 +274,5 @@ animation = &"harvest_wood"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 visible = false
 shape = SubResource("RectangleShape2D_pylmc")
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="."]

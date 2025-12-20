@@ -4,6 +4,8 @@ public static class Constants
 {
 	public const float INTERACTION_RANGE = 72.0f;
 
+	public const float HARVEST_DURATION = 1.3f;
+
 	public static class NodeGroups
 	{
 		public const string RESOURCES = "Resources";
@@ -12,6 +14,13 @@ public static class Constants
 	public static class Scenes
 	{
 		public const string RESOURCE_NODE = "res://Scenes/resource_node.tscn";
+	}
+
+	public static class Sounds
+	{
+		public const string HARVEST_WOOD = "res://Assets/Sounds/harvest_wood.wav";
+		public const string HARVEST_ORE = "res://Assets/Sounds/harvest_ore.wav";
+		public const string FOOTSTEPS = "res://Assets/Sounds/footsteps.wav";
 	}
 
 	public static class Sprites

@@ -13,7 +13,15 @@ public partial class PlayerController : CharacterBody2D
 		if (_animatedSprite is null)
 			throw new InvalidOperationException($"AnimatedSprite2D node not found for {Name} ({nameof(PlayerController)})");
 
-		HandleAnimations();
+		_audioStreamPlayer = GetNode<AudioStreamPlayer>("AudioStreamPlayer");
+		if (_audioStreamPlayer is null)
+			throw new InvalidOperationException($"AudioStreamPlayer node not found for {Name} ({nameof(PlayerController)})");
+
+		_harvestWoodSoundEffect = GD.Load<AudioStream>(Constants.Sounds.HARVEST_WOOD);
+		_harvestOreSoundEffect = GD.Load<AudioStream>(Constants.Sounds.HARVEST_ORE);
+		_footstepsSoundEffect = GD.Load<AudioStream>(Constants.Sounds.FOOTSTEPS);
+
+		HandleAnimation();
 	}
 
 	public override void _PhysicsProcess(double delta)
@@ -65,10 +73,11 @@ public partial class PlayerController : CharacterBody2D
 		CheckForResourceNode();
 		HandleHarvestInput();
 
-		HandleAnimations();
+		HandleAnimation();
+		HandleSound();
 	}
 
-	private void HandleAnimations()
+	private void HandleAnimation()
 	{
 		if (_animatedSprite is null)
 			return;
@@ -98,6 +107,62 @@ public partial class PlayerController : CharacterBody2D
 			else
 			{
 				_animatedSprite?.Play(animationToPlay);
+			}
+		}
+	}
+
+	private void HandleSound()
+	{
+		if (_audioStreamPlayer is null)
+			return;
+
+		switch (_state)
+		{
+			case PlayerState.Harvesting:
+			{
+				if (_nearbyResourceNode is not null)
+				{
+					if (_nearbyResourceNode.ResourceData?.ResourceKind == ResourceKind.Wood)
+					{
+						// check if the harvest wood sound effect is already playing
+						if (_audioStreamPlayer!.Stream == _harvestWoodSoundEffect && _audioStreamPlayer!.IsPlaying())
+							return;
+
+						// Play the harvesting sound effect
+						_audioStreamPlayer!.Stream = _harvestWoodSoundEffect;
+						_audioStreamPlayer!.PitchScale = 1.0f;
+						_audioStreamPlayer!.Play();
+					}
+					else if (_nearbyResourceNode.ResourceData?.ResourceKind == ResourceKind.Ore)
+					{
+						// check if the harvest ore sound effect is already playing
+						if (_audioStreamPlayer!.Stream == _harvestOreSoundEffect && _audioStreamPlayer!.IsPlaying())
+							return;
+
+						_audioStreamPlayer!.Stream = _harvestOreSoundEffect;
+						_audioStreamPlayer!.PitchScale = 1.0f;
+						_audioStreamPlayer!.Play();
+					}
+				}
+
+				break;
+			}
+			case PlayerState.Walking:
+			case PlayerState.Running:
+			{
+				// check if the footsteps sound effect is already playing
+				if (_audioStreamPlayer!.Stream == _footstepsSoundEffect && _audioStreamPlayer!.IsPlaying())
+					return;
+
+				_audioStreamPlayer!.Stream = _footstepsSoundEffect;
+				_audioStreamPlayer!.PitchScale = _state == PlayerState.Running ? 1.3f : 1.0f;
+				_audioStreamPlayer!.Play();
+				break;
+			}
+			default:
+			{
+				_audioStreamPlayer!.Stop();
+				break;
 			}
 		}
 	}
@@ -138,7 +203,7 @@ public partial class PlayerController : CharacterBody2D
 
 			// kick off a timer for harvesting duration after which the resource node will be harvested
 			var harvestTimer = new Timer();
-			harvestTimer.WaitTime = 1.0f;
+			harvestTimer.WaitTime = Constants.HARVEST_DURATION;
 			harvestTimer.OneShot = true;
 			harvestTimer.Timeout += () =>
 			{
@@ -155,4 +220,8 @@ public partial class PlayerController : CharacterBody2D
 	private ResourceNode? _nearbyResourceNode;
 	private AnimatedSprite2D? _animatedSprite;
 	private PlayerState _state;
+	private AudioStreamPlayer? _audioStreamPlayer;
+	private AudioStream? _harvestWoodSoundEffect;
+	private AudioStream? _harvestOreSoundEffect;
+	private AudioStream? _footstepsSoundEffect;
 }
