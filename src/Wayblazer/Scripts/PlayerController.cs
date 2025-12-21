@@ -68,7 +68,7 @@ public partial class PlayerController : CharacterBody2D
 		Velocity = velocity;
 		MoveAndSlide();
 
-		ZIndex = (int)GlobalPosition.Y;
+		_animatedSprite!.ZIndex = (int) Math.Round(GlobalPosition.Y);
 
 		CheckForResourceNode();
 		HandleHarvestInput();

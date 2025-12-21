@@ -19,7 +19,8 @@ public static class Constants
 
 	public static class Scenes
 	{
-		public const string RESOURCE_NODE = "res://Scenes/resource_node.tscn";
+		public const string PINE_TREE = "res://Scenes/Objects/pine_tree.tscn";
+		public const string GOLD_ORE = "res://Scenes/Objects/gold_ore.tscn";
 	}
 
 	public static class Sounds
