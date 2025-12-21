@@ -6,6 +6,12 @@ public static class Constants
 
 	public const float HARVEST_DURATION = 1.3f;
 
+	public static class Music
+	{
+		public const string BACKGROUND_1 = "res://Assets/Music/track_1.mp3";
+		public const string BACKGROUND_2 = "res://Assets/Music/track_2.mp3";
+	}
+
 	public static class NodeGroups
 	{
 		public const string RESOURCES = "Resources";

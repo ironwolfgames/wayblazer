@@ -1,10 +1,11 @@
-[gd_scene load_steps=9 format=3 uid="uid://c184ht1xrxrkd"]
+[gd_scene load_steps=10 format=3 uid="uid://c184ht1xrxrkd"]
 
 [ext_resource type="Texture2D" uid="uid://bld005lob5egg" path="res://Assets/TinySwords/Terrain/Tileset/Tilemap_color2.png" id="1_5a7ea"]
 [ext_resource type="Script" uid="uid://c1cieuvv0mwp7" path="res://Scripts/GameCamera.cs" id="1_k7acu"]
 [ext_resource type="Texture2D" uid="uid://b2f5vv8mtl3eq" path="res://Assets/TinySwords/Terrain/Tileset/Tilemap_Plains.png" id="2_8j60k"]
 [ext_resource type="Script" uid="uid://cqigde7ie3t0j" path="res://Scripts/WorldGenerator.cs" id="4_8j60k"]
 [ext_resource type="PackedScene" uid="uid://f6fg6kakkp1j" path="res://Scenes/player.tscn" id="5_fo5ed"]
+[ext_resource type="Script" uid="uid://brlfh56hxjnaq" path="res://Scripts/MusicManager.cs" id="6_5ukr8"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_5ukr8"]
 texture = ExtResource("1_5a7ea")
@@ -140,3 +141,7 @@ PlayerCharacter = NodePath("../Player")
 
 [node name="Player" parent="." instance=ExtResource("5_fo5ed")]
 position = Vector2(600, 400)
+
+[node name="MusicManager" type="AudioStreamPlayer" parent="."]
+volume_db = -6.0
+script = ExtResource("6_5ukr8")
