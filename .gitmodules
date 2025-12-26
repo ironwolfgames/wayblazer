@@ -1,0 +1,3 @@
+[submodule "lib/wave-function-collapse"]
+	path = lib/wave-function-collapse
+	url = git@github.com:chrisculy/wave-function-collapse.git
