@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-  	<Compile Remove="Tests\**\*.cs" />
+    <ProjectReference Include="..\..\lib\wave-function-collapse\src\WFC.Core\WFC.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Tests\**\*.cs" />
   </ItemGroup>
 </Project>
