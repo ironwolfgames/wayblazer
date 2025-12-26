@@ -45,6 +45,6 @@ public partial class MusicManager : AudioStreamPlayer
 		}
 	}
 
-	private AudioStream _backgroundTrackOne;
-	private AudioStream _backgroundTrackTwo;
+	private AudioStream? _backgroundTrackOne;
+	private AudioStream? _backgroundTrackTwo;
 }

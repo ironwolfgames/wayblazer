@@ -4,10 +4,11 @@ namespace Wayblazer;
 
 public static class GlobalRandom
 {
-	private static Random _random = new Random();
+	public static int Seed { get; private set; }
 
-	public static void Seed(int seed)
+	public static void InitializeWithSeed(int seed)
 	{
+		Seed = seed;
 		_random = new Random(seed);
 	}
 
@@ -20,4 +21,6 @@ public static class GlobalRandom
 	{
 		return _random.Next(min, max);
 	}
+
+	private static Random _random = new Random();
 }

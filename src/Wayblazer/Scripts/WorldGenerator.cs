@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Godot;
 using Godot.Collections;
 
@@ -11,25 +12,55 @@ public partial class WorldGenerator : TileMapLayer
 		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
 		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
-		int seed = (int)GD.Randi();
-		GlobalRandom.Seed(seed);
+		GlobalRandom.InitializeWithSeed((int)GD.Randi());
 
 		GenerateWorldData();
-		GD.Print($"World data generated with seed: {seed}");
+		GD.Print($"World data generated with seed: {GlobalRandom.Seed}");
 
 		RenderWorld();
 	}
 
 	public void GenerateWorldData()
 	{
+		var worldBiomeMapNoiseConfig = new NoiseLayerConfig();
+		var worldHeightMap = NoiseService.GenerateNoiseMap(WORLD_SIZE, WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
+		Array<BiomeRange> biomeRanges =
+		[
+			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
+			new BiomeRange(BiomeType.River, 0.2f, 0.4f),
+			new BiomeRange(BiomeType.Lake, 0.3f, 0.6f),
+			new BiomeRange(BiomeType.Swamp, 0.2f, 0.3f, 0.1f, 0.2f),
+			new BiomeRange(BiomeType.Beach, 0.2f, 0.3f),
+			new BiomeRange(BiomeType.Plains, 0.3f, 0.5f, 0.4f, 0.7f),
+			new BiomeRange(BiomeType.Desert, 0.3f, 0.5f, 0.2f, 0.4f),
+			new BiomeRange(BiomeType.Tundra, 0.5f, 0.7f, 0.7f, 1.0f),
+			new BiomeRange(BiomeType.ForestDeciduous, 0.4f, 0.7f, 0.0f, 0.5f),
+			new BiomeRange(BiomeType.ForestConiferous, 0.6f, 0.9f, 0.5f, 1.0f),
+			new BiomeRange(BiomeType.Jungle, 0.3f, 0.4f, 0.0f, 0.2f),
+			new BiomeRange(BiomeType.Mountain, 0.8f, 1.0f, 0.0f, 1.0f),
+		];
+
+		// Assign biomes to each tile based on the height map
 		for (var x = 0; x < WORLD_SIZE; x++)
 		{
 			for (var y = 0; y < WORLD_SIZE; y++)
 			{
-				// Randomly assign an environment type (0-1 for now, can be expanded)
-				_worldData[x, y] = GlobalRandom.Next(0, 2);
+				// calculate equator value in the range of 0.0 to 1.0 for the current y where 0.0 is the equator and 1.0 is either pole.
+				var equatorValue = (float)Math.Abs(y - (WORLD_SIZE / 2)) / (WORLD_SIZE / 2);
+				_worldMapBiomeTypes[x, y] = GetBiomeAt(worldHeightMap[x, y], biomeRanges, equatorValue);
 			}
 		}
+
+		var environmentalDecorations = Enum.GetValues(typeof(EnvironmentalDecorationType));
+		Array<EnvironmentalDecorationPlacementConfig> environmentalDecorationPlacementConfigs =
+		[
+			new (EnvironmentalDecorationType.Tree,
+				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
+				),
+		];
 
 		_resources = new Dictionary<ResourceKind, Array<RawResource>>
 		{
@@ -98,21 +129,26 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void RenderWorld()
 	{
+		// Use WFC (Wave Function Collapse) to generate the world's base tiles
+
+		// Spawn resources and environmental decorations in each valid tile that matches the environmental decoration placement config
+
+		/*
 		for (int x = 0; x < WORLD_SIZE; x++)
 		{
 			for (int y = 0; y < WORLD_SIZE; y++)
 			{
-				int tileType = _worldData[x, y];
+				var biomeType = _worldMapBiomeTypes[x, y];
 
 				// SetCell parameters: layer, coords, source_id, atlas_coords
 				// Using source_id 0 and atlas coords based on tile type
-				SetCell(new Vector2I(x, y), tileType, new Vector2I(1, 1));
+				SetCell(new Vector2I(x, y), biomeType, new Vector2I(1, 1));
 
 				// Randomly place resource nodes on certain tiles with 10% chance
 				if (GD.Randf() < 0.1f)
 				{
 					ResourceNode resourceNode;
-					if (tileType == 1)
+					if (biomeType == 1)
 					{
 						resourceNode = _goldOreScene!.Instantiate<ResourceNode>();
 						resourceNode.ResourceData = _resources![ResourceKind.Ore][GlobalRandom.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
@@ -131,12 +167,19 @@ public partial class WorldGenerator : TileMapLayer
 				}
 			}
 		}
+		*/
 
 		GD.Print($"World rendered: {WORLD_SIZE}x{WORLD_SIZE} tiles");
 	}
 
+	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
+	{
+		var validBiomeRanges = biomeRanges.FirstOrDefault(b => height >= b.MinimumHeight && height <= b.MaximumHeight && equatorValue >= b.MinimumEquatorValue && equatorValue <= b.MaximumEquatorValue);
+		return validBiomeRanges is not null ? validBiomeRanges.Biome : BiomeType.Default;
+	}
+
 	private const int WORLD_SIZE = 48;
-	private int[,] _worldData = new int[WORLD_SIZE, WORLD_SIZE];
+	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[WORLD_SIZE, WORLD_SIZE];
 	private TileMapLayer? _tileMapLayer;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 	private PackedScene? _pineTreeScene;
