@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
+using WFC.Core;
 
 namespace Wayblazer;
 
@@ -24,6 +26,8 @@ public partial class WorldGenerator : TileMapLayer
 	{
 		var worldBiomeMapNoiseConfig = new NoiseLayerConfig();
 		var worldHeightMap = NoiseService.GenerateNoiseMap(WORLD_SIZE, WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
+
+		// For now, hardcode the biome ranges but in the future, these will be loaded from a configuration file or generated procedurally.
 		Array<BiomeRange> biomeRanges =
 		[
 			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
@@ -51,6 +55,55 @@ public partial class WorldGenerator : TileMapLayer
 			}
 		}
 
+		// For now, hardcode the environmental decoration placement configs but in the future, these
+		// will be loaded from a configuration file or generated procedurally.
+		_environmentalDecorationPlacementConfigs =
+		[
+			new (EnvironmentalDecorationType.Tree,
+				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
+				),
+			new (EnvironmentalDecorationType.Rock,
+				new NoiseLayerConfig() { Frequency = 0.2f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.6f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				),
+			new (EnvironmentalDecorationType.Bush,
+				new NoiseLayerConfig() { Frequency = 0.3f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.4f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.Flower,
+				new NoiseLayerConfig() { Frequency = 0.4f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.Grass,
+				new NoiseLayerConfig() { Frequency = 0.5f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.OreDeposit,
+				new NoiseLayerConfig() { Frequency = 0.6f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				),
+			new (EnvironmentalDecorationType.GasDeposit,
+				new NoiseLayerConfig() { Frequency = 0.7f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				)
+		];
+
+		// For now, hardcode the resources but in the future, these will be loaded from a configuration file or procedurally generated.
 		var environmentalDecorations = Enum.GetValues(typeof(EnvironmentalDecorationType));
 		Array<EnvironmentalDecorationPlacementConfig> environmentalDecorationPlacementConfigs =
 		[
@@ -125,11 +178,75 @@ public partial class WorldGenerator : TileMapLayer
 				}
 			},
 		};
+
+
 	}
 
 	public void RenderWorld()
 	{
 		// Use WFC (Wave Function Collapse) to generate the world's base tiles
+
+		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
+		List<ProtoTile> protoTiles =
+		[
+			new()
+			{
+				// 0 - Plains
+				Id = "plains",
+				Weight = 10,
+				NeighborIndices =
+				[
+					[ 0, 1 ], // up
+					[ 0, 1 ], // right
+					[ 0, 1 ], // down
+					[ 0, 1 ]  // left
+				]
+			},
+			new()
+			{
+				// 1 - Water
+				Id = "water",
+				Weight = 5,
+				NeighborIndices =
+				[
+					[ 1 ], // up
+					[ 1 ], // right
+					[ 1 ], // down
+					[ 1 ], // left
+				]
+			}
+		];
+
+		// Map proto tile indices to their corresponding tile set coordinates using hard coded values for now
+		System.Collections.Generic.Dictionary<int, (int X, int Y)> protoTileIndexToTileSetCoords = new()
+		{
+			{ 0, (0, 0) },
+			{ 1, (1, 0) },
+		};
+
+		var configuration = new Configuration(protoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
+		var output = new Output(configuration, width: WORLD_SIZE, height: WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
+			{
+				// for now, return all proto tiles as valid for any position
+				return protoTiles;
+			});
+		var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
+		algorithm.Run(output);
+
+		// Iterate through the WFC output and set the corresponding tiles in the world
+		var protoTileIndices = output.ToSerializable().Tiles;
+		// Spawn resources and environmental decorations in each valid tile that matches the environmental decoration placement config
+
+		/*
+		for (int x = 0; x < WORLD_SIZE; x++)
+		{
+			for (int y = 0; y < WORLD_SIZE; y++)
+			{
+				var protoTileIndex = protoTileIndices[x + y * WORLD_SIZE];
+				var atlasCoords = protoTileIndexToTileSetCoords[protoTileIndex];
+				_tileMapLayer?.SetCell(new Vector2I(x, y), atlasCoords: new Vector2I(atlasCoords.X, atlasCoords.Y));
+			}
+		}
 
 		// Spawn resources and environmental decorations in each valid tile that matches the environmental decoration placement config
 
@@ -180,6 +297,7 @@ public partial class WorldGenerator : TileMapLayer
 
 	private const int WORLD_SIZE = 48;
 	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[WORLD_SIZE, WORLD_SIZE];
+	private Array<EnvironmentalDecorationPlacementConfig>? _environmentalDecorationPlacementConfigs;
 	private TileMapLayer? _tileMapLayer;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 	private PackedScene? _pineTreeScene;
