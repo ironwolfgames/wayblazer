@@ -4,6 +4,7 @@
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
 		<NoWarn>CS8785</NoWarn>		<!-- Ignore Godot build error since this is not a Godot project -->
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>
