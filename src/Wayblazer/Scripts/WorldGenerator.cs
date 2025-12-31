@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Godot;
 using Godot.Collections;
@@ -31,8 +30,8 @@ public partial class WorldGenerator : TileMapLayer
 		Array<BiomeRange> biomeRanges =
 		[
 			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
-			new BiomeRange(BiomeType.River, 0.2f, 0.4f),
-			new BiomeRange(BiomeType.Lake, 0.3f, 0.6f),
+			// new BiomeRange(BiomeType.River, 0.2f, 0.4f),
+			// new BiomeRange(BiomeType.Lake, 0.3f, 0.6f),
 			new BiomeRange(BiomeType.Swamp, 0.2f, 0.3f, 0.1f, 0.2f),
 			new BiomeRange(BiomeType.Beach, 0.2f, 0.3f),
 			new BiomeRange(BiomeType.Plains, 0.3f, 0.5f, 0.4f, 0.7f),
@@ -187,7 +186,7 @@ public partial class WorldGenerator : TileMapLayer
 		// Use WFC (Wave Function Collapse) to generate the world's base tiles
 
 		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
-		List<ProtoTile> protoTiles =
+		System.Collections.Generic.List<ProtoTile> protoTiles =
 		[
 			new()
 			{
