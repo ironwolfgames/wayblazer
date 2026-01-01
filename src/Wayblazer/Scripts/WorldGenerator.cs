@@ -102,18 +102,6 @@ public partial class WorldGenerator : TileMapLayer
 				)
 		];
 
-		// For now, hardcode the resources but in the future, these will be loaded from a configuration file or procedurally generated.
-		var environmentalDecorations = Enum.GetValues(typeof(EnvironmentalDecorationType));
-		Array<EnvironmentalDecorationPlacementConfig> environmentalDecorationPlacementConfigs =
-		[
-			new (EnvironmentalDecorationType.Tree,
-				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.1f,
-				maximumValue: 0.5f,
-				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
-				),
-		];
-
 		_resources = new Dictionary<ResourceKind, Array<RawResource>>
 		{
 			{ ResourceKind.Ore, new Array<RawResource>()
@@ -188,28 +176,132 @@ public partial class WorldGenerator : TileMapLayer
 		[
 			new()
 			{
-				// 0 - Plains
-				Id = "plains",
-				Weight = 10,
+				// 0 - Ocean
+				Id = "ocean",
+				Weight = 20,
 				NeighborIndices =
 				[
-					[ 0, 1 ], // up
-					[ 0, 1 ], // right
-					[ 0, 1 ], // down
-					[ 0, 1 ]  // left
+					[ 0, 1, 9 ], // up
+					[ 0, 1, 9 ], // right
+					[ 0, 1, 9 ], // down
+					[ 0, 1, 9 ]  // left
 				]
 			},
 			new()
 			{
-				// 1 - Water
-				Id = "water",
+				// 1 - Beach
+				Id = "beach",
 				Weight = 5,
 				NeighborIndices =
 				[
-					[ 1 ], // up
-					[ 1 ], // right
-					[ 1 ], // down
-					[ 1 ], // left
+					[ 0, 1, 2, 3, 4, 9 ], // up
+					[ 0, 1, 2, 3, 4, 9 ], // right
+					[ 0, 1, 2, 3, 4, 9 ], // down
+					[ 0, 1, 2, 3, 4, 9 ]  // left
+				]
+			},
+			new()
+			{
+				// 2 - Plains
+				Id = "plains",
+				Weight = 15,
+				NeighborIndices =
+				[
+					[ 1, 2, 3, 5, 8 ], // up
+					[ 1, 2, 3, 5, 8 ], // right
+					[ 1, 2, 3, 5, 8 ], // down
+					[ 1, 2, 3, 5, 8 ]  // left
+				]
+			},
+			new()
+			{
+				// 3 - Desert
+				Id = "desert",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ 1, 2, 3, 8 ], // up
+					[ 1, 2, 3, 8 ], // right
+					[ 1, 2, 3, 8 ], // down
+					[ 1, 2, 3, 8 ]  // left
+				]
+			},
+			new()
+			{
+				// 4 - Jungle
+				Id = "jungle",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ 1, 4, 5, 9 ], // up
+					[ 1, 4, 5, 9 ], // right
+					[ 1, 4, 5, 9 ], // down
+					[ 1, 4, 5, 9 ]  // left
+				]
+			},
+			new()
+			{
+				// 5 - ForestDeciduous
+				Id = "forest_deciduous",
+				Weight = 12,
+				NeighborIndices =
+				[
+					[ 2, 4, 5, 6 ], // up
+					[ 2, 4, 5, 6 ], // right
+					[ 2, 4, 5, 6 ], // down
+					[ 2, 4, 5, 6 ]  // left
+				]
+			},
+			new()
+			{
+				// 6 - ForestConiferous
+				Id = "forest_coniferous",
+				Weight = 10,
+				NeighborIndices =
+				[
+					[ 5, 6, 7, 8 ], // up
+					[ 5, 6, 7, 8 ], // right
+					[ 5, 6, 7, 8 ], // down
+					[ 5, 6, 7, 8 ]  // left
+				]
+			},
+			new()
+			{
+				// 7 - Tundra
+				Id = "tundra",
+				Weight = 6,
+				NeighborIndices =
+				[
+					[ 6, 7, 8 ], // up
+					[ 6, 7, 8 ], // right
+					[ 6, 7, 8 ], // down
+					[ 6, 7, 8 ]  // left
+				]
+			},
+			new()
+			{
+				// 8 - Mountain
+				Id = "mountain",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ 2, 3, 6, 7, 8 ], // up
+					[ 2, 3, 6, 7, 8 ], // right
+					[ 2, 3, 6, 7, 8 ], // down
+					[ 2, 3, 6, 7, 8 ]  // left
+				]
+			},
+			new()
+			{
+				// 9 - Swamp
+				Id = "swamp",
+				Weight = 5,
+				NeighborIndices =
+				[
+					[ 0, 1, 4, 9 ], // up
+					[ 0, 1, 4, 9 ], // right
+					[ 0, 1, 4, 9 ], // down
+					[ 0, 1, 4, 9 ]  // left
 				]
 			}
 		];
@@ -219,12 +311,30 @@ public partial class WorldGenerator : TileMapLayer
 		{
 			{ 0, (0, 0) },
 			{ 1, (1, 0) },
+			{ 2, (2, 0) },
+			{ 3, (3, 0) },
+			{ 4, (4, 0) },
+			{ 5, (5, 0) },
+			{ 6, (6, 0) },
+			{ 7, (7, 0) },
+			{ 8, (8, 0) },
+			{ 9, (9, 0) },
 		};
 
 		var configuration = new Configuration(protoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
 		var output = new Output(configuration, width: WORLD_SIZE, height: WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 			{
-				// for now, return all proto tiles as valid for any position
+				// Get the biome type at this position
+				var biomeType = _worldMapBiomeTypes[x, y];
+
+				// only allow the proto tiles that matches this biome
+				var protoTileIndex = (int)biomeType;
+				if (protoTileIndex >= 0 && protoTileIndex < protoTiles.Count)
+				{
+					return new System.Collections.Generic.List<ProtoTile> { protoTiles[protoTileIndex] };
+				}
+
+				// fallback to returning all proto tiles as valid
 				return protoTiles;
 			});
 		var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
