@@ -25,7 +25,7 @@ public partial class MusicManager : AudioStreamPlayer
 
 		// play the current track and set a timer for when it finishes to switch to the next track
 		Timer timer = new Timer();
-		timer.WaitTime = Stream.GetLength();
+		timer.WaitTime = Stream?.GetLength() ?? 0;
 		timer.OneShot = true;
 		timer.Timeout += () => PlayNextTrack();
 		AddChild(timer);
@@ -45,6 +45,6 @@ public partial class MusicManager : AudioStreamPlayer
 		}
 	}
 
-	private AudioStream _backgroundTrackOne;
-	private AudioStream _backgroundTrackTwo;
+	private AudioStream? _backgroundTrackOne;
+	private AudioStream? _backgroundTrackTwo;
 }

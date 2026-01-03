@@ -29,9 +29,8 @@ public partial class GameCamera : Camera2D
 		LimitLeft = -edgeBuffer;
 		LimitTop = -edgeBuffer;
 
-		var worldMapSize = WorldMapBaseLayer.GetUsedRect().Size;
-		LimitRight = worldMapSize.X * WorldMapBaseLayer.TileSet.TileSize.X + edgeBuffer;
-		LimitBottom = worldMapSize.Y * WorldMapBaseLayer.TileSet.TileSize.Y + edgeBuffer;
+		LimitRight = Constants.WORLD_SIZE * WorldMapBaseLayer.TileSet.TileSize.X + edgeBuffer;
+		LimitBottom = Constants.WORLD_SIZE * WorldMapBaseLayer.TileSet.TileSize.Y + edgeBuffer;
 	}
 
 	public override void _Process(double delta)

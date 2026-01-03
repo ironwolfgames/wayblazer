@@ -87,7 +87,7 @@ public partial class PlayerController : CharacterBody2D
 			PlayerState.Idle => "idle",
 			PlayerState.Walking => "walk",
 			PlayerState.Running => "run",
-			PlayerState.Harvesting => "harvest",
+			PlayerState.Harvesting => "harvest_wood",
 			_ => null
 		};
 

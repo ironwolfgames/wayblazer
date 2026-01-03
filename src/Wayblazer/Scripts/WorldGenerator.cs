@@ -1,6 +1,8 @@
 using System;
+using System.Linq;
 using Godot;
 using Godot.Collections;
+using WFC.Core;
 
 namespace Wayblazer;
 
@@ -11,25 +13,95 @@ public partial class WorldGenerator : TileMapLayer
 		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
 		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
-		int seed = (int)GD.Randi();
-		GlobalRandom.Seed(seed);
+		var seed = (int)GD.Randi();
+		GlobalRandom.InitializeWithSeed(seed);
 
 		GenerateWorldData();
-		GD.Print($"World data generated with seed: {seed}");
+		GD.Print($"World data generated with seed: {GlobalRandom.Seed}");
 
 		RenderWorld();
 	}
 
 	public void GenerateWorldData()
 	{
-		for (var x = 0; x < WORLD_SIZE; x++)
+		var worldBiomeMapNoiseConfig = new NoiseLayerConfig();
+		var worldHeightMap = NoiseService.GenerateNoiseMap(Constants.WORLD_SIZE, Constants.WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
+
+		// For now, hardcode the biome ranges but in the future, these will be loaded from a configuration file or generated procedurally.
+		Array<BiomeRange> biomeRanges =
+		[
+			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
+			// new BiomeRange(BiomeType.River, 0.2f, 0.4f),
+			// new BiomeRange(BiomeType.Lake, 0.3f, 0.6f),
+			new BiomeRange(BiomeType.Swamp, 0.2f, 0.3f, 0.1f, 0.2f),
+			new BiomeRange(BiomeType.Beach, 0.2f, 0.3f),
+			new BiomeRange(BiomeType.Plains, 0.3f, 0.5f, 0.4f, 0.7f),
+			new BiomeRange(BiomeType.Desert, 0.3f, 0.5f, 0.2f, 0.4f),
+			new BiomeRange(BiomeType.Tundra, 0.5f, 0.7f, 0.7f, 1.0f),
+			new BiomeRange(BiomeType.ForestDeciduous, 0.4f, 0.7f, 0.0f, 0.5f),
+			new BiomeRange(BiomeType.ForestConiferous, 0.6f, 0.9f, 0.5f, 1.0f),
+			new BiomeRange(BiomeType.Jungle, 0.3f, 0.4f, 0.0f, 0.2f),
+			new BiomeRange(BiomeType.Mountain, 0.8f, 1.0f, 0.0f, 1.0f),
+		];
+
+		// Assign biomes to each tile based on the height map
+		for (var x = 0; x < Constants.WORLD_SIZE; x++)
 		{
-			for (var y = 0; y < WORLD_SIZE; y++)
+			for (var y = 0; y < Constants.WORLD_SIZE; y++)
 			{
-				// Randomly assign an environment type (0-1 for now, can be expanded)
-				_worldData[x, y] = GlobalRandom.Next(0, 2);
+				// calculate equator value in the range of 0.0 to 1.0 for the current y where 0.0 is the equator and 1.0 is either pole.
+				var equatorValue = (float)Math.Abs(y - (Constants.WORLD_SIZE / 2)) / (Constants.WORLD_SIZE / 2);
+				_worldMapBiomeTypes[x, y] = GetBiomeAt(worldHeightMap[x, y], biomeRanges, equatorValue);
 			}
 		}
+
+		// For now, hardcode the environmental decoration placement configs but in the future, these
+		// will be loaded from a configuration file or generated procedurally.
+		_environmentalDecorationPlacementConfigs =
+		[
+			new (EnvironmentalDecorationType.Tree,
+				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
+				),
+			new (EnvironmentalDecorationType.Rock,
+				new NoiseLayerConfig() { Frequency = 0.2f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.6f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				),
+			new (EnvironmentalDecorationType.Bush,
+				new NoiseLayerConfig() { Frequency = 0.3f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.4f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.Flower,
+				new NoiseLayerConfig() { Frequency = 0.4f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.Grass,
+				new NoiseLayerConfig() { Frequency = 0.5f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+				),
+			new (EnvironmentalDecorationType.OreDeposit,
+				new NoiseLayerConfig() { Frequency = 0.6f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				),
+			new (EnvironmentalDecorationType.GasDeposit,
+				new NoiseLayerConfig() { Frequency = 0.7f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+				)
+		];
 
 		_resources = new Dictionary<ResourceKind, Array<RawResource>>
 		{
@@ -98,46 +170,260 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void RenderWorld()
 	{
-		for (int x = 0; x < WORLD_SIZE; x++)
-		{
-			for (int y = 0; y < WORLD_SIZE; y++)
+		// Use WFC (Wave Function Collapse) to generate the world's base tiles
+
+		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
+		System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)> protoTileInfos =
+		[
+			(new()
 			{
-				int tileType = _worldData[x, y];
+				// 0 - Ocean
+				Id = "ocean",
+				Weight = 20,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ],  // left
+				]
+			}, 10, 1),
+			(new()
+			{
+				// 1 - Beach
+				Id = "beach",
+				Weight = 5,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
+				]
+			}, 1, 1),
+			(new()
+			{
+				// 2 - Plains
+				Id = "plains",
+				Weight = 15,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ]  // left
+				]
+			}, 4, 1),
+			(new()
+			{
+				// 3 - Desert
+				Id = "desert",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ]  // left
+				]
+			}, 7, 1),
+			(new()
+			{
+				// 4 - Jungle
+				Id = "jungle",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ]  // left
+				]
+			}, 1, 4),
+			(new()
+			{
+				// 5 - ForestDeciduous
+				Id = "forest_deciduous",
+				Weight = 12,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // up
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // right
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // down
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ]  // left
+				]
+			}, 4, 4),
+			(new()
+			{
+				// 6 - ForestConiferous
+				Id = "forest_coniferous",
+				Weight = 10,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
+				]
+			}, 7, 4),
+			(new()
+			{
+				// 7 - Tundra
+				Id = "tundra",
+				Weight = 6,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
+				]
+			}, 1, 7),
+			(new()
+			{
+				// 8 - Mountain
+				Id = "mountain",
+				Weight = 8,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
+				]
+			}, 4, 7),
+			(new()
+			{
+				// 9 - Swamp
+				Id = "swamp",
+				Weight = 5,
+				NeighborIndices =
+				[
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
+				]
+			}, 7, 7)
+		];
 
-				// SetCell parameters: layer, coords, source_id, atlas_coords
-				// Using source_id 0 and atlas coords based on tile type
-				SetCell(new Vector2I(x, y), tileType, new Vector2I(1, 1));
+		var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
+		var output = new Output(configuration, width: Constants.WORLD_SIZE, height: Constants.WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
+			{
+				// Get the biome type at this position
+				var biomeType = _worldMapBiomeTypes[x, y];
 
-				// Randomly place resource nodes on certain tiles with 10% chance
-				if (GD.Randf() < 0.1f)
+				// only allow the proto tiles that matches this biome
+				var protoTileIndex = (int)biomeType;
+				if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
 				{
-					ResourceNode resourceNode;
-					if (tileType == 1)
-					{
-						resourceNode = _goldOreScene!.Instantiate<ResourceNode>();
-						resourceNode.ResourceData = _resources![ResourceKind.Ore][GlobalRandom.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
-					}
-					else
-					{
-						resourceNode = _pineTreeScene!.Instantiate<ResourceNode>();
-						resourceNode.ResourceData = _resources![ResourceKind.Wood][GlobalRandom.Next(0, _resources[ResourceKind.Wood].Count)].Duplicate() as RawResource;
-					}
+					return new System.Collections.Generic.List<ProtoTile> { protoTileInfos[protoTileIndex].Tile };
+				}
 
-					// Convert grid position to world position
-					resourceNode.Position = new Vector2((x + 0.5f) * TileSet.TileSize.X, (y + 0.5f) * TileSet.TileSize.Y);
-					resourceNode.ZIndex = (int) Math.Round(resourceNode.Position.Y);
+				return protoTileInfos.Select(x => x.Tile).ToList();
+			});
+		var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
+		algorithm.Run(output);
 
-					AddChild(resourceNode);
+		// Get the proto tile indices from the WFC output
+		var protoTileIndices = output.ToSerializable().Tiles;
+
+		// Generate noise maps for all decoration types
+		var decorationNoiseMaps = GenerateDecorationNoiseMaps();
+
+		// Create a lookup for scene paths (you'll need to add these to Constants.Scenes)
+		var decorationScenes = new Dictionary<EnvironmentalDecorationType, PackedScene>
+		{
+			{ EnvironmentalDecorationType.Tree, _pineTreeScene! },
+			{ EnvironmentalDecorationType.OreDeposit, _goldOreScene! },
+			// Add more as you create the scenes
+		};
+
+		// Iterate through the world, set the tiles in the world according to the WFC output and place environmental decorations
+		for (int x = 0; x < Constants.WORLD_SIZE; x++)
+		{
+			for (int y = 0; y < Constants.WORLD_SIZE; y++)
+			{
+				var protoTileIndex = protoTileIndices[x + y * Constants.WORLD_SIZE];
+				var protoTileInfo = protoTileInfos[protoTileIndex];
+				SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: new Vector2I(protoTileInfo.X, protoTileInfo.Y));
+
+				foreach (var config in _environmentalDecorationPlacementConfigs!)
+				{
+					if (!decorationNoiseMaps.ContainsKey(config.DecorationType) || !decorationScenes.ContainsKey(config.DecorationType))
+						continue;
+
+					var noiseValue = decorationNoiseMaps[config.DecorationType][x, y];
+					if (ShouldPlaceDecoration(x, y, config, noiseValue))
+					{
+						var scene = decorationScenes[config.DecorationType];
+						var instance = scene.Instantiate<ResourceNode>();
+
+						// Set resource data based on decoration type
+						if (config.DecorationType == EnvironmentalDecorationType.OreDeposit)
+						{
+							instance.ResourceData = _resources![ResourceKind.Ore][GlobalRandom.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
+						}
+						else if (config.DecorationType == EnvironmentalDecorationType.Tree)
+						{
+							instance.ResourceData = _resources![ResourceKind.Wood][GlobalRandom.Next(0, _resources[ResourceKind.Wood].Count)].Duplicate() as RawResource;
+						}
+
+						// Convert grid position to world position
+						instance.Position = new Vector2((x + 0.5f) * TileSet.TileSize.X, (y + 0.5f) * TileSet.TileSize.Y);
+						instance.ZIndex = (int)Math.Round(instance.Position.Y);
+
+						AddChild(instance);
+
+						// Only place one decoration per tile
+						// TODO: ensure we order decorations by priority
+						break;
+					}
 				}
 			}
 		}
 
-		GD.Print($"World rendered: {WORLD_SIZE}x{WORLD_SIZE} tiles");
+		GD.Print($"World rendered: {Constants.WORLD_SIZE}x{Constants.WORLD_SIZE} tiles");
 	}
 
-	private const int WORLD_SIZE = 48;
-	private int[,] _worldData = new int[WORLD_SIZE, WORLD_SIZE];
-	private TileMapLayer? _tileMapLayer;
+	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
+	{
+		var validBiomeRanges = biomeRanges.FirstOrDefault(b => height >= b.MinimumHeight && height <= b.MaximumHeight && equatorValue >= b.MinimumEquatorValue && equatorValue <= b.MaximumEquatorValue);
+		return validBiomeRanges is not null ? validBiomeRanges.Biome : BiomeType.Default;
+	}
+
+	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps()
+	{
+		var noiseMaps = new System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]>();
+
+		foreach (var config in _environmentalDecorationPlacementConfigs!)
+		{
+			var noiseMap = NoiseService.GenerateNoiseMap(
+				Constants.WORLD_SIZE,
+				Constants.WORLD_SIZE,
+				GlobalRandom.Seed + (int)config.DecorationType, // Different seed per decoration
+				config.NoiseConfig
+			);
+			noiseMaps[config.DecorationType] = noiseMap;
+		}
+
+		return noiseMaps;
+	}
+
+	private bool ShouldPlaceDecoration(int x, int y, EnvironmentalDecorationPlacementConfig config, float noiseValue)
+	{
+		var biomeType = _worldMapBiomeTypes[x, y];
+
+		// Check if noise value is in the valid range
+		if (noiseValue < config.MinimumValue || noiseValue > config.MaximumValue)
+			return false;
+
+		// Check if the current biome is valid for this decoration
+		return config.ValidBiomes.Contains(biomeType);
+	}
+
+	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[Constants.WORLD_SIZE, Constants.WORLD_SIZE];
+	private Array<EnvironmentalDecorationPlacementConfig>? _environmentalDecorationPlacementConfigs;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 	private PackedScene? _pineTreeScene;
 	private PackedScene? _goldOreScene;
