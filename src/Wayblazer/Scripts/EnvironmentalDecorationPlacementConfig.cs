@@ -26,4 +26,6 @@ public partial class EnvironmentalDecorationPlacementConfig : Resource
 		MaximumValue = maximumValue;
 		ValidBiomes = validBiomes;
 	}
+
+	public EnvironmentalDecorationPlacementConfig() : this(EnvironmentalDecorationType.Tree, new NoiseLayerConfig(), 0.0f, 1.0f, new Array<BiomeType>()) { }
 }
