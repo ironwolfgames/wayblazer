@@ -338,7 +338,7 @@ public partial class WorldGenerator : TileMapLayer
 	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
 	{
 		var validBiomeRanges = biomeRanges.FirstOrDefault(b => height >= b.MinimumHeight && height <= b.MaximumHeight && equatorValue >= b.MinimumEquatorValue && equatorValue <= b.MaximumEquatorValue);
-		return validBiomeRanges is not null ? validBiomeRanges.Biome : BiomeType.Default;
+		return validBiomeRanges is not null ? validBiomeRanges.Biome : BiomeType.Ocean;
 	}
 
 	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps()

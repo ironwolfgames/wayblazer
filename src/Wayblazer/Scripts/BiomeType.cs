@@ -2,7 +2,6 @@ namespace Wayblazer;
 
 public enum BiomeType
 {
-	Default = 0,
 	Ocean = 0, // #4fa4b8
 	// Not sure these work as "biomes", maybe we need a separate river & lake generation system?
 	// River,
