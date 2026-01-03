@@ -13,7 +13,8 @@ public partial class WorldGenerator : TileMapLayer
 		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
 		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
-		GlobalRandom.InitializeWithSeed((int)GD.Randi());
+		var seed = (int)GD.Randi();
+		GlobalRandom.InitializeWithSeed(seed);
 
 		GenerateWorldData();
 		GD.Print($"World data generated with seed: {GlobalRandom.Seed}");
@@ -24,7 +25,7 @@ public partial class WorldGenerator : TileMapLayer
 	public void GenerateWorldData()
 	{
 		var worldBiomeMapNoiseConfig = new NoiseLayerConfig();
-		var worldHeightMap = NoiseService.GenerateNoiseMap(WORLD_SIZE, WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
+		var worldHeightMap = NoiseService.GenerateNoiseMap(Constants.WORLD_SIZE, Constants.WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
 
 		// For now, hardcode the biome ranges but in the future, these will be loaded from a configuration file or generated procedurally.
 		Array<BiomeRange> biomeRanges =
@@ -44,12 +45,12 @@ public partial class WorldGenerator : TileMapLayer
 		];
 
 		// Assign biomes to each tile based on the height map
-		for (var x = 0; x < WORLD_SIZE; x++)
+		for (var x = 0; x < Constants.WORLD_SIZE; x++)
 		{
-			for (var y = 0; y < WORLD_SIZE; y++)
+			for (var y = 0; y < Constants.WORLD_SIZE; y++)
 			{
 				// calculate equator value in the range of 0.0 to 1.0 for the current y where 0.0 is the equator and 1.0 is either pole.
-				var equatorValue = (float)Math.Abs(y - (WORLD_SIZE / 2)) / (WORLD_SIZE / 2);
+				var equatorValue = (float)Math.Abs(y - (Constants.WORLD_SIZE / 2)) / (Constants.WORLD_SIZE / 2);
 				_worldMapBiomeTypes[x, y] = GetBiomeAt(worldHeightMap[x, y], biomeRanges, equatorValue);
 			}
 		}
@@ -172,170 +173,154 @@ public partial class WorldGenerator : TileMapLayer
 		// Use WFC (Wave Function Collapse) to generate the world's base tiles
 
 		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
-		System.Collections.Generic.List<ProtoTile> protoTiles =
+		System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)> protoTileInfos =
 		[
-			new()
+			(new()
 			{
 				// 0 - Ocean
 				Id = "ocean",
 				Weight = 20,
 				NeighborIndices =
 				[
-					[ 0, 1, 9 ], // up
-					[ 0, 1, 9 ], // right
-					[ 0, 1, 9 ], // down
-					[ 0, 1, 9 ]  // left
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ],  // left
 				]
-			},
-			new()
+			}, 10, 1),
+			(new()
 			{
 				// 1 - Beach
 				Id = "beach",
 				Weight = 5,
 				NeighborIndices =
 				[
-					[ 0, 1, 2, 3, 4, 9 ], // up
-					[ 0, 1, 2, 3, 4, 9 ], // right
-					[ 0, 1, 2, 3, 4, 9 ], // down
-					[ 0, 1, 2, 3, 4, 9 ]  // left
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
 				]
-			},
-			new()
+			}, 1, 1),
+			(new()
 			{
 				// 2 - Plains
 				Id = "plains",
 				Weight = 15,
 				NeighborIndices =
 				[
-					[ 1, 2, 3, 5, 8 ], // up
-					[ 1, 2, 3, 5, 8 ], // right
-					[ 1, 2, 3, 5, 8 ], // down
-					[ 1, 2, 3, 5, 8 ]  // left
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ]  // left
 				]
-			},
-			new()
+			}, 4, 1),
+			(new()
 			{
 				// 3 - Desert
 				Id = "desert",
 				Weight = 8,
 				NeighborIndices =
 				[
-					[ 1, 2, 3, 8 ], // up
-					[ 1, 2, 3, 8 ], // right
-					[ 1, 2, 3, 8 ], // down
-					[ 1, 2, 3, 8 ]  // left
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ]  // left
 				]
-			},
-			new()
+			}, 7, 1),
+			(new()
 			{
 				// 4 - Jungle
 				Id = "jungle",
 				Weight = 8,
 				NeighborIndices =
 				[
-					[ 1, 4, 5, 9 ], // up
-					[ 1, 4, 5, 9 ], // right
-					[ 1, 4, 5, 9 ], // down
-					[ 1, 4, 5, 9 ]  // left
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ]  // left
 				]
-			},
-			new()
+			}, 1, 4),
+			(new()
 			{
 				// 5 - ForestDeciduous
 				Id = "forest_deciduous",
 				Weight = 12,
 				NeighborIndices =
 				[
-					[ 2, 4, 5, 6 ], // up
-					[ 2, 4, 5, 6 ], // right
-					[ 2, 4, 5, 6 ], // down
-					[ 2, 4, 5, 6 ]  // left
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // up
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // right
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // down
+					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ]  // left
 				]
-			},
-			new()
+			}, 4, 4),
+			(new()
 			{
 				// 6 - ForestConiferous
 				Id = "forest_coniferous",
 				Weight = 10,
 				NeighborIndices =
 				[
-					[ 5, 6, 7, 8 ], // up
-					[ 5, 6, 7, 8 ], // right
-					[ 5, 6, 7, 8 ], // down
-					[ 5, 6, 7, 8 ]  // left
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
 				]
-			},
-			new()
+			}, 7, 4),
+			(new()
 			{
 				// 7 - Tundra
 				Id = "tundra",
 				Weight = 6,
 				NeighborIndices =
 				[
-					[ 6, 7, 8 ], // up
-					[ 6, 7, 8 ], // right
-					[ 6, 7, 8 ], // down
-					[ 6, 7, 8 ]  // left
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
 				]
-			},
-			new()
+			}, 1, 7),
+			(new()
 			{
 				// 8 - Mountain
 				Id = "mountain",
 				Weight = 8,
 				NeighborIndices =
 				[
-					[ 2, 3, 6, 7, 8 ], // up
-					[ 2, 3, 6, 7, 8 ], // right
-					[ 2, 3, 6, 7, 8 ], // down
-					[ 2, 3, 6, 7, 8 ]  // left
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
+					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
 				]
-			},
-			new()
+			}, 4, 7),
+			(new()
 			{
 				// 9 - Swamp
 				Id = "swamp",
 				Weight = 5,
 				NeighborIndices =
 				[
-					[ 0, 1, 4, 9 ], // up
-					[ 0, 1, 4, 9 ], // right
-					[ 0, 1, 4, 9 ], // down
-					[ 0, 1, 4, 9 ]  // left
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
+					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
 				]
-			}
+			}, 7, 7)
 		];
 
-		// Map proto tile indices to their corresponding tile set coordinates using hard coded values for now
-		System.Collections.Generic.Dictionary<int, (int X, int Y)> protoTileIndexToTileSetCoords = new()
-		{
-			{ 0, (0, 0) },
-			{ 1, (1, 0) },
-			{ 2, (2, 0) },
-			{ 3, (3, 0) },
-			{ 4, (4, 0) },
-			{ 5, (5, 0) },
-			{ 6, (6, 0) },
-			{ 7, (7, 0) },
-			{ 8, (8, 0) },
-			{ 9, (9, 0) },
-		};
-
-		var configuration = new Configuration(protoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
-		var output = new Output(configuration, width: WORLD_SIZE, height: WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
+		var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
+		var output = new Output(configuration, width: Constants.WORLD_SIZE, height: Constants.WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 			{
 				// Get the biome type at this position
 				var biomeType = _worldMapBiomeTypes[x, y];
 
 				// only allow the proto tiles that matches this biome
 				var protoTileIndex = (int)biomeType;
-				if (protoTileIndex >= 0 && protoTileIndex < protoTiles.Count)
+				if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
 				{
-					return new System.Collections.Generic.List<ProtoTile> { protoTiles[protoTileIndex] };
+					return new System.Collections.Generic.List<ProtoTile> { protoTileInfos[protoTileIndex].Tile };
 				}
 
-				// fallback to returning all proto tiles as valid
-				return protoTiles;
+				return protoTileInfos.Select(x => x.Tile).ToList();
 			});
 		var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
 		algorithm.Run(output);
@@ -355,13 +340,13 @@ public partial class WorldGenerator : TileMapLayer
 		};
 
 		// Iterate through the world, set the tiles in the world according to the WFC output and place environmental decorations
-		for (int x = 0; x < WORLD_SIZE; x++)
+		for (int x = 0; x < Constants.WORLD_SIZE; x++)
 		{
-			for (int y = 0; y < WORLD_SIZE; y++)
+			for (int y = 0; y < Constants.WORLD_SIZE; y++)
 			{
-				var protoTileIndex = protoTileIndices[x + y * WORLD_SIZE];
-				var atlasCoords = protoTileIndexToTileSetCoords[protoTileIndex];
-				_tileMapLayer?.SetCell(new Vector2I(x, y), atlasCoords: new Vector2I(atlasCoords.X, atlasCoords.Y));
+				var protoTileIndex = protoTileIndices[x + y * Constants.WORLD_SIZE];
+				var protoTileInfo = protoTileInfos[protoTileIndex];
+				SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: new Vector2I(protoTileInfo.X, protoTileInfo.Y));
 
 				foreach (var config in _environmentalDecorationPlacementConfigs!)
 				{
@@ -398,7 +383,7 @@ public partial class WorldGenerator : TileMapLayer
 			}
 		}
 
-		GD.Print($"World rendered: {WORLD_SIZE}x{WORLD_SIZE} tiles");
+		GD.Print($"World rendered: {Constants.WORLD_SIZE}x{Constants.WORLD_SIZE} tiles");
 	}
 
 	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
@@ -414,8 +399,8 @@ public partial class WorldGenerator : TileMapLayer
 		foreach (var config in _environmentalDecorationPlacementConfigs!)
 		{
 			var noiseMap = NoiseService.GenerateNoiseMap(
-				WORLD_SIZE,
-				WORLD_SIZE,
+				Constants.WORLD_SIZE,
+				Constants.WORLD_SIZE,
 				GlobalRandom.Seed + (int)config.DecorationType, // Different seed per decoration
 				config.NoiseConfig
 			);
@@ -437,10 +422,8 @@ public partial class WorldGenerator : TileMapLayer
 		return config.ValidBiomes.Contains(biomeType);
 	}
 
-	private const int WORLD_SIZE = 48;
-	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[WORLD_SIZE, WORLD_SIZE];
+	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[Constants.WORLD_SIZE, Constants.WORLD_SIZE];
 	private Array<EnvironmentalDecorationPlacementConfig>? _environmentalDecorationPlacementConfigs;
-	private TileMapLayer? _tileMapLayer;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 	private PackedScene? _pineTreeScene;
 	private PackedScene? _goldOreScene;
