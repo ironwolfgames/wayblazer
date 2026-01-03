@@ -1,5 +1,6 @@
 using Godot;
 
+namespace Wayblazer;
 public partial class NoiseLayerConfig : Resource
 {
 	[Export] public float Frequency = 0.01f;
