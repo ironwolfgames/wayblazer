@@ -17,6 +17,13 @@ public partial class EnvironmentalDecorationPlacementConfig : Resource
 	[Export]
 	public Array<BiomeType> ValidBiomes { get; set; }
 
+	public EnvironmentalDecorationPlacementConfig()
+	{
+		// Default constructor for Godot
+		NoiseConfig = new NoiseLayerConfig();
+		ValidBiomes = new Array<BiomeType>();
+	}
+
 	public EnvironmentalDecorationPlacementConfig(EnvironmentalDecorationType decorationType, NoiseLayerConfig noiseConfig,
 		float minimumValue, float maximumValue, Array<BiomeType> validBiomes)
 	{

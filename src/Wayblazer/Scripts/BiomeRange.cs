@@ -2,6 +2,7 @@ using Godot;
 
 namespace Wayblazer;
 
+[GlobalClass]
 public partial class BiomeRange : Resource
 {
 	[Export] public BiomeType Biome;
@@ -9,6 +10,11 @@ public partial class BiomeRange : Resource
 	[Export] public float MaximumHeight;
 	[Export] public float MinimumEquatorValue;
 	[Export] public float MaximumEquatorValue;
+
+	public BiomeRange()
+	{
+		// Default constructor for Godot
+	}
 
 	public BiomeRange(BiomeType biome, float minimumHeight, float maximumHeight, float minimumEquatorValue = 0.0f, float maximumEquatorValue = 1.0f)
 	{

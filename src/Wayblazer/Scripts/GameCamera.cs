@@ -5,14 +5,14 @@ namespace Wayblazer;
 public partial class GameCamera : Camera2D
 {
 	[Export]
-	public TileMapLayer? WorldMapBaseLayer;
+	public WorldGenerator? WorldMap;
 
 	[Export]
 	public CharacterBody2D? PlayerCharacter;
 
 	public override void _Ready()
 	{
-		if (WorldMapBaseLayer is null)
+		if (WorldMap is null)
 		{
 			GD.PrintErr("WorldMapBaseLayer is not assigned in the GameCamera.");
 			return;
@@ -29,8 +29,8 @@ public partial class GameCamera : Camera2D
 		LimitLeft = -edgeBuffer;
 		LimitTop = -edgeBuffer;
 
-		LimitRight = Constants.WORLD_SIZE * WorldMapBaseLayer.TileSet.TileSize.X + edgeBuffer;
-		LimitBottom = Constants.WORLD_SIZE * WorldMapBaseLayer.TileSet.TileSize.Y + edgeBuffer;
+		LimitRight = WorldMap.Width * WorldMap.TileSet.TileSize.X + edgeBuffer;
+		LimitBottom = WorldMap.Height * WorldMap.TileSet.TileSize.Y + edgeBuffer;
 	}
 
 	public override void _Process(double delta)

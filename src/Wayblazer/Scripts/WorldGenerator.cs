@@ -6,16 +6,53 @@ using WFC.Core;
 
 namespace Wayblazer;
 
+[Tool]
+[GlobalClass]
 public partial class WorldGenerator : TileMapLayer
 {
+	[Export]
+	public int Width { get; set; } = 100;
+
+	[Export]
+	public int Height { get; set; } = 100;
+
+	[ExportGroup("Biome Configuration")]
+	[Export]
+	public NoiseLayerConfig BiomeNoiseConfig { get; set; } = new NoiseLayerConfig();
+
+	[Export]
+	public Array<BiomeRange> BiomeRanges { get; set; } = new Array<BiomeRange>();
+
+	[ExportGroup("Decoration Configuration")]
+	[Export]
+	public Array<EnvironmentalDecorationPlacementConfig> DecorationConfigs { get; set; } = new Array<EnvironmentalDecorationPlacementConfig>();
+
 	public override void _Ready()
 	{
+		// Don't auto-generate in editor mode
+		if (Engine.IsEditorHint())
+			return;
+
+		GenerateWorldFromZero();
+	}
+
+	public void GenerateWorldFromZero()
+	{
+		Clear();
+		foreach (Node child in GetChildren())
+		{
+			child.QueueFree();
+		}
+
+		_worldMapBiomeTypes = new BiomeType[Width, Height];
+
 		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
 		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
 		var seed = (int)GD.Randi();
 		GlobalRandom.InitializeWithSeed(seed);
 
+		InitializeResources();
 		GenerateWorldData();
 		GD.Print($"World data generated with seed: {GlobalRandom.Seed}");
 
@@ -24,153 +61,48 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void GenerateWorldData()
 	{
-		var worldBiomeMapNoiseConfig = new NoiseLayerConfig();
-		var worldHeightMap = NoiseService.GenerateNoiseMap(Constants.WORLD_SIZE, Constants.WORLD_SIZE, GlobalRandom.Seed, worldBiomeMapNoiseConfig);
+		// Use the exported noise config, or create a default one if not set
+		if (BiomeNoiseConfig == null)
+		{
+			BiomeNoiseConfig = new NoiseLayerConfig();
+		}
 
-		// For now, hardcode the biome ranges but in the future, these will be loaded from a configuration file or generated procedurally.
-		Array<BiomeRange> biomeRanges =
-		[
-			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
-			// new BiomeRange(BiomeType.River, 0.2f, 0.4f),
-			// new BiomeRange(BiomeType.Lake, 0.3f, 0.6f),
-			new BiomeRange(BiomeType.Swamp, 0.2f, 0.3f, 0.1f, 0.2f),
-			new BiomeRange(BiomeType.Beach, 0.2f, 0.3f),
-			new BiomeRange(BiomeType.Plains, 0.3f, 0.5f, 0.4f, 0.7f),
-			new BiomeRange(BiomeType.Desert, 0.3f, 0.5f, 0.2f, 0.4f),
-			new BiomeRange(BiomeType.Tundra, 0.5f, 0.7f, 0.7f, 1.0f),
-			new BiomeRange(BiomeType.ForestDeciduous, 0.4f, 0.7f, 0.0f, 0.5f),
-			new BiomeRange(BiomeType.ForestConiferous, 0.6f, 0.9f, 0.5f, 1.0f),
-			new BiomeRange(BiomeType.Jungle, 0.3f, 0.4f, 0.0f, 0.2f),
-			new BiomeRange(BiomeType.Mountain, 0.8f, 1.0f, 0.0f, 1.0f),
-		];
+		var worldHeightMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed, BiomeNoiseConfig);
+
+		// Use the exported biome ranges, or create defaults if empty
+		if (BiomeRanges == null || BiomeRanges.Count == 0)
+		{
+			BiomeRanges = GetDefaultBiomeRanges();
+		}
 
 		// Assign biomes to each tile based on the height map
-		for (var x = 0; x < Constants.WORLD_SIZE; x++)
+		for (var x = 0; x < Width; x++)
 		{
-			for (var y = 0; y < Constants.WORLD_SIZE; y++)
+			for (var y = 0; y < Height; y++)
 			{
 				// calculate equator value in the range of 0.0 to 1.0 for the current y where 0.0 is the equator and 1.0 is either pole.
-				var equatorValue = (float)Math.Abs(y - (Constants.WORLD_SIZE / 2)) / (Constants.WORLD_SIZE / 2);
-				_worldMapBiomeTypes[x, y] = GetBiomeAt(worldHeightMap[x, y], biomeRanges, equatorValue);
+				var equatorValue = (float)Math.Abs(y - (Height / 2)) / (Height / 2);
+				_worldMapBiomeTypes![x, y] = GetBiomeAt(worldHeightMap[x, y], BiomeRanges, equatorValue);
 			}
 		}
 
-		// For now, hardcode the environmental decoration placement configs but in the future, these
-		// will be loaded from a configuration file or generated procedurally.
-		_environmentalDecorationPlacementConfigs =
-		[
-			new (EnvironmentalDecorationType.Tree,
-				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.1f,
-				maximumValue: 0.5f,
-				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
-				),
-			new (EnvironmentalDecorationType.Rock,
-				new NoiseLayerConfig() { Frequency = 0.2f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.2f,
-				maximumValue: 0.6f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
-				),
-			new (EnvironmentalDecorationType.Bush,
-				new NoiseLayerConfig() { Frequency = 0.3f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.1f,
-				maximumValue: 0.4f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
-				),
-			new (EnvironmentalDecorationType.Flower,
-				new NoiseLayerConfig() { Frequency = 0.4f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.1f,
-				maximumValue: 0.3f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
-				),
-			new (EnvironmentalDecorationType.Grass,
-				new NoiseLayerConfig() { Frequency = 0.5f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.1f,
-				maximumValue: 0.3f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
-				),
-			new (EnvironmentalDecorationType.OreDeposit,
-				new NoiseLayerConfig() { Frequency = 0.6f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.2f,
-				maximumValue: 0.5f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
-				),
-			new (EnvironmentalDecorationType.GasDeposit,
-				new NoiseLayerConfig() { Frequency = 0.7f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
-				minimumValue: 0.2f,
-				maximumValue: 0.5f,
-				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
-				)
-		];
-
-		_resources = new Dictionary<ResourceKind, Array<RawResource>>
+		// Use the exported decoration configs, or create defaults if empty
+		if (DecorationConfigs == null || DecorationConfigs.Count == 0)
 		{
-			{ ResourceKind.Ore, new Array<RawResource>()
-				{
-					new RawResource("Iron", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 8.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 6.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 7.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 5.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 4.0f) },
-					}),
-					new RawResource("Copper", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 6.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 5.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 4.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 9.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 7.0f) },
-					})
-				}
-			},
-			{ ResourceKind.Wood, new Array<RawResource>()
-				{
-					new RawResource("Pine", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 4.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 5.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 3.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 6.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 7.0f) },
-					}),
-					new RawResource("Oak", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 6.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 7.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 5.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 4.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 6.0f) },
-					})
-				}
-			},
-			{ ResourceKind.Gas, new Array<RawResource>()
-				{
-					new RawResource("Hydrogen", ResourceKind.Gas, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 2.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 1.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 2.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 9.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 8.0f) },
-					}),
-					new RawResource("Oxygen", ResourceKind.Gas, new Dictionary<ResourcePropertyType, ResourceProperty>()
-					{
-						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 3.0f) },
-						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 2.0f) },
-						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 3.0f) },
-						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 8.0f) },
-						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 9.0f) },
-					})
-				}
-			},
-		};
+			DecorationConfigs = GetDefaultDecorationConfigs();
+		}
+
+		// Initialize resources if not already done
+		if (_resources == null)
+		{
+			InitializeResources();
+		}
 	}
 
 	public void RenderWorld()
 	{
-		// Use WFC (Wave Function Collapse) to generate the world's base tiles
+		const bool useWFC = false;
+		System.Collections.Generic.List<int> protoTileIndices;
 
 		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
 		System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)> protoTileInfos =
@@ -307,26 +239,43 @@ public partial class WorldGenerator : TileMapLayer
 			}, 7, 7)
 		];
 
-		var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
-		var output = new Output(configuration, width: Constants.WORLD_SIZE, height: Constants.WORLD_SIZE, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
-			{
-				// Get the biome type at this position
-				var biomeType = _worldMapBiomeTypes[x, y];
-
-				// only allow the proto tiles that matches this biome
-				var protoTileIndex = (int)biomeType;
-				if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
+		// Use WFC (Wave Function Collapse) to generate the world's base tiles
+#pragma warning disable CS0162 // Unreachable code detected
+		if (useWFC)
+		{
+			var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
+			var output = new Output(configuration, width: Width, height: Height, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 				{
-					return new System.Collections.Generic.List<ProtoTile> { protoTileInfos[protoTileIndex].Tile };
+					// Get the biome type at this position
+					var biomeType = _worldMapBiomeTypes![x, y];
+
+					// only allow the proto tiles that matches this biome
+					var protoTileIndex = (int)biomeType;
+					if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
+					{
+						return new System.Collections.Generic.List<ProtoTile> { protoTileInfos[protoTileIndex].Tile };
+					}
+
+					return protoTileInfos.Select(x => x.Tile).ToList();
+				});
+			var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
+			algorithm.Run(output);
+
+			// Get the proto tile indices from the WFC output
+			protoTileIndices = output.ToSerializable().Tiles;
+		}
+#pragma warning restore CS0162
+		else
+		{
+			protoTileIndices = new System.Collections.Generic.List<int>(Width * Height);
+			for (int x = 0; x < Width; x++)
+			{
+				for (int y = 0; y < Height; y++)
+				{
+					protoTileIndices.Add((int)_worldMapBiomeTypes![x, y]);
 				}
-
-				return protoTileInfos.Select(x => x.Tile).ToList();
-			});
-		var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
-		algorithm.Run(output);
-
-		// Get the proto tile indices from the WFC output
-		var protoTileIndices = output.ToSerializable().Tiles;
+			}
+		}
 
 		// Generate noise maps for all decoration types
 		var decorationNoiseMaps = GenerateDecorationNoiseMaps();
@@ -340,15 +289,15 @@ public partial class WorldGenerator : TileMapLayer
 		};
 
 		// Iterate through the world, set the tiles in the world according to the WFC output and place environmental decorations
-		for (int x = 0; x < Constants.WORLD_SIZE; x++)
+		for (int x = 0; x < Width; x++)
 		{
-			for (int y = 0; y < Constants.WORLD_SIZE; y++)
+			for (int y = 0; y < Height; y++)
 			{
-				var protoTileIndex = protoTileIndices[x + y * Constants.WORLD_SIZE];
+				var protoTileIndex = protoTileIndices[x + y * Width];
 				var protoTileInfo = protoTileInfos[protoTileIndex];
 				SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: new Vector2I(protoTileInfo.X, protoTileInfo.Y));
 
-				foreach (var config in _environmentalDecorationPlacementConfigs!)
+				foreach (var config in DecorationConfigs!)
 				{
 					if (!decorationNoiseMaps.ContainsKey(config.DecorationType) || !decorationScenes.ContainsKey(config.DecorationType))
 						continue;
@@ -383,7 +332,7 @@ public partial class WorldGenerator : TileMapLayer
 			}
 		}
 
-		GD.Print($"World rendered: {Constants.WORLD_SIZE}x{Constants.WORLD_SIZE} tiles");
+		GD.Print($"World rendered: {Width}x{Height} tiles");
 	}
 
 	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
@@ -396,11 +345,11 @@ public partial class WorldGenerator : TileMapLayer
 	{
 		var noiseMaps = new System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]>();
 
-		foreach (var config in _environmentalDecorationPlacementConfigs!)
+		foreach (var config in DecorationConfigs!)
 		{
 			var noiseMap = NoiseService.GenerateNoiseMap(
-				Constants.WORLD_SIZE,
-				Constants.WORLD_SIZE,
+				Width,
+				Height,
 				GlobalRandom.Seed + (int)config.DecorationType, // Different seed per decoration
 				config.NoiseConfig
 			);
@@ -412,7 +361,7 @@ public partial class WorldGenerator : TileMapLayer
 
 	private bool ShouldPlaceDecoration(int x, int y, EnvironmentalDecorationPlacementConfig config, float noiseValue)
 	{
-		var biomeType = _worldMapBiomeTypes[x, y];
+		var biomeType = _worldMapBiomeTypes![x, y];
 
 		// Check if noise value is in the valid range
 		if (noiseValue < config.MinimumValue || noiseValue > config.MaximumValue)
@@ -422,8 +371,140 @@ public partial class WorldGenerator : TileMapLayer
 		return config.ValidBiomes.Contains(biomeType);
 	}
 
-	private BiomeType[,] _worldMapBiomeTypes = new BiomeType[Constants.WORLD_SIZE, Constants.WORLD_SIZE];
-	private Array<EnvironmentalDecorationPlacementConfig>? _environmentalDecorationPlacementConfigs;
+	private Array<BiomeRange> GetDefaultBiomeRanges()
+	{
+		return new Array<BiomeRange>
+		{
+			new BiomeRange(BiomeType.Ocean, 0.0f, 0.2f),
+			new BiomeRange(BiomeType.Swamp, 0.2f, 0.3f, 0.1f, 0.2f),
+			new BiomeRange(BiomeType.Beach, 0.2f, 0.3f),
+			new BiomeRange(BiomeType.Plains, 0.3f, 0.5f, 0.4f, 0.7f),
+			new BiomeRange(BiomeType.Desert, 0.3f, 0.5f, 0.2f, 0.4f),
+			new BiomeRange(BiomeType.Tundra, 0.5f, 0.7f, 0.7f, 1.0f),
+			new BiomeRange(BiomeType.ForestDeciduous, 0.4f, 0.7f, 0.0f, 0.5f),
+			new BiomeRange(BiomeType.ForestConiferous, 0.6f, 0.9f, 0.5f, 1.0f),
+			new BiomeRange(BiomeType.Jungle, 0.3f, 0.4f, 0.0f, 0.2f),
+			new BiomeRange(BiomeType.Mountain, 0.8f, 1.0f, 0.0f, 1.0f),
+		};
+	}
+
+	private Array<EnvironmentalDecorationPlacementConfig> GetDefaultDecorationConfigs()
+	{
+		return new Array<EnvironmentalDecorationPlacementConfig>
+		{
+			new (EnvironmentalDecorationType.Tree,
+				new NoiseLayerConfig() { Frequency = 0.1f, Octaves = 3, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.ForestDeciduous, BiomeType.ForestConiferous }
+			),
+			new (EnvironmentalDecorationType.Rock,
+				new NoiseLayerConfig() { Frequency = 0.2f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.6f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+			),
+			new (EnvironmentalDecorationType.Bush,
+				new NoiseLayerConfig() { Frequency = 0.3f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.4f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+			),
+			new (EnvironmentalDecorationType.Flower,
+				new NoiseLayerConfig() { Frequency = 0.4f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+			),
+			new (EnvironmentalDecorationType.Grass,
+				new NoiseLayerConfig() { Frequency = 0.5f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.1f,
+				maximumValue: 0.3f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Plains, BiomeType.ForestDeciduous }
+			),
+			new (EnvironmentalDecorationType.OreDeposit,
+				new NoiseLayerConfig() { Frequency = 0.6f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+			),
+			new (EnvironmentalDecorationType.GasDeposit,
+				new NoiseLayerConfig() { Frequency = 0.7f, Octaves = 2, Lacunarity = 2.0f, Persistence = 0.5f },
+				minimumValue: 0.2f,
+				maximumValue: 0.5f,
+				validBiomes: new Array<BiomeType>() { BiomeType.Mountain, BiomeType.Plains }
+			)
+		};
+	}
+
+	private void InitializeResources()
+	{
+		_resources = new Dictionary<ResourceKind, Array<RawResource>>
+		{
+			{ ResourceKind.Ore, new Array<RawResource>()
+				{
+					new RawResource("Iron", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 8.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 6.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 7.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 5.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 4.0f) },
+					}),
+					new RawResource("Copper", ResourceKind.Ore, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 6.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 5.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 4.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 9.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 7.0f) },
+					})
+				}
+			},
+			{ ResourceKind.Wood, new Array<RawResource>()
+				{
+					new RawResource("Pine", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 4.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 5.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 3.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 6.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 7.0f) },
+					}),
+					new RawResource("Oak", ResourceKind.Wood, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 6.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 7.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 5.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 4.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 6.0f) },
+					})
+				}
+			},
+			{ ResourceKind.Gas, new Array<RawResource>()
+				{
+					new RawResource("Hydrogen", ResourceKind.Gas, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 2.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 1.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 2.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 9.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 8.0f) },
+					}),
+					new RawResource("Oxygen", ResourceKind.Gas, new Dictionary<ResourcePropertyType, ResourceProperty>()
+					{
+						{ ResourcePropertyType.Strength, new ResourceProperty(ResourcePropertyType.Strength, 3.0f) },
+						{ ResourcePropertyType.Toughness, new ResourceProperty(ResourcePropertyType.Toughness, 2.0f) },
+						{ ResourcePropertyType.Resistance, new ResourceProperty(ResourcePropertyType.Resistance, 3.0f) },
+						{ ResourcePropertyType.Conductivity, new ResourceProperty(ResourcePropertyType.Conductivity, 8.0f) },
+						{ ResourcePropertyType.Reactivity, new ResourceProperty(ResourcePropertyType.Reactivity, 9.0f) },
+					})
+				}
+			},
+		};
+	}
+
+	private BiomeType[,]? _worldMapBiomeTypes;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
 	private PackedScene? _pineTreeScene;
 	private PackedScene? _goldOreScene;

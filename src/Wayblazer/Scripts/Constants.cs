@@ -2,7 +2,6 @@ namespace Wayblazer;
 
 public static class Constants
 {
-	public const int WORLD_SIZE = 64;
 	public const float INTERACTION_RANGE = 72.0f;
 
 	public const float HARVEST_DURATION = 1.3f;

@@ -24,6 +24,10 @@ window/size/viewport_height=800
 
 project/assembly_name="Wayblazer"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/world_generator_tools/plugin.cfg")
+
 [input]
 
 player_left={
