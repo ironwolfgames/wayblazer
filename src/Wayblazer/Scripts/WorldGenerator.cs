@@ -361,6 +361,8 @@ public partial class WorldGenerator : TileMapLayer
 
 	private bool ShouldPlaceDecoration(int x, int y, EnvironmentalDecorationPlacementConfig config, float noiseValue)
 	{
+		return false;
+		/*
 		var biomeType = _worldMapBiomeTypes![x, y];
 
 		// Check if noise value is in the valid range
@@ -369,6 +371,7 @@ public partial class WorldGenerator : TileMapLayer
 
 		// Check if the current biome is valid for this decoration
 		return config.ValidBiomes.Contains(biomeType);
+		*/
 	}
 
 	private Array<BiomeRange> GetDefaultBiomeRanges()
