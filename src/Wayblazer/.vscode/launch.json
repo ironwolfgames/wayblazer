@@ -17,6 +17,21 @@
 				"${workspaceFolder}"
 			],
 			"console": "integratedTerminal"
+		},
+		{
+			"name": "Launch Godot Editor",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "C:/bin/Godot_v4.5.1-stable_mono_win64/Godot_v4.5.1-stable_mono_win64.exe",
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"args": [
+				"--path",
+				"${workspaceFolder}",
+				"--editor"
+			],
+			"console": "internalConsole"
 		}
 	]
 }
