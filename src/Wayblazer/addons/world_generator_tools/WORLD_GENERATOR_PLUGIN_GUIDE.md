@@ -169,7 +169,7 @@ private void ShowGenerateButton()
 
 private void OnGenerateButtonPressed()
 {
-    if (_currentWorldGenerator != null && _currentWorldGenerator.IsInsideTree())
+    if (_currentWorldGenerator is not null && _currentWorldGenerator.IsInsideTree())
     {
         // Use custom seed if provided
         if (!string.IsNullOrEmpty(_seedInput.Text) && int.TryParse(_seedInput.Text, out int customSeed))

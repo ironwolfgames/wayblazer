@@ -20,7 +20,7 @@ public partial class WorldGeneratorEditorPlugin : EditorPlugin
 	{
 		// This is called when the plugin is disabled
 		// Clean up the button if it exists
-		if (_buttonContainer != null)
+		if (_buttonContainer is not null)
 		{
 			_buttonContainer.QueueFree();
 			_buttonContainer = null;
@@ -55,7 +55,7 @@ public partial class WorldGeneratorEditorPlugin : EditorPlugin
 
 	private void ShowGenerateButton()
 	{
-		if (_buttonContainer == null)
+		if (_buttonContainer is null)
 		{
 			// Create the button container
 			_buttonContainer = new VBoxContainer();
@@ -88,7 +88,7 @@ public partial class WorldGeneratorEditorPlugin : EditorPlugin
 
 	private void HideGenerateButton()
 	{
-		if (_buttonContainer != null)
+		if (_buttonContainer is not null)
 		{
 			HideBottomPanel();
 		}
@@ -96,7 +96,7 @@ public partial class WorldGeneratorEditorPlugin : EditorPlugin
 
 	private void OnGenerateButtonPressed()
 	{
-		if (_currentWorldGenerator != null && _currentWorldGenerator.IsInsideTree())
+		if (_currentWorldGenerator is not null && _currentWorldGenerator.IsInsideTree())
 		{
 			GD.Print("Regenerating world...");
 			_currentWorldGenerator.GenerateWorldFromZero();

@@ -10,20 +10,72 @@ namespace Wayblazer;
 [GlobalClass]
 public partial class WorldGenerator : TileMapLayer
 {
+	/// <summary>
+	/// Width of the world in tiles.
+	/// </summary>
 	[Export]
-	public int Width { get; set; } = 100;
+	public int Width { get; set; } = 1024;
 
+	/// <summary>
+	/// Height of the world in tiles.
+	/// </summary>
 	[Export]
-	public int Height { get; set; } = 100;
+	public int Height { get; set; } = 1024;
+
+	/// <summary>
+	/// Seed for random number generation. Use -1 for a random seed.
+	/// </summary>
+	[Export]
+	public int Seed { get; set; } = -1;
+
+	[ExportGroup("Ocean Configuration")]
+	/// <summary>
+	/// When enabled, forces all map edges to be ocean with a smooth falloff gradient.
+	/// </summary>
+	[Export]
+	public bool EdgesAreOcean { get; set; } = false;
+
+	/// <summary>
+	/// Minimum distance in tiles from the edge where ocean falloff begins. Used per cardinal direction.
+	/// </summary>
+	[Export]
+	public float EdgeFalloffDistanceMin { get; set; } = 5.0f;
+
+	/// <summary>
+	/// Maximum distance in tiles from the edge where ocean falloff begins. Used per cardinal direction.
+	/// </summary>
+	[Export]
+	public float EdgeFalloffDistanceMax { get; set; } = 15.0f;
 
 	[ExportGroup("Biome Configuration")]
+	/// <summary>
+	/// Noise configuration for the base height map used in biome generation.
+	/// </summary>
 	[Export]
 	public NoiseLayerConfig BiomeNoiseConfig { get; set; } = new NoiseLayerConfig();
 
+	/// <summary>
+	/// Noise configuration for temperature/latitude variation. Low frequency creates large continental climate zones.
+	/// </summary>
+	[Export]
+	public NoiseLayerConfig TemperatureNoiseConfig { get; set; } = new NoiseLayerConfig() { Frequency = 0.03f, Octaves = 4 };
+
+	/// <summary>
+	/// How much the temperature noise affects biome boundaries (0.0 to 1.0). Higher values create more variation.
+	/// </summary>
+	[Export]
+	public float TemperatureNoiseInfluence { get; set; } = 0.3f;
+
+	/// <summary>
+	/// Defines which biomes appear at which height and temperature/latitude ranges.
+	/// </summary>
 	[Export]
 	public Array<BiomeRange> BiomeRanges { get; set; } = new Array<BiomeRange>();
 
 	[ExportGroup("Decoration Configuration")]
+	/// <summary>
+	/// Configuration for placing environmental decorations (trees, rocks, etc.) across the world.
+	/// </summary>
 	[Export]
 	public Array<EnvironmentalDecorationPlacementConfig> DecorationConfigs { get; set; } = new Array<EnvironmentalDecorationPlacementConfig>();
 
@@ -49,8 +101,7 @@ public partial class WorldGenerator : TileMapLayer
 		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
 		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
-		var seed = (int)GD.Randi();
-		GlobalRandom.InitializeWithSeed(seed);
+		GlobalRandom.InitializeWithSeed(Seed == -1 ? (int)GD.Randi() : Seed);
 
 		InitializeResources();
 		GenerateWorldData();
@@ -61,16 +112,26 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void GenerateWorldData()
 	{
-		// Use the exported noise config, or create a default one if not set
-		if (BiomeNoiseConfig == null)
+		if (BiomeNoiseConfig is null)
 		{
 			BiomeNoiseConfig = new NoiseLayerConfig();
 		}
 
 		var worldHeightMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed, BiomeNoiseConfig);
 
-		// Use the exported biome ranges, or create defaults if empty
-		if (BiomeRanges == null || BiomeRanges.Count == 0)
+		// Generate temperature/latitude noise for more organic biome boundaries
+		if (TemperatureNoiseConfig is null)
+		{
+			TemperatureNoiseConfig = new NoiseLayerConfig() { Frequency = 0.03f, Octaves = 4 };
+		}
+		var temperatureNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + 1000, TemperatureNoiseConfig);
+
+		if (EdgesAreOcean)
+		{
+			ApplyEdgeOceanOverlay(worldHeightMap);
+		}
+
+		if (BiomeRanges is null || BiomeRanges.Count == 0)
 		{
 			BiomeRanges = GetDefaultBiomeRanges();
 		}
@@ -80,20 +141,21 @@ public partial class WorldGenerator : TileMapLayer
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				// calculate equator value in the range of 0.0 to 1.0 for the current y where 0.0 is the equator and 1.0 is either pole.
+				// Calculate base equator value (0.0 at equator, 1.0 at poles)
 				var equatorValue = (float)Math.Abs(y - (Height / 2)) / (Height / 2);
-				_worldMapBiomeTypes![x, y] = GetBiomeAt(worldHeightMap[x, y], BiomeRanges, equatorValue);
+
+				_worldMapBiomeTypes![x, y] = GetBiomeAt(worldHeightMap[x, y], temperatureNoiseMap[x, y], BiomeRanges, equatorValue);
 			}
 		}
 
 		// Use the exported decoration configs, or create defaults if empty
-		if (DecorationConfigs == null || DecorationConfigs.Count == 0)
+		if (DecorationConfigs is null || DecorationConfigs.Count == 0)
 		{
 			DecorationConfigs = GetDefaultDecorationConfigs();
 		}
 
 		// Initialize resources if not already done
-		if (_resources == null)
+		if (_resources is null)
 		{
 			InitializeResources();
 		}
@@ -268,9 +330,9 @@ public partial class WorldGenerator : TileMapLayer
 		else
 		{
 			protoTileIndices = new System.Collections.Generic.List<int>(Width * Height);
-			for (int x = 0; x < Width; x++)
+			for (int y = 0; y < Height; y++)
 			{
-				for (int y = 0; y < Height; y++)
+				for (int x = 0; x < Width; x++)
 				{
 					protoTileIndices.Add((int)_worldMapBiomeTypes![x, y]);
 				}
@@ -335,10 +397,59 @@ public partial class WorldGenerator : TileMapLayer
 		GD.Print($"World rendered: {Width}x{Height} tiles");
 	}
 
-	private BiomeType GetBiomeAt(float height, Array<BiomeRange> biomeRanges, float equatorValue)
+	private void ApplyEdgeOceanOverlay(float[,] heightMap)
 	{
-		var validBiomeRanges = biomeRanges.FirstOrDefault(b => height >= b.MinimumHeight && height <= b.MaximumHeight && equatorValue >= b.MinimumEquatorValue && equatorValue <= b.MaximumEquatorValue);
-		return validBiomeRanges is not null ? validBiomeRanges.Biome : BiomeType.Ocean;
+		var northFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+		var southFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+		var eastFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+		var westFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+
+		for (var x = 0; x < Width; x++)
+		{
+			for (var y = 0; y < Height; y++)
+			{
+				var distanceToNorth = y;
+				var distanceToSouth = Height - 1 - y;
+				var distanceToWest = x;
+				var distanceToEast = Width - 1 - x;
+
+				var minimumDistance = distanceToNorth;
+				var falloffDistance = northFalloff;
+				if (distanceToSouth < minimumDistance)
+				{
+					minimumDistance = distanceToSouth;
+					falloffDistance = southFalloff;
+				}
+				if (distanceToWest < minimumDistance)
+				{
+					minimumDistance = distanceToWest;
+					falloffDistance = westFalloff;
+				}
+				if (distanceToEast < minimumDistance)
+				{
+					minimumDistance = distanceToEast;
+					falloffDistance = eastFalloff;
+				}
+
+				// Calculate edge factor (0 at edge, 1 at falloff distance or beyond)
+				var edgeFactor = Mathf.Clamp(minimumDistance / falloffDistance, 0f, 1f);
+
+				// Apply the edge factor to push values toward ocean (0.0)
+				heightMap[x, y] *= edgeFactor;
+			}
+		}
+	}
+
+	private BiomeType GetBiomeAt(float height, float temperature, Array<BiomeRange> biomeRanges, float baseEquatorValue)
+	{
+		// Apply temperature noise to create organic boundaries
+		// Remap noise from 0-1 to -influence to +influence
+		var noiseOffset = (temperature - 0.5f) * 2.0f * TemperatureNoiseInfluence;
+		var equatorValue = Mathf.Clamp(baseEquatorValue + noiseOffset, 0f, 1f);
+		var validBiomeRanges = biomeRanges.Where(b => height >= b.MinimumHeight && height <= b.MaximumHeight && equatorValue >= b.MinimumEquatorValue && equatorValue <= b.MaximumEquatorValue).ToList();
+
+		var selectedBiomeRange = validBiomeRanges.Count > 0 ? validBiomeRanges[(int)(temperature * validBiomeRanges.Count) % validBiomeRanges.Count] : null;
+		return selectedBiomeRange is not null ? selectedBiomeRange.Biome : BiomeType.Ocean;
 	}
 
 	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps()

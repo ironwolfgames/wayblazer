@@ -3,7 +3,7 @@ using Godot.Collections;
 
 namespace Wayblazer;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class RawResource(string name, ResourceKind resourceKind, Dictionary<ResourcePropertyType, ResourceProperty> properties) : Resource
 {
 	[Export]

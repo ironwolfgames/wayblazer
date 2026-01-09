@@ -1,18 +1,204 @@
-[gd_scene load_steps=6 format=3 uid="uid://c184ht1xrxrkd"]
+[gd_scene load_steps=35 format=3 uid="uid://c184ht1xrxrkd"]
 
 [ext_resource type="TileSet" uid="uid://2cesqlo4vgab" path="res://Assets/Graphics/tileset.tres" id="1_fo5ed"]
 [ext_resource type="Script" uid="uid://c1cieuvv0mwp7" path="res://Scripts/GameCamera.cs" id="1_k7acu"]
+[ext_resource type="Script" uid="uid://cw2e7u7vvcqjr" path="res://Scripts/NoiseLayerConfig.cs" id="3_k7acu"]
+[ext_resource type="Script" uid="uid://imivwxbqqpcw" path="res://Scripts/BiomeRange.cs" id="4_5v1tr"]
 [ext_resource type="Script" uid="uid://cqigde7ie3t0j" path="res://Scripts/WorldGenerator.cs" id="4_8j60k"]
+[ext_resource type="Script" uid="uid://bqq2tgp1c6757" path="res://Scripts/EnvironmentalDecorationPlacementConfig.cs" id="5_0fj1v"]
 [ext_resource type="PackedScene" uid="uid://f6fg6kakkp1j" path="res://Scenes/player.tscn" id="5_fo5ed"]
 [ext_resource type="Script" uid="uid://brlfh56hxjnaq" path="res://Scripts/MusicManager.cs" id="6_5ukr8"]
+
+[sub_resource type="Resource" id="Resource_k7acu"]
+script = ExtResource("3_k7acu")
+Frequency = 0.011
+Octaves = 4
+Lacunarity = 2.1
+Persistence = 0.6
+
+[sub_resource type="Resource" id="Resource_5v1tr"]
+script = ExtResource("3_k7acu")
+Frequency = 0.035
+Octaves = 4
+Lacunarity = 1.6
+Persistence = 0.7
+
+[sub_resource type="Resource" id="Resource_7yui6"]
+script = ExtResource("4_5v1tr")
+MaximumHeight = 0.3
+MaximumEquatorValue = 1.0
+
+[sub_resource type="Resource" id="Resource_c5t2i"]
+script = ExtResource("4_5v1tr")
+Biome = 9
+MinimumHeight = 0.2
+MaximumHeight = 0.4
+MaximumEquatorValue = 0.25
+
+[sub_resource type="Resource" id="Resource_e0ngr"]
+script = ExtResource("4_5v1tr")
+Biome = 1
+MinimumHeight = 0.2
+MaximumHeight = 0.35
+MaximumEquatorValue = 0.4
+
+[sub_resource type="Resource" id="Resource_kn0ld"]
+script = ExtResource("4_5v1tr")
+Biome = 2
+MinimumHeight = 0.3
+MaximumHeight = 0.6
+MinimumEquatorValue = 0.4
+MaximumEquatorValue = 0.7
+
+[sub_resource type="Resource" id="Resource_hgpy0"]
+script = ExtResource("4_5v1tr")
+Biome = 3
+MinimumHeight = 0.35
+MaximumHeight = 0.6
+MaximumEquatorValue = 0.4
+
+[sub_resource type="Resource" id="Resource_t2t4p"]
+script = ExtResource("4_5v1tr")
+Biome = 7
+MinimumHeight = 0.5
+MaximumHeight = 0.7
+MinimumEquatorValue = 0.7
+MaximumEquatorValue = 1.0
+
+[sub_resource type="Resource" id="Resource_0pcbe"]
+script = ExtResource("4_5v1tr")
+Biome = 5
+MinimumHeight = 0.3
+MaximumHeight = 0.7
+MaximumEquatorValue = 0.7
+
+[sub_resource type="Resource" id="Resource_axeuq"]
+script = ExtResource("4_5v1tr")
+Biome = 6
+MinimumHeight = 0.5
+MaximumHeight = 0.9
+MinimumEquatorValue = 0.3
+MaximumEquatorValue = 1.0
+
+[sub_resource type="Resource" id="Resource_1cojt"]
+script = ExtResource("4_5v1tr")
+Biome = 4
+MinimumHeight = 0.2
+MaximumHeight = 0.6
+MaximumEquatorValue = 0.2
+
+[sub_resource type="Resource" id="Resource_yq1aw"]
+script = ExtResource("4_5v1tr")
+Biome = 8
+MinimumHeight = 0.7
+MaximumHeight = 1.0
+MaximumEquatorValue = 1.0
+
+[sub_resource type="Resource" id="Resource_pyn1s"]
+script = ExtResource("3_k7acu")
+Frequency = 0.1
+
+[sub_resource type="Resource" id="Resource_no8kt"]
+script = ExtResource("5_0fj1v")
+NoiseConfig = SubResource("Resource_pyn1s")
+MinimumValue = 0.1
+MaximumValue = 0.5
+ValidBiomes = Array[int]([5, 6])
+
+[sub_resource type="Resource" id="Resource_xbk3s"]
+script = ExtResource("3_k7acu")
+Frequency = 0.2
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_i4fjy"]
+script = ExtResource("5_0fj1v")
+DecorationType = 1
+NoiseConfig = SubResource("Resource_xbk3s")
+MinimumValue = 0.2
+MaximumValue = 0.6
+ValidBiomes = Array[int]([8, 2])
+
+[sub_resource type="Resource" id="Resource_pt3ps"]
+script = ExtResource("3_k7acu")
+Frequency = 0.3
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_hmc15"]
+script = ExtResource("5_0fj1v")
+DecorationType = 2
+NoiseConfig = SubResource("Resource_pt3ps")
+MinimumValue = 0.1
+MaximumValue = 0.4
+ValidBiomes = Array[int]([2, 5])
+
+[sub_resource type="Resource" id="Resource_dt0r1"]
+script = ExtResource("3_k7acu")
+Frequency = 0.4
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_qebug"]
+script = ExtResource("5_0fj1v")
+DecorationType = 3
+NoiseConfig = SubResource("Resource_dt0r1")
+MinimumValue = 0.1
+MaximumValue = 0.3
+ValidBiomes = Array[int]([2, 5])
+
+[sub_resource type="Resource" id="Resource_o2rbt"]
+script = ExtResource("3_k7acu")
+Frequency = 0.5
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_1vso6"]
+script = ExtResource("5_0fj1v")
+DecorationType = 4
+NoiseConfig = SubResource("Resource_o2rbt")
+MinimumValue = 0.1
+MaximumValue = 0.3
+ValidBiomes = Array[int]([2, 5])
+
+[sub_resource type="Resource" id="Resource_3ua1v"]
+script = ExtResource("3_k7acu")
+Frequency = 0.6
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_r0ikl"]
+script = ExtResource("5_0fj1v")
+DecorationType = 5
+NoiseConfig = SubResource("Resource_3ua1v")
+MinimumValue = 0.2
+MaximumValue = 0.5
+ValidBiomes = Array[int]([8, 2])
+
+[sub_resource type="Resource" id="Resource_opbav"]
+script = ExtResource("3_k7acu")
+Frequency = 0.7
+Octaves = 2
+
+[sub_resource type="Resource" id="Resource_coyub"]
+script = ExtResource("5_0fj1v")
+DecorationType = 6
+NoiseConfig = SubResource("Resource_opbav")
+MinimumValue = 0.2
+MaximumValue = 0.5
+ValidBiomes = Array[int]([8, 2])
 
 [node name="World" type="Node2D"]
 
 [node name="WorldMapBaseLayer" type="TileMapLayer" parent="."]
+position = Vector2(-1939, -1113)
 tile_set = ExtResource("1_fo5ed")
 script = ExtResource("4_8j60k")
-Width = 128
-Height = 128
+Width = 256
+Height = 256
+Seed = 42317
+EdgesAreOcean = true
+EdgeFalloffDistanceMin = 15.0
+EdgeFalloffDistanceMax = 25.0
+BiomeNoiseConfig = SubResource("Resource_k7acu")
+TemperatureNoiseConfig = SubResource("Resource_5v1tr")
+BiomeRanges = Array[ExtResource("4_5v1tr")]([SubResource("Resource_7yui6"), SubResource("Resource_c5t2i"), SubResource("Resource_e0ngr"), SubResource("Resource_kn0ld"), SubResource("Resource_hgpy0"), SubResource("Resource_t2t4p"), SubResource("Resource_0pcbe"), SubResource("Resource_axeuq"), SubResource("Resource_1cojt"), SubResource("Resource_yq1aw")])
+DecorationConfigs = Array[ExtResource("5_0fj1v")]([SubResource("Resource_no8kt"), SubResource("Resource_i4fjy"), SubResource("Resource_hmc15"), SubResource("Resource_qebug"), SubResource("Resource_1vso6"), SubResource("Resource_r0ikl"), SubResource("Resource_coyub")])
 
 [node name="GameCamera" type="Camera2D" parent="." node_paths=PackedStringArray("PlayerCharacter")]
 script = ExtResource("1_k7acu")

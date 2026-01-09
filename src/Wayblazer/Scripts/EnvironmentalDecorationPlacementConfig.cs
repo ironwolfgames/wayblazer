@@ -3,7 +3,7 @@ using Godot.Collections;
 
 namespace Wayblazer;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class EnvironmentalDecorationPlacementConfig : Resource
 {
 	[Export]

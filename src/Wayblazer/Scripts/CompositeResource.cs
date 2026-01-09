@@ -4,7 +4,7 @@ using Godot.Collections;
 
 namespace Wayblazer;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class CompositeResource(string name, Array<RawResource> inputs) : RawResource(name, ResourceKind.Composite, CalculateProperties(inputs))
 {
 	public Array<RawResource> Inputs { get; private set; } = inputs;

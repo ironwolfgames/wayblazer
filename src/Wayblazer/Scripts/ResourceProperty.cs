@@ -2,7 +2,7 @@ using Godot;
 
 namespace Wayblazer;
 
-[GlobalClass]
+[GlobalClass, Tool]
 public partial class ResourceProperty : Resource
 {
 	[Export]
