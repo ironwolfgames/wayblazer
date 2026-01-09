@@ -6,15 +6,15 @@ namespace Wayblazer;
 public partial class NoiseLayerConfig : Resource
 {
 	/// <summary>
-	/// Controls the scale of noise features. Lower values (0.001-0.01) create large continents, higher values (0.1-1.0) create fine details.
+	/// Controls the scale of noise features. Lower values (0.001-0.01) create large continents, higher values (0.1 and up) create fine details.
 	/// </summary>
-	[Export(PropertyHint.Range, "0.001,1.0")]
+	[Export(PropertyHint.Range, "0.001,0.5")]
 	public float Frequency { get; set; } = 0.01f;
 
 	/// <summary>
-	/// Number of noise layers combined. More octaves add finer detail but increase computation cost. Range: 1-8.
+	/// Number of noise layers combined. More octaves add finer detail but increase computation cost. Range: 1-10.
 	/// </summary>
-	[Export(PropertyHint.Range, "1,8,1")]
+	[Export(PropertyHint.Range, "1,10,1")]
 	public int Octaves { get; set; } = 3;
 
 	/// <summary>
