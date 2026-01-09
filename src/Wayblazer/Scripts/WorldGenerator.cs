@@ -47,6 +47,12 @@ public partial class WorldGenerator : TileMapLayer
 	[Export]
 	public float EdgeFalloffDistanceMax { get; set; } = 15.0f;
 
+	/// <summary>
+	/// Frequency of the noise map used to create irregular coastlines when EdgesAreOcean is enabled.
+	/// </summary>
+	[Export]
+	public float OceanEdgeNoiseMapFrequency { get; set; } = 0.05f;
+
 	[ExportGroup("Biome Configuration")]
 	/// <summary>
 	/// Noise configuration for the base height map used in biome generation.
@@ -404,6 +410,16 @@ public partial class WorldGenerator : TileMapLayer
 		var eastFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
 		var westFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
 
+		// Generate noise map to create organic, irregular coastlines
+		var edgeNoiseConfig = new NoiseLayerConfig
+		{
+			Frequency = OceanEdgeNoiseMapFrequency,  // Low frequency for large-scale coastal features
+			Octaves = 4,
+			Lacunarity = 2.0f,
+			Persistence = 0.5f
+		};
+		var edgeNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + 9999, edgeNoiseConfig);
+
 		for (var x = 0; x < Width; x++)
 		{
 			for (var y = 0; y < Height; y++)
@@ -431,8 +447,13 @@ public partial class WorldGenerator : TileMapLayer
 					falloffDistance = eastFalloff;
 				}
 
+				// Use noise to modulate the falloff distance, creating irregular coastlines
+				// Remap noise from 0-1 to 0.5-1.5 to vary the effective falloff distance
+				var noiseModulation = 0.5f + edgeNoiseMap[x, y];
+				var modulatedFalloffDistance = falloffDistance * noiseModulation;
+
 				// Calculate edge factor (0 at edge, 1 at falloff distance or beyond)
-				var edgeFactor = Mathf.Clamp(minimumDistance / falloffDistance, 0f, 1f);
+				var edgeFactor = Mathf.Clamp(minimumDistance / modulatedFalloffDistance, 0f, 1f);
 
 				// Apply the edge factor to push values toward ocean (0.0)
 				heightMap[x, y] *= edgeFactor;
