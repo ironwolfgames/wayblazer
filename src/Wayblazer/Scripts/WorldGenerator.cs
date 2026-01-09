@@ -30,6 +30,29 @@ public partial class WorldGenerator : TileMapLayer
 
 	[ExportGroup("Ocean Configuration")]
 	/// <summary>
+	/// When enabled, generates oceans and continents using a low-frequency noise map.
+	/// </summary>
+	[Export]
+	public bool EnableOceanContinentGeneration { get; set; } = true;
+	/// <summary>
+	// Threshold for ocean vs continent (values below this become ocean)
+	/// </summary>
+	[Export]
+	public float OceanContinentNoiseMapThreshold { get; set; } = 0.45f;
+
+	/// <summary>
+	/// Frequency of the noise map used to determine ocean vs continent placement.
+	/// </summary>
+	[Export]
+	public float OceanContinentNoiseMapFrequency { get; set; } = 0.009f;
+
+	/// <summary>
+	/// Number of octaves for the ocean/continent noise map. Higher values add more detail to coastlines.
+	/// </summary>
+	[Export]
+	public int OceanContinentNoiseMapOctaves { get; set; } = 6;
+
+	/// <summary>
 	/// When enabled, forces all map edges to be ocean with a smooth falloff gradient.
 	/// </summary>
 	[Export]
@@ -53,12 +76,12 @@ public partial class WorldGenerator : TileMapLayer
 	[Export]
 	public float OceanEdgeNoiseMapFrequency { get; set; } = 0.05f;
 
-	[ExportGroup("Biome Configuration")]
+	[ExportGroup("World Map Configuration")]
 	/// <summary>
 	/// Noise configuration for the base height map used in biome generation.
 	/// </summary>
 	[Export]
-	public NoiseLayerConfig BiomeNoiseConfig { get; set; } = new NoiseLayerConfig();
+	public NoiseLayerConfig WorldMapNoiseConfig { get; set; } = new NoiseLayerConfig();
 
 	/// <summary>
 	/// Noise configuration for temperature/latitude variation. Low frequency creates large continental climate zones.
@@ -118,24 +141,21 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void GenerateWorldData()
 	{
-		if (BiomeNoiseConfig is null)
+		if (WorldMapNoiseConfig is null)
 		{
-			BiomeNoiseConfig = new NoiseLayerConfig();
+			WorldMapNoiseConfig = new NoiseLayerConfig();
 		}
 
-		var worldHeightMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed, BiomeNoiseConfig);
+		var worldHeightMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed, WorldMapNoiseConfig);
 
 		// Generate temperature/latitude noise for more organic biome boundaries
 		if (TemperatureNoiseConfig is null)
 		{
 			TemperatureNoiseConfig = new NoiseLayerConfig() { Frequency = 0.03f, Octaves = 4 };
 		}
-		var temperatureNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + 1000, TemperatureNoiseConfig);
+		var temperatureNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + TEMPERATURE_NOISE_SEED_OFFSET, TemperatureNoiseConfig);
 
-		if (EdgesAreOcean)
-		{
-			ApplyEdgeOceanOverlay(worldHeightMap);
-		}
+		ApplyOceanOverlays(worldHeightMap);
 
 		if (BiomeRanges is null || BiomeRanges.Count == 0)
 		{
@@ -403,60 +423,98 @@ public partial class WorldGenerator : TileMapLayer
 		GD.Print($"World rendered: {Width}x{Height} tiles");
 	}
 
-	private void ApplyEdgeOceanOverlay(float[,] heightMap)
+	private void ApplyOceanOverlays(float[,] heightMap)
 	{
-		var northFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
-		var southFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
-		var eastFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
-		var westFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
-
-		// Generate noise map to create organic, irregular coastlines
-		var edgeNoiseConfig = new NoiseLayerConfig
+		float[,]? oceanContinentNoiseMap = null;
+		if (EnableOceanContinentGeneration)
 		{
-			Frequency = OceanEdgeNoiseMapFrequency,  // Low frequency for large-scale coastal features
-			Octaves = 4,
-			Lacunarity = 2.0f,
-			Persistence = 0.5f
-		};
-		var edgeNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + 9999, edgeNoiseConfig);
+			var oceanContinentNoiseConfig = new NoiseLayerConfig
+			{
+				Frequency = OceanContinentNoiseMapFrequency,
+				Octaves = OceanContinentNoiseMapOctaves,
+				Lacunarity = 2.0f,
+				Persistence = 0.5f
+			};
+			oceanContinentNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + OCEAN_CONTINENT_NOISE_SEED_OFFSET, oceanContinentNoiseConfig);
+		}
+
+		float[,]? edgeNoiseMap = null;
+		var northFalloff = 0f;
+		var southFalloff = 0f;
+		var eastFalloff = 0f;
+		var westFalloff = 0f;
+		if (EdgesAreOcean)
+		{
+			northFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+			southFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+			eastFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+			westFalloff = EdgeFalloffDistanceMin + GlobalRandom.NextFloat(EdgeFalloffDistanceMin, EdgeFalloffDistanceMax);
+
+			var edgeNoiseConfig = new NoiseLayerConfig
+			{
+				Frequency = OceanEdgeNoiseMapFrequency,
+				Octaves = 4,
+				Lacunarity = 2.0f,
+				Persistence = 0.5f
+			};
+			edgeNoiseMap = NoiseService.GenerateNoiseMap(Width, Height, GlobalRandom.Seed + EDGE_NOISE_SEED_OFFSET, edgeNoiseConfig);
+		}
 
 		for (var x = 0; x < Width; x++)
 		{
 			for (var y = 0; y < Height; y++)
 			{
-				var distanceToNorth = y;
-				var distanceToSouth = Height - 1 - y;
-				var distanceToWest = x;
-				var distanceToEast = Width - 1 - x;
+				var finalFactor = 1.0f;
 
-				var minimumDistance = distanceToNorth;
-				var falloffDistance = northFalloff;
-				if (distanceToSouth < minimumDistance)
+				// Apply continent/ocean noise to create large landmasses and oceans
+				if (EnableOceanContinentGeneration && oceanContinentNoiseMap != null)
 				{
-					minimumDistance = distanceToSouth;
-					falloffDistance = southFalloff;
-				}
-				if (distanceToWest < minimumDistance)
-				{
-					minimumDistance = distanceToWest;
-					falloffDistance = westFalloff;
-				}
-				if (distanceToEast < minimumDistance)
-				{
-					minimumDistance = distanceToEast;
-					falloffDistance = eastFalloff;
+					if (oceanContinentNoiseMap[x, y] < OceanContinentNoiseMapThreshold)
+					{
+						finalFactor *= 0.2f;
+					}
 				}
 
-				// Use noise to modulate the falloff distance, creating irregular coastlines
-				// Remap noise from 0-1 to 0.5-1.5 to vary the effective falloff distance
-				var noiseModulation = 0.5f + edgeNoiseMap[x, y];
-				var modulatedFalloffDistance = falloffDistance * noiseModulation;
+				// Apply edge ocean falloff if enabled
+				if (EdgesAreOcean && edgeNoiseMap != null)
+				{
+					var distanceToNorth = y;
+					var distanceToSouth = Height - 1 - y;
+					var distanceToWest = x;
+					var distanceToEast = Width - 1 - x;
 
-				// Calculate edge factor (0 at edge, 1 at falloff distance or beyond)
-				var edgeFactor = Mathf.Clamp(minimumDistance / modulatedFalloffDistance, 0f, 1f);
+					var minimumDistance = distanceToNorth;
+					var falloffDistance = northFalloff;
+					if (distanceToSouth < minimumDistance)
+					{
+						minimumDistance = distanceToSouth;
+						falloffDistance = southFalloff;
+					}
+					if (distanceToWest < minimumDistance)
+					{
+						minimumDistance = distanceToWest;
+						falloffDistance = westFalloff;
+					}
+					if (distanceToEast < minimumDistance)
+					{
+						minimumDistance = distanceToEast;
+						falloffDistance = eastFalloff;
+					}
 
-				// Apply the edge factor to push values toward ocean (0.0)
-				heightMap[x, y] *= edgeFactor;
+					// Use noise to modulate the falloff distance, creating irregular coastlines
+					// Remap noise from 0-1 to 0.5-1.5 to vary the effective falloff distance
+					var noiseModulation = 0.5f + edgeNoiseMap[x, y];
+					var modulatedFalloffDistance = falloffDistance * noiseModulation;
+
+					// Calculate edge factor (0 at edge, 1 at falloff distance or beyond)
+					var edgeFactor = Mathf.Clamp(minimumDistance / modulatedFalloffDistance, 0f, 1f);
+
+					// Combine with continent factor (take minimum to ensure both constraints apply)
+					finalFactor = Mathf.Min(finalFactor, edgeFactor);
+				}
+
+				// Apply the combined factor to modulate the height map
+				heightMap[x, y] *= finalFactor;
 			}
 		}
 	}
@@ -638,6 +696,10 @@ public partial class WorldGenerator : TileMapLayer
 			},
 		};
 	}
+
+	private const int TEMPERATURE_NOISE_SEED_OFFSET = 1000;
+	private const int OCEAN_CONTINENT_NOISE_SEED_OFFSET = 2000;
+	private const int EDGE_NOISE_SEED_OFFSET = 3000;
 
 	private BiomeType[,]? _worldMapBiomeTypes;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
