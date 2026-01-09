@@ -4,6 +4,7 @@
 
 Here are some common settings for world generation. All of the configurations below have the following settings:
 
+- Width & Height : `256`
 - Enable Ocean Continent Generation : `TRUE`
 - Edges Are Ocean : `TRUE`
 - WorldMapNoiseConfig:
