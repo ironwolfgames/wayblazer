@@ -108,6 +108,21 @@ public partial class WorldGenerator : TileMapLayer
 	[Export]
 	public Array<EnvironmentalDecorationPlacementConfig> DecorationConfigs { get; set; } = new Array<EnvironmentalDecorationPlacementConfig>();
 
+	[ExportGroup("Tile Rendering Configuration")]
+	/// <summary>
+	/// Expansion factor for tile resolution. Each biome cell becomes NxN tiles on the final tilemap.
+	/// Higher values create more detailed transitions but increase memory and generation time.
+	/// </summary>
+	[Export]
+	public int TileExpansionFactor { get; set; } = 3;
+
+	/// <summary>
+	/// Radius for sampling neighboring biomes when calculating probabilities.
+	/// Larger values create smoother, more gradual transitions.
+	/// </summary>
+	[Export]
+	public int BiomeSampleRadius { get; set; } = 2;
+
 	public override void _Ready()
 	{
 		// Don't auto-generate in editor mode
@@ -191,6 +206,10 @@ public partial class WorldGenerator : TileMapLayer
 	{
 		const bool useWFC = false;
 		System.Collections.Generic.List<int> protoTileIndices;
+
+		// Calculate expanded dimensions
+		int expandedWidth = Width * TileExpansionFactor;
+		int expandedHeight = Height * TileExpansionFactor;
 
 		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
 		System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)> protoTileInfos =
@@ -332,19 +351,28 @@ public partial class WorldGenerator : TileMapLayer
 		if (useWFC)
 		{
 			var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
-			var output = new Output(configuration, width: Width, height: Height, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
+			var output = new Output(configuration, width: expandedWidth, height: expandedHeight, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 				{
-					// Get the biome type at this position
-					var biomeType = _worldMapBiomeTypes![x, y];
+					// Get biome probabilities at this expanded tile position
+					var biomeProbabilities = GetBiomeProbabilities(x, y);
 
-					// only allow the proto tiles that matches this biome
-					var protoTileIndex = (int)biomeType;
-					if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
+					// Allow proto tiles for all biomes with significant probability (>5%)
+					var validTiles = new System.Collections.Generic.List<ProtoTile>();
+					foreach (var kvp in biomeProbabilities)
 					{
-						return new System.Collections.Generic.List<ProtoTile> { protoTileInfos[protoTileIndex].Tile };
+						if (kvp.Value > 0.05f)
+						{
+							var protoTileIndex = (int)kvp.Key;
+							if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
+							{
+								// Weight the tile by its probability
+								var tile = protoTileInfos[protoTileIndex].Tile;
+								validTiles.Add(tile);
+							}
+						}
 					}
 
-					return protoTileInfos.Select(x => x.Tile).ToList();
+					return validTiles.Count > 0 ? validTiles : protoTileInfos.Select(x => x.Tile).ToList();
 				});
 			var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
 			algorithm.Run(output);
@@ -355,12 +383,30 @@ public partial class WorldGenerator : TileMapLayer
 #pragma warning restore CS0162
 		else
 		{
-			protoTileIndices = new System.Collections.Generic.List<int>(Width * Height);
-			for (int y = 0; y < Height; y++)
+			// Simple mode: use biome probabilities to select tiles with weighted randomness
+			protoTileIndices = new System.Collections.Generic.List<int>(expandedWidth * expandedHeight);
+			for (int y = 0; y < expandedHeight; y++)
 			{
-				for (int x = 0; x < Width; x++)
+				for (int x = 0; x < expandedWidth; x++)
 				{
-					protoTileIndices.Add((int)_worldMapBiomeTypes![x, y]);
+					var biomeProbabilities = GetBiomeProbabilities(x, y);
+
+					// Select biome based on weighted random selection
+					float randomValue = GlobalRandom.NextFloat(0f, 1f);
+					float cumulativeProbability = 0f;
+					BiomeType selectedBiome = BiomeType.Ocean;
+
+					foreach (var kvp in biomeProbabilities.OrderByDescending(kv => kv.Value))
+					{
+						cumulativeProbability += kvp.Value;
+						if (randomValue <= cumulativeProbability)
+						{
+							selectedBiome = kvp.Key;
+							break;
+						}
+					}
+
+					protoTileIndices.Add((int)selectedBiome);
 				}
 			}
 		}
@@ -420,7 +466,7 @@ public partial class WorldGenerator : TileMapLayer
 			}
 		}
 
-		GD.Print($"World rendered: {Width}x{Height} tiles");
+		GD.Print($"World rendered: {expandedWidth}x{expandedHeight} tiles (from {Width}x{Height} biome map, {TileExpansionFactor}x expansion)");
 	}
 
 	private void ApplyOceanOverlays(float[,] heightMap)
@@ -529,6 +575,60 @@ public partial class WorldGenerator : TileMapLayer
 
 		var selectedBiomeRange = validBiomeRanges.Count > 0 ? validBiomeRanges[(int)(temperature * validBiomeRanges.Count) % validBiomeRanges.Count] : null;
 		return selectedBiomeRange is not null ? selectedBiomeRange.Biome : BiomeType.Ocean;
+	}
+
+	/// <summary>
+	/// Samples the biome map around a tile position and returns weighted probabilities for each biome.
+	/// This creates smooth transitions between biomes by blending nearby biome types.
+	/// </summary>
+	/// <param name="tileX">X position in the expanded tile space</param>
+	/// <param name="tileY">Y position in the expanded tile space</param>
+	/// <returns>Dictionary mapping each biome type to its probability (0.0 to 1.0)</returns>
+	private System.Collections.Generic.Dictionary<BiomeType, float> GetBiomeProbabilities(int tileX, int tileY)
+	{
+		var probabilities = new System.Collections.Generic.Dictionary<BiomeType, float>();
+
+		// Convert tile position back to world biome map coordinates
+		float worldX = (float)tileX / TileExpansionFactor;
+		float worldY = (float)tileY / TileExpansionFactor;
+
+		float totalWeight = 0f;
+
+		// Sample surrounding biomes within the radius
+		for (int dx = -BiomeSampleRadius; dx <= BiomeSampleRadius; dx++)
+		{
+			for (int dy = -BiomeSampleRadius; dy <= BiomeSampleRadius; dy++)
+			{
+				int sampleX = Mathf.Clamp((int)worldX + dx, 0, Width - 1);
+				int sampleY = Mathf.Clamp((int)worldY + dy, 0, Height - 1);
+
+				var biome = _worldMapBiomeTypes![sampleX, sampleY];
+
+				// Calculate distance-based weight (inverse square falloff)
+				float distance = Mathf.Sqrt(dx * dx + dy * dy);
+				float weight = 1.0f / (1.0f + distance * distance);
+
+				if (!probabilities.ContainsKey(biome))
+				{
+					probabilities[biome] = 0f;
+				}
+
+				probabilities[biome] += weight;
+				totalWeight += weight;
+			}
+		}
+
+		// Normalize probabilities to sum to 1.0
+		if (totalWeight > 0f)
+		{
+			var keys = probabilities.Keys.ToList();
+			foreach (var biome in keys)
+			{
+				probabilities[biome] /= totalWeight;
+			}
+		}
+
+		return probabilities;
 	}
 
 	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps()
