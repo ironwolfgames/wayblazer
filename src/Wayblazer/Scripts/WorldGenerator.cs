@@ -123,6 +123,13 @@ public partial class WorldGenerator : TileMapLayer
 	[Export]
 	public int BiomeSampleRadius { get; set; } = 2;
 
+	/// <summary>
+	/// Optional separate TileMapLayer for environmental decorations (trees, rocks, etc.).
+	/// If not set, decorations will be placed on the main layer.
+	/// </summary>
+	[Export]
+	public TileMapLayer? DecorationLayer { get; set; }
+
 	public override void _Ready()
 	{
 		// Don't auto-generate in editor mode
@@ -135,15 +142,13 @@ public partial class WorldGenerator : TileMapLayer
 	public void GenerateWorldFromZero()
 	{
 		Clear();
+		DecorationLayer?.Clear();
 		foreach (Node child in GetChildren())
 		{
 			child.QueueFree();
 		}
 
 		_worldMapBiomeTypes = new BiomeType[Width, Height];
-
-		_pineTreeScene = GD.Load<PackedScene>(Constants.Scenes.PINE_TREE);
-		_goldOreScene = GD.Load<PackedScene>(Constants.Scenes.GOLD_ORE);
 
 		GlobalRandom.InitializeWithSeed(Seed == -1 ? (int)GD.Randi() : Seed);
 
@@ -411,56 +416,63 @@ public partial class WorldGenerator : TileMapLayer
 			}
 		}
 
-		// Generate noise maps for all decoration types
-		var decorationNoiseMaps = GenerateDecorationNoiseMaps();
+		// Generate noise maps for all decoration types at expanded resolution
+		var decorationNoiseMaps = GenerateDecorationNoiseMaps(expandedWidth, expandedHeight);
 
-		// Create a lookup for scene paths (you'll need to add these to Constants.Scenes)
-		var decorationScenes = new Dictionary<EnvironmentalDecorationType, PackedScene>
+		// Create a lookup for decoration tile atlas coordinates
+		// TODO: Load these from configuration or tileset metadata
+		var decorationTileCoords = new System.Collections.Generic.Dictionary<EnvironmentalDecorationType, Vector2I[]>
 		{
-			{ EnvironmentalDecorationType.Tree, _pineTreeScene! },
-			{ EnvironmentalDecorationType.OreDeposit, _goldOreScene! },
-			// Add more as you create the scenes
+			{ EnvironmentalDecorationType.Tree, new[] { new Vector2I(0, 10), new Vector2I(1, 10), new Vector2I(2, 10) } },
+			{ EnvironmentalDecorationType.Rock, new[] { new Vector2I(3, 10), new Vector2I(4, 10) } },
+			{ EnvironmentalDecorationType.Bush, new[] { new Vector2I(5, 10) } },
+			{ EnvironmentalDecorationType.Flower, new[] { new Vector2I(6, 10) } },
+			{ EnvironmentalDecorationType.Grass, new[] { new Vector2I(7, 10) } },
+			{ EnvironmentalDecorationType.OreDeposit, new[] { new Vector2I(8, 10) } },
+			{ EnvironmentalDecorationType.GasDeposit, new[] { new Vector2I(9, 10) } },
 		};
 
-		// Iterate through the world, set the tiles in the world according to the WFC output and place environmental decorations
-		for (int x = 0; x < Width; x++)
+		// Iterate through the world and set base tiles
+		for (int x = 0; x < expandedWidth; x++)
 		{
-			for (int y = 0; y < Height; y++)
+			for (int y = 0; y < expandedHeight; y++)
 			{
-				var protoTileIndex = protoTileIndices[x + y * Width];
+				var protoTileIndex = protoTileIndices[x + y * expandedWidth];
 				var protoTileInfo = protoTileInfos[protoTileIndex];
 				SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: new Vector2I(protoTileInfo.X, protoTileInfo.Y));
+			}
+		}
 
-				foreach (var config in DecorationConfigs!)
+		// Place decorations on the decoration layer at expanded resolution
+		if (DecorationLayer != null && DecorationConfigs != null)
+		{
+			for (int x = 0; x < expandedWidth; x++)
+			{
+				for (int y = 0; y < expandedHeight; y++)
 				{
-					if (!decorationNoiseMaps.ContainsKey(config.DecorationType) || !decorationScenes.ContainsKey(config.DecorationType))
-						continue;
+					var biomeProbabilities = GetBiomeProbabilities(x, y);
+					var dominantBiome = biomeProbabilities.OrderByDescending(kvp => kvp.Value).First().Key;
 
-					var noiseValue = decorationNoiseMaps[config.DecorationType][x, y];
-					if (ShouldPlaceDecoration(x, y, config, noiseValue))
+					foreach (var config in DecorationConfigs)
 					{
-						var scene = decorationScenes[config.DecorationType];
-						var instance = scene.Instantiate<ResourceNode>();
+						if (!decorationNoiseMaps.ContainsKey(config.DecorationType))
+							continue;
 
-						// Set resource data based on decoration type
-						if (config.DecorationType == EnvironmentalDecorationType.OreDeposit)
+						if (!decorationTileCoords.ContainsKey(config.DecorationType))
+							continue;
+
+						var noiseValue = decorationNoiseMaps[config.DecorationType][x, y];
+						if (ShouldPlaceDecoration(dominantBiome, config, noiseValue))
 						{
-							instance.ResourceData = _resources![ResourceKind.Ore][GlobalRandom.Next(0, _resources[ResourceKind.Ore].Count)].Duplicate() as RawResource;
+							var tileVariants = decorationTileCoords[config.DecorationType];
+							var selectedTile = tileVariants[GlobalRandom.Next(0, tileVariants.Length)];
+
+							DecorationLayer.SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: selectedTile);
+
+							// Only place one decoration per tile
+							// TODO: ensure we order decorations by priority
+							break;
 						}
-						else if (config.DecorationType == EnvironmentalDecorationType.Tree)
-						{
-							instance.ResourceData = _resources![ResourceKind.Wood][GlobalRandom.Next(0, _resources[ResourceKind.Wood].Count)].Duplicate() as RawResource;
-						}
-
-						// Convert grid position to world position
-						instance.Position = new Vector2((x + 0.5f) * TileSet.TileSize.X, (y + 0.5f) * TileSet.TileSize.Y);
-						instance.ZIndex = (int)Math.Round(instance.Position.Y);
-
-						AddChild(instance);
-
-						// Only place one decoration per tile
-						// TODO: ensure we order decorations by priority
-						break;
 					}
 				}
 			}
@@ -631,15 +643,15 @@ public partial class WorldGenerator : TileMapLayer
 		return probabilities;
 	}
 
-	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps()
+	private System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]> GenerateDecorationNoiseMaps(int width, int height)
 	{
 		var noiseMaps = new System.Collections.Generic.Dictionary<EnvironmentalDecorationType, float[,]>();
 
 		foreach (var config in DecorationConfigs!)
 		{
 			var noiseMap = NoiseService.GenerateNoiseMap(
-				Width,
-				Height,
+				width,
+				height,
 				GlobalRandom.Seed + (int)config.DecorationType, // Different seed per decoration
 				config.NoiseConfig
 			);
@@ -649,19 +661,14 @@ public partial class WorldGenerator : TileMapLayer
 		return noiseMaps;
 	}
 
-	private bool ShouldPlaceDecoration(int x, int y, EnvironmentalDecorationPlacementConfig config, float noiseValue)
+	private bool ShouldPlaceDecoration(BiomeType biomeType, EnvironmentalDecorationPlacementConfig config, float noiseValue)
 	{
-		return false;
-		/*
-		var biomeType = _worldMapBiomeTypes![x, y];
-
 		// Check if noise value is in the valid range
 		if (noiseValue < config.MinimumValue || noiseValue > config.MaximumValue)
 			return false;
 
 		// Check if the current biome is valid for this decoration
 		return config.ValidBiomes.Contains(biomeType);
-		*/
 	}
 
 	private Array<BiomeRange> GetDefaultBiomeRanges()
@@ -803,6 +810,4 @@ public partial class WorldGenerator : TileMapLayer
 
 	private BiomeType[,]? _worldMapBiomeTypes;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
-	private PackedScene? _pineTreeScene;
-	private PackedScene? _goldOreScene;
 }
