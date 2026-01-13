@@ -37,6 +37,20 @@
 			"cwd": "${workspaceFolder}",
 			"stopAtEntry": false,
 			"console": "internalConsole"
+		},
+		{
+			"name": "TilesetProcessor",
+			"type": "coreclr",
+			"request": "launch",
+			"preLaunchTask": "build",
+			"program": "${workspaceFolder}/src/Wayblazer.TilesetProcessor/bin/Debug/net8.0/Wayblazer.TilesetProcessor.dll",
+			"args": [
+				"${workspaceFolder}/src/Wayblazer/Assets/Graphics/tileset.png",
+				"${workspaceFolder}/src/Wayblazer/Assets/Graphics/tileset.json"
+			],
+			"cwd": "${workspaceFolder}",
+			"stopAtEntry": false,
+			"console": "internalConsole"
 		}
 	]
 }

@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wayblazer.Configurator", "s
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Wayblazer.World", "src\Wayblazer.World\Wayblazer.World.csproj", "{596C4393-7267-456F-992B-EF1100B85AC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WFC.Utility", "src\WFC.Utility\WFC.Utility.csproj", "{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wayblazer.TilesetProcessor", "src\Wayblazer.TilesetProcessor\Wayblazer.TilesetProcessor.csproj", "{1E81703E-180E-4454-9E99-DF4475546DFD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,14 @@ Global
 		{8C340270-98A4-4BE2-922A-7AA74B3F0940}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C340270-98A4-4BE2-922A-7AA74B3F0940}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C340270-98A4-4BE2-922A-7AA74B3F0940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E81703E-180E-4454-9E99-DF4475546DFD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E81703E-180E-4454-9E99-DF4475546DFD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E81703E-180E-4454-9E99-DF4475546DFD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E81703E-180E-4454-9E99-DF4475546DFD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +49,8 @@ Global
 		{596C4393-7267-456F-992B-EF1100B85AC5} = {6C9B2A58-C586-4770-9E1F-0BE532D66C39}
 		{709DC37C-7A4F-4717-99C3-9C8E0AD3B425} = {6C9B2A58-C586-4770-9E1F-0BE532D66C39}
 		{8C340270-98A4-4BE2-922A-7AA74B3F0940} = {6C9B2A58-C586-4770-9E1F-0BE532D66C39}
+		{B171ADEC-30C6-49CD-9FC1-1C50C61AA77F} = {6C9B2A58-C586-4770-9E1F-0BE532D66C39}
+		{1E81703E-180E-4454-9E99-DF4475546DFD} = {6C9B2A58-C586-4770-9E1F-0BE532D66C39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {244A1603-6B23-4A8E-B9F1-14A98F61873D}
