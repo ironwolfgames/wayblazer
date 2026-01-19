@@ -246,39 +246,60 @@ public partial class WorldGenerator : TileMapLayer
 		// Use WFC (Wave Function Collapse) to generate the world's base tiles
 		if (UseWFC)
 		{
-			var configuration = new Configuration(_tilesetData!.ProtoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
-			var output = new Output(configuration, width: expandedWidth, height: expandedHeight, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
-				{
-					// Get biome probabilities at this expanded tile position
-					var biomeProbabilities = GetBiomeProbabilities(x, y);
-
-					// Find proto tiles that contain any of the probable biomes
-					var validTiles = new System.Collections.Generic.List<ProtoTile>();
-					for (int tileIndex = 0; tileIndex < _tilesetData.ProtoTiles.Count; tileIndex++)
+			try
+			{
+				var configuration = new Configuration(_tilesetData!.ProtoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
+				var output = new Output(configuration, width: expandedWidth, height: expandedHeight, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 					{
-						// Check if this tile contains any of the biomes with significant probability
-						if (_tilesetData.TileToBiomes.TryGetValue(tileIndex, out var tileBiomes))
+						// Get biome probabilities at this expanded tile position
+						var biomeProbabilities = GetBiomeProbabilities(x, y);
+
+						// Find proto tiles that contain any of the probable biomes
+						var validTiles = new System.Collections.Generic.List<ProtoTile>();
+						for (int tileIndex = 0; tileIndex < _tilesetData.ProtoTiles.Count; tileIndex++)
 						{
-							foreach (var biome in tileBiomes)
+							// Check if this tile contains any of the biomes with significant probability
+							if (_tilesetData.TileToBiomes.TryGetValue(tileIndex, out var tileBiomes))
 							{
-								// Check if this biome has significant probability (>5%)
-								if (biomeProbabilities.TryGetValue((BiomeType)biome, out var probability) && probability > 0.05f)
+								foreach (var biome in tileBiomes)
 								{
-									validTiles.Add(_tilesetData.ProtoTiles[tileIndex]);
-									break; // This tile is valid, no need to check other biomes
+									// Check if this biome has significant probability (>1%)
+									if (biomeProbabilities.TryGetValue((BiomeType)biome, out var probability) && probability > 0.01f)
+									{
+										validTiles.Add(_tilesetData.ProtoTiles[tileIndex]);
+										break; // This tile is valid, no need to check other biomes
+									}
 								}
 							}
 						}
-					}
 
-					// If no valid tiles found, return all tiles as fallback
-					return validTiles.Count > 0 ? validTiles : _tilesetData.ProtoTiles;
-				});
-			var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
-			algorithm.Run(output);
+						// If no valid tiles found, return all tiles as fallback
+						return validTiles.Count > 0 ? validTiles : _tilesetData.ProtoTiles;
+					});
+				var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
 
-			// Get the proto tile indices from the WFC output
-			protoTileIndices = output.ToSerializable().Tiles;
+				GD.Print("Running WFC algorithm...");
+				bool wfcSuccess = algorithm.Run(output);
+
+				if (!wfcSuccess)
+				{
+					GD.PrintErr("WFC failed to converge. Falling back to simple tile selection mode.");
+					UseWFC = false;
+					RenderWorld(); // Retry without WFC
+					return;
+				}
+
+				// Get the proto tile indices from the WFC output
+				protoTileIndices = output.ToSerializable().Tiles;
+				GD.Print($"WFC completed successfully: {protoTileIndices.Count} tiles generated");
+			}
+			catch (Exception ex)
+			{
+				GD.PrintErr($"WFC error: {ex.Message}. Falling back to simple tile selection mode.");
+				UseWFC = false;
+				RenderWorld(); // Retry without WFC
+				return;
+			}
 		}
 		else
 		{
@@ -305,7 +326,23 @@ public partial class WorldGenerator : TileMapLayer
 						}
 					}
 
-					protoTileIndices.Add((int)selectedBiome);
+					// Find proto tiles that match the selected biome
+					var matchingTiles = new System.Collections.Generic.List<int>();
+					for (int i = 0; i < _tilesetData!.ProtoTiles.Count; i++)
+					{
+						if (_tilesetData.TileToBiomes.TryGetValue(i, out var tileBiomes)
+							&& tileBiomes.Contains((int)selectedBiome))
+						{
+							matchingTiles.Add(i);
+						}
+					}
+
+					// Select a random proto tile from matching tiles, or fallback to first tile
+					int selectedTileIndex = matchingTiles.Count > 0
+						? matchingTiles[GlobalRandom.Next(0, matchingTiles.Count)]
+						: 0;
+
+					protoTileIndices.Add(selectedTileIndex);
 				}
 			}
 		}
@@ -746,11 +783,16 @@ public partial class WorldGenerator : TileMapLayer
 			{
 				GD.PrintErr("Failed to deserialize tileset data");
 				_tilesetData = new TilesetProcessingResult();
+				throw new InvalidOperationException("Failed to load tileset data from JSON");
 			}
-			else
+
+			if (_tilesetData.ProtoTiles == null || _tilesetData.ProtoTiles.Count == 0)
 			{
-				GD.Print($"Loaded {_tilesetData.ProtoTiles.Count} proto tiles from {TilesetDataPath}");
+				GD.PrintErr("Tileset data contains no proto tiles");
+				throw new InvalidOperationException("Tileset must contain at least one proto tile");
 			}
+
+			GD.Print($"Loaded {_tilesetData.ProtoTiles.Count} proto tiles from {TilesetDataPath}");
 		}
 		catch (Exception ex)
 		{
