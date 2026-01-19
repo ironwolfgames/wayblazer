@@ -9,6 +9,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\lib\wave-function-collapse\src\WFC.Core\WFC.Core.csproj" />
+		<ProjectReference Include="..\WFC.Utility\WFC.Utility.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

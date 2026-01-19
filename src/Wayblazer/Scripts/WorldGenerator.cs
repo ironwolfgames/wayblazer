@@ -1,8 +1,10 @@
 using System;
 using System.Linq;
+using System.Text.Json;
 using Godot;
 using Godot.Collections;
 using WFC.Core;
+using WFC.Utility;
 
 namespace Wayblazer;
 
@@ -27,6 +29,12 @@ public partial class WorldGenerator : TileMapLayer
 	/// </summary>
 	[Export]
 	public int Seed { get; set; } = -1;
+
+	/// <summary>
+	/// Path to the tileset processing result JSON file.
+	/// </summary>
+	[Export(PropertyHint.File, "*.json")]
+	public string TilesetDataPath { get; set; } = "res://Assets/Graphics/tileset.json";
 
 	[ExportGroup("Ocean Configuration")]
 	/// <summary>
@@ -130,6 +138,13 @@ public partial class WorldGenerator : TileMapLayer
 	[Export]
 	public TileMapLayer? DecorationLayer { get; set; }
 
+	/// <summary>
+	/// When true, uses Wave Function Collapse (WFC) algorithm for tile placement.
+	/// When false, uses simple weighted random selection based on biome probabilities.
+	/// </summary>
+	[Export]
+	public bool UseWFC { get; set; } = true;
+
 	public override void _Ready()
 	{
 		// Don't auto-generate in editor mode
@@ -209,175 +224,55 @@ public partial class WorldGenerator : TileMapLayer
 
 	public void RenderWorld()
 	{
-		const bool useWFC = false;
 		System.Collections.Generic.List<int> protoTileIndices;
 
 		// Calculate expanded dimensions
 		int expandedWidth = Width * TileExpansionFactor;
 		int expandedHeight = Height * TileExpansionFactor;
 
-		// Hard coded proto tiles for now. In the future, load these from the source WFC image and configuration file
-		System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)> protoTileInfos =
-		[
-			(new()
-			{
-				// 0 - Ocean
-				Id = "ocean",
-				Weight = 20,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // up
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // right
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ], // down
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Swamp ],  // left
-				]
-			}, 10, 1),
-			(new()
-			{
-				// 1 - Beach
-				Id = "beach",
-				Weight = 5,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
-				]
-			}, 1, 1),
-			(new()
-			{
-				// 2 - Plains
-				Id = "plains",
-				Weight = 15,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // up
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // right
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ], // down
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestDeciduous, (int)BiomeType.Mountain ]  // left
-				]
-			}, 4, 1),
-			(new()
-			{
-				// 3 - Desert
-				Id = "desert",
-				Weight = 8,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // up
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // right
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ], // down
-					[ (int)BiomeType.Beach, (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.Mountain ]  // left
-				]
-			}, 7, 1),
-			(new()
-			{
-				// 4 - Jungle
-				Id = "jungle",
-				Weight = 8,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // up
-					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // right
-					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ], // down
-					[ (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.Swamp ]  // left
-				]
-			}, 1, 4),
-			(new()
-			{
-				// 5 - ForestDeciduous
-				Id = "forest_deciduous",
-				Weight = 12,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // up
-					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // right
-					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ], // down
-					[ (int)BiomeType.Plains, (int)BiomeType.Jungle, (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous ]  // left
-				]
-			}, 4, 4),
-			(new()
-			{
-				// 6 - ForestConiferous
-				Id = "forest_coniferous",
-				Weight = 10,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
-					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
-					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
-					[ (int)BiomeType.ForestDeciduous, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
-				]
-			}, 7, 4),
-			(new()
-			{
-				// 7 - Tundra
-				Id = "tundra",
-				Weight = 6,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
-					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
-					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
-					[ (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
-				]
-			}, 1, 7),
-			(new()
-			{
-				// 8 - Mountain
-				Id = "mountain",
-				Weight = 8,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // up
-					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // right
-					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ], // down
-					[ (int)BiomeType.Plains, (int)BiomeType.Desert, (int)BiomeType.ForestConiferous, (int)BiomeType.Tundra, (int)BiomeType.Mountain ]  // left
-				]
-			}, 4, 7),
-			(new()
-			{
-				// 9 - Swamp
-				Id = "swamp",
-				Weight = 5,
-				NeighborIndices =
-				[
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // up
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // right
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ], // down
-					[ (int)BiomeType.Ocean, (int)BiomeType.Beach, (int)BiomeType.Jungle, (int)BiomeType.Swamp ]  // left
-				]
-			}, 7, 7)
-		];
+		// Load tileset processing result from JSON
+		LoadTilesetData();
+
+		// Parse tile IDs to get atlas coordinates
+		// Tile IDs are in format "Tile_X_Y_VARIANT" where X and Y are atlas coordinates
+		var protoTileInfos = new System.Collections.Generic.List<(ProtoTile Tile, int X, int Y)>();
+		for (int i = 0; i < _tilesetData!.ProtoTiles.Count; i++)
+		{
+			var protoTile = _tilesetData.ProtoTiles[i];
+			var (atlasX, atlasY) = ParseTileId(protoTile.Id);
+			protoTileInfos.Add((protoTile, atlasX, atlasY));
+		}
 
 		// Use WFC (Wave Function Collapse) to generate the world's base tiles
-#pragma warning disable CS0162 // Unreachable code detected
-		if (useWFC)
+		if (UseWFC)
 		{
-			var configuration = new Configuration(protoTileInfos.Select(x => x.Tile).ToList(), AdjacencyAlgorithmKind.ADJACENCY_2D);
+			var configuration = new Configuration(_tilesetData!.ProtoTiles, AdjacencyAlgorithmKind.ADJACENCY_2D);
 			var output = new Output(configuration, width: expandedWidth, height: expandedHeight, depth: 1, getInitialValidProtoTilesForPosition: (x, y, z) =>
 				{
 					// Get biome probabilities at this expanded tile position
 					var biomeProbabilities = GetBiomeProbabilities(x, y);
 
-					// Allow proto tiles for all biomes with significant probability (>5%)
+					// Find proto tiles that contain any of the probable biomes
 					var validTiles = new System.Collections.Generic.List<ProtoTile>();
-					foreach (var kvp in biomeProbabilities)
+					for (int tileIndex = 0; tileIndex < _tilesetData.ProtoTiles.Count; tileIndex++)
 					{
-						if (kvp.Value > 0.05f)
+						// Check if this tile contains any of the biomes with significant probability
+						if (_tilesetData.TileToBiomes.TryGetValue(tileIndex, out var tileBiomes))
 						{
-							var protoTileIndex = (int)kvp.Key;
-							if (protoTileIndex >= 0 && protoTileIndex < protoTileInfos.Count)
+							foreach (var biome in tileBiomes)
 							{
-								// Weight the tile by its probability
-								var tile = protoTileInfos[protoTileIndex].Tile;
-								validTiles.Add(tile);
+								// Check if this biome has significant probability (>5%)
+								if (biomeProbabilities.TryGetValue((BiomeType)biome, out var probability) && probability > 0.05f)
+								{
+									validTiles.Add(_tilesetData.ProtoTiles[tileIndex]);
+									break; // This tile is valid, no need to check other biomes
+								}
 							}
 						}
 					}
 
-					return validTiles.Count > 0 ? validTiles : protoTileInfos.Select(x => x.Tile).ToList();
+					// If no valid tiles found, return all tiles as fallback
+					return validTiles.Count > 0 ? validTiles : _tilesetData.ProtoTiles;
 				});
 			var algorithm = new Algorithm(configuration, seed: GlobalRandom.Seed);
 			algorithm.Run(output);
@@ -385,7 +280,6 @@ public partial class WorldGenerator : TileMapLayer
 			// Get the proto tile indices from the WFC output
 			protoTileIndices = output.ToSerializable().Tiles;
 		}
-#pragma warning restore CS0162
 		else
 		{
 			// Simple mode: use biome probabilities to select tiles with weighted randomness
@@ -421,15 +315,15 @@ public partial class WorldGenerator : TileMapLayer
 
 		// Create a lookup for decoration tile atlas coordinates
 		// TODO: Load these from configuration or tileset metadata
-		var decorationTileCoords = new System.Collections.Generic.Dictionary<EnvironmentalDecorationType, Vector2I[]>
+		var decorationTileCoords = new Dictionary<EnvironmentalDecorationType, Array<Vector2I>>
 		{
-			{ EnvironmentalDecorationType.Tree, new[] { new Vector2I(0, 10), new Vector2I(1, 10), new Vector2I(2, 10) } },
-			{ EnvironmentalDecorationType.Rock, new[] { new Vector2I(3, 10), new Vector2I(4, 10) } },
-			{ EnvironmentalDecorationType.Bush, new[] { new Vector2I(5, 10) } },
-			{ EnvironmentalDecorationType.Flower, new[] { new Vector2I(6, 10) } },
-			{ EnvironmentalDecorationType.Grass, new[] { new Vector2I(7, 10) } },
-			{ EnvironmentalDecorationType.OreDeposit, new[] { new Vector2I(8, 10) } },
-			{ EnvironmentalDecorationType.GasDeposit, new[] { new Vector2I(9, 10) } },
+			{ EnvironmentalDecorationType.Tree, new Array<Vector2I> { new Vector2I(0, 10), new Vector2I(1, 10), new Vector2I(2, 10) } },
+			{ EnvironmentalDecorationType.Rock, new Array<Vector2I> { new Vector2I(3, 10), new Vector2I(4, 10) } },
+			{ EnvironmentalDecorationType.Bush, new Array<Vector2I> { new Vector2I(5, 10) } },
+			{ EnvironmentalDecorationType.Flower, new Array<Vector2I> { new Vector2I(6, 10) } },
+			{ EnvironmentalDecorationType.Grass, new Array<Vector2I> { new Vector2I(7, 10) } },
+			{ EnvironmentalDecorationType.OreDeposit, new Array<Vector2I> { new Vector2I(8, 10) } },
+			{ EnvironmentalDecorationType.GasDeposit, new Array<Vector2I> { new Vector2I(9, 10) } },
 		};
 
 		// Iterate through the world and set base tiles
@@ -465,7 +359,7 @@ public partial class WorldGenerator : TileMapLayer
 						if (ShouldPlaceDecoration(dominantBiome, config, noiseValue))
 						{
 							var tileVariants = decorationTileCoords[config.DecorationType];
-							var selectedTile = tileVariants[GlobalRandom.Next(0, tileVariants.Length)];
+							var selectedTile = tileVariants[GlobalRandom.Next(0, tileVariants.Count)];
 
 							DecorationLayer.SetCell(new Vector2I(x, y), sourceId: 0, atlasCoords: selectedTile);
 
@@ -596,9 +490,9 @@ public partial class WorldGenerator : TileMapLayer
 	/// <param name="tileX">X position in the expanded tile space</param>
 	/// <param name="tileY">Y position in the expanded tile space</param>
 	/// <returns>Dictionary mapping each biome type to its probability (0.0 to 1.0)</returns>
-	private System.Collections.Generic.Dictionary<BiomeType, float> GetBiomeProbabilities(int tileX, int tileY)
+	private Dictionary<BiomeType, float> GetBiomeProbabilities(int tileX, int tileY)
 	{
-		var probabilities = new System.Collections.Generic.Dictionary<BiomeType, float>();
+		var probabilities = new Dictionary<BiomeType, float>();
 
 		// Convert tile position back to world biome map coordinates
 		float worldX = (float)tileX / TileExpansionFactor;
@@ -804,10 +698,98 @@ public partial class WorldGenerator : TileMapLayer
 		};
 	}
 
+	/// <summary>
+	/// Loads the tileset processing result from the JSON file if not already loaded.
+	/// </summary>
+	private void LoadTilesetData()
+	{
+		if (_tilesetData != null)
+		{
+			return; // Already loaded
+		}
+
+		// Validate the tileset path is set
+		if (string.IsNullOrEmpty(TilesetDataPath))
+		{
+			GD.PrintErr("TilesetDataPath is not set");
+			_tilesetData = new TilesetProcessingResult();
+			return;
+		}
+
+		// Use Godot's FileAccess to load the file
+		if (!FileAccess.FileExists(TilesetDataPath))
+		{
+			GD.PrintErr($"Tileset file not found at: {TilesetDataPath}");
+			_tilesetData = new TilesetProcessingResult();
+			return;
+		}
+
+		try
+		{
+			// Open the file using Godot's FileAccess
+			using var file = FileAccess.Open(TilesetDataPath, FileAccess.ModeFlags.Read);
+			if (file == null)
+			{
+				GD.PrintErr($"Failed to open tileset file: {FileAccess.GetOpenError()}");
+				_tilesetData = new TilesetProcessingResult();
+				return;
+			}
+
+			string jsonContent = file.GetAsText();
+			var options = new JsonSerializerOptions
+			{
+				PropertyNameCaseInsensitive = true
+			};
+			_tilesetData = JsonSerializer.Deserialize<TilesetProcessingResult>(jsonContent, options);
+
+			if (_tilesetData == null)
+			{
+				GD.PrintErr("Failed to deserialize tileset data");
+				_tilesetData = new TilesetProcessingResult();
+			}
+			else
+			{
+				GD.Print($"Loaded {_tilesetData.ProtoTiles.Count} proto tiles from {TilesetDataPath}");
+			}
+		}
+		catch (Exception ex)
+		{
+			GD.PrintErr($"Error loading tileset data: {ex.Message}");
+			_tilesetData = new TilesetProcessingResult();
+		}
+	}
+
+	/// <summary>
+	/// Parses a tile ID in format "Tile_X_Y_VARIANT" to extract atlas coordinates.
+	/// </summary>
+	/// <param name="tileId">The tile ID to parse</param>
+	/// <returns>A tuple containing the X and Y atlas coordinates</returns>
+	private (int X, int Y) ParseTileId(string tileId)
+	{
+		try
+		{
+			// Expected format: "Tile_X_Y_VARIANT" or "Tile_X_Y"
+			var parts = tileId.Split('_');
+			if (parts.Length >= 3)
+			{
+				int x = int.Parse(parts[1]);
+				int y = int.Parse(parts[2]);
+				return (x, y);
+			}
+		}
+		catch (Exception ex)
+		{
+			GD.PrintErr($"Error parsing tile ID '{tileId}': {ex.Message}");
+		}
+
+		throw new FormatException($"Invalid tile ID format: {tileId}");
+	}
+
 	private const int TEMPERATURE_NOISE_SEED_OFFSET = 1000;
 	private const int OCEAN_CONTINENT_NOISE_SEED_OFFSET = 2000;
 	private const int EDGE_NOISE_SEED_OFFSET = 3000;
 
 	private BiomeType[,]? _worldMapBiomeTypes;
 	private Dictionary<ResourceKind, Array<RawResource>>? _resources;
+	private TilesetProcessingResult? _tilesetData;
 }
