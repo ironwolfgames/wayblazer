@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 3: Inventory Manager — deterministic acceptance tests.
+/// Inventory Manager — deterministic acceptance tests.
 /// These tests define "done" for the inventory system.
 /// </summary>
 public class Sprint03_InventoryTests

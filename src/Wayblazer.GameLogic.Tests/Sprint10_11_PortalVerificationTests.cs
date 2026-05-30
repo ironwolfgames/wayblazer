@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprints 10-11: Portal Construction & Simulation — deterministic acceptance tests.
+/// Portal Construction & Simulation — deterministic acceptance tests.
 /// Tests material verification against calculated portal requirements.
 /// </summary>
 public class Sprint10_11_PortalVerificationTests

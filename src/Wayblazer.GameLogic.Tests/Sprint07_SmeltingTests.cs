@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 7: Basic Furnace & Smelting — deterministic acceptance tests.
+/// Basic Furnace & Smelting — deterministic acceptance tests.
 /// Tests the basic crafting/smelting mechanic.
 /// </summary>
 public class Sprint07_SmeltingTests

@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 6: Planetary Observatory & Deduction — deterministic acceptance tests.
+/// Planetary Observatory & Deduction — deterministic acceptance tests.
 /// Tests measuring planetary constants and calculating portal requirements.
 /// </summary>
 public class Sprint06_ObservatoryTests

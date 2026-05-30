@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 5: Field Lab & Analysis — deterministic acceptance tests.
+/// Field Lab & Analysis — deterministic acceptance tests.
 /// Tests the transition from vague to precise resource data.
 /// </summary>
 public class Sprint05_FieldLabTests

@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Measures planetary constants precisely and calculates portal requirements.
-/// Sprint 6: Planetary Observatory and deduction formula.
 /// </summary>
 public class PlanetaryAnalysisSystem
 {

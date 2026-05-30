@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 8: Gas Injector & Compositing — deterministic acceptance tests.
+/// Gas Injector & Compositing — deterministic acceptance tests.
 /// Tests the advanced material synthesis that creates high-stat alloys.
 /// </summary>
 public class Sprint08_CompositingTests

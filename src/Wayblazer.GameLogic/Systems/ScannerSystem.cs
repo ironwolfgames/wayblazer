@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Handles resource scanning and progressive knowledge revelation.
-/// Sprint 4: Vague scanning. Sprint 5: Precise analysis via Field Lab.
 /// </summary>
 public class ScannerSystem
 {

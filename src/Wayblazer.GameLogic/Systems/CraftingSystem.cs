@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Handles crafting operations: smelting (Furnace) and compositing (Gas Injector).
-/// Sprint 7: Basic smelting. Sprint 8: Advanced compositing.
 /// </summary>
 public class CraftingSystem
 {

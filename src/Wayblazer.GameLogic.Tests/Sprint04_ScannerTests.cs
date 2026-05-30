@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 4: Hand Scanner — deterministic acceptance tests.
+/// Hand Scanner — deterministic acceptance tests.
 /// Tests the vague scanning system that provides initial deduction clues.
 /// </summary>
 public class Sprint04_ScannerTests

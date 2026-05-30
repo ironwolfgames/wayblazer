@@ -4,7 +4,7 @@ using Wayblazer.GameLogic.Systems;
 namespace Wayblazer.GameLogic.Tests;
 
 /// <summary>
-/// Sprint 9: Tech Tree & Unlocks — deterministic acceptance tests.
+/// Tech Tree & Unlocks — deterministic acceptance tests.
 /// Tests knowledge point accumulation, prerequisite gating, and machine unlocking.
 /// </summary>
 public class Sprint09_TechTreeTests

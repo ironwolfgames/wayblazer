@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Manages the player's inventory of resources.
-/// Sprint 3: Core inventory operations.
 /// </summary>
 public class InventorySystem
 {

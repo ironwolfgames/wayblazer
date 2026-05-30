@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Verifies whether engineered materials meet portal requirements.
-/// Sprint 10: Portal construction. Sprint 11: Simulation verification.
 /// </summary>
 public class PortalVerificationSystem
 {

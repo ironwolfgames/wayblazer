@@ -4,7 +4,6 @@ namespace Wayblazer.GameLogic.Systems;
 
 /// <summary>
 /// Manages the technology tree, knowledge points, and unlock progression.
-/// Sprint 9: Research UI, knowledge point tracking, machine gating.
 /// </summary>
 public class TechTreeSystem
 {
