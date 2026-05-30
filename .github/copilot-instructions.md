@@ -6,11 +6,11 @@
 # Build all non-Godot projects (root solution excludes src/Wayblazer):
 dotnet build Wayblazer.sln --configuration Release
 
-# Run game logic tests (xUnit, 209 tests):
-dotnet test src/Wayblazer.GameLogic.Tests
+# Run core tests (xUnit, 209 tests):
+dotnet test tests/Wayblazer.Core.Tests
 
 # Run a single test by name:
-dotnet test src/Wayblazer.GameLogic.Tests --filter "FullyQualifiedName~TestMethodName"
+dotnet test tests/Wayblazer.Core.Tests --filter "FullyQualifiedName~TestMethodName"
 ```
 
 ## Solution Architecture
@@ -19,9 +19,8 @@ The root `Wayblazer.sln` contains all projects **except** the Godot game project
 
 | Project | Framework | Type | Notes |
 |---------|-----------|------|-------|
-| `src/Wayblazer.Core` | net9.0 | Library | Core data models and shared types |
-| `src/Wayblazer.GameLogic` | net9.0 | Library | Pure game logic (inventory, crafting, scanning, tech tree, etc.) |
-| `src/Wayblazer.GameLogic.Tests` | net9.0 | Tests | xUnit tests for GameLogic |
+| `src/Wayblazer.Core` | net9.0 | Library | Core data models, game logic systems, and shared types |
+| `tests/Wayblazer.Core.Tests` | net9.0 | Tests | xUnit tests for Core |
 | `src/Wayblazer.World` | net9.0 | Exe | World generation CLI |
 | `src/Wayblazer.Configurator` | net9.0 | Exe | Configuration utility |
 | `src/Wayblazer.TilesetProcessor` | net8.0 | Exe | Tileset processing (Windows-only, uses System.Drawing) |

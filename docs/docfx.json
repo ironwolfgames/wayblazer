@@ -5,7 +5,6 @@
         {
           "files": [
             "src/Wayblazer.Core/Wayblazer.Core.csproj",
-            "src/Wayblazer.GameLogic/Wayblazer.GameLogic.csproj",
             "src/Wayblazer.World/Wayblazer.World.csproj",
             "src/Wayblazer.Configurator/Wayblazer.Configurator.csproj",
             "src/Wayblazer.TilesetProcessor/Wayblazer.TilesetProcessor.csproj",

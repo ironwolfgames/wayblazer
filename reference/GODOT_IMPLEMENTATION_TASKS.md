@@ -2,7 +2,7 @@
 
 **Purpose:** Step-by-step tasks for implementing the remaining game features in Godot 4 (C#).
 
-The core game logic (inventory, crafting, scanning, tech tree, portal verification, etc.) is implemented and tested in `src/Wayblazer.GameLogic/`. These tasks cover the Godot-side integration: scenes, UI, input handling, assets, and wiring the logic systems into the engine.
+The core game logic (inventory, crafting, scanning, tech tree, portal verification, etc.) is implemented and tested in `src/Wayblazer.Core/`. These tasks cover the Godot-side integration: scenes, UI, input handling, assets, and wiring the logic systems into the engine.
 
 **Reference Documents:**
 - `VERTICAL_SLICE_PLAN.md` — Sprint details with code examples
@@ -41,14 +41,14 @@ The core game logic (inventory, crafting, scanning, tech tree, portal verificati
 
 ## Sprint 3: Resource Engine & ProcGen V1
 
-### 3.1 — GameManager Integration with GameLogic Library
+### 3.1 — GameManager Integration with Core Library
 
 | # | Task | Type |
 |---|------|------|
-| 1 | Add project reference from `Wayblazer.csproj` to `Wayblazer.GameLogic.csproj` | Configuration |
-| 2 | Update `GameManager.cs` to instantiate `InventorySystem`, `ScannerSystem`, `TechTreeSystem` from GameLogic library | Code |
-| 3 | Create `VSResourcePresets.cs` defining the 3 VS resources (Base Ore, Catalyst Ore, Soft Wood) using `RawResource` from GameLogic | Code |
-| 4 | Wire `ResourceNode.cs` to reference `RawResource` instances from the GameLogic library | Code |
+| 1 | Add project reference from `Wayblazer.csproj` to `Wayblazer.Core.csproj` | Configuration |
+| 2 | Update `GameManager.cs` to instantiate `InventorySystem`, `ScannerSystem`, `TechTreeSystem` from Core library | Code |
+| 3 | Create `VSResourcePresets.cs` defining the 3 VS resources (Base Ore, Catalyst Ore, Soft Wood) using `RawResource` from Core | Code |
+| 4 | Wire `ResourceNode.cs` to reference `RawResource` instances from the Core library | Code |
 | 5 | Register GameManager systems as accessible singletons (or via static accessor) | Code |
 
 ### 3.2 — Harvesting Interaction System
@@ -477,9 +477,9 @@ Sprint 12 (Polish) ── Independent, can run in parallel after Sprint 7
 To begin Sprint 3 implementation:
 
 1. Open `Wayblazer.sln` in your IDE
-2. Add `<ProjectReference Include="..\Wayblazer.GameLogic\Wayblazer.GameLogic.csproj" />` to the Godot project's `.csproj`
+2. Add `<ProjectReference Include="..\Wayblazer.Core\Wayblazer.Core.csproj" />` to the Godot project's `.csproj`
 3. Open Godot, load `world.tscn`
-4. Start with Task 3.1 — wire up `GameManager.cs` to use `InventorySystem` from the GameLogic library
+4. Start with Task 3.1 — wire up `GameManager.cs` to use `InventorySystem` from the Core library
 5. Then build the interaction system (3.2) so the player can actually harvest resources
 6. Then add the HUD (3.3) so the player can see their inventory
 

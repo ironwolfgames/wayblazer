@@ -10,8 +10,7 @@ Welcome to the Wayblazer API documentation. This site is automatically generated
 
 | Project | Description |
 |---------|-------------|
-| **Wayblazer.Core** | Core data models and shared types |
-| **Wayblazer.GameLogic** | Game systems including inventory, crafting, scanning, tech tree, and objectives |
+| **Wayblazer.Core** | Core data models, game logic systems (inventory, crafting, scanning, tech tree, objectives), and shared types |
 | **Wayblazer.World** | World generation command-line tool |
 | **Wayblazer.Configurator** | Configuration utility for game data |
 | **Wayblazer.TilesetProcessor** | Tileset processing for WFC-based terrain generation |

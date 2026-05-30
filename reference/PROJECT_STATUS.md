@@ -314,16 +314,16 @@ These tasks span multiple sprints and should be addressed as the phases progress
 | **Save/Load** | Implement JSON-based persistence (inventory, knowledge, discovered stats, world seed) | Medium |
 | **Namespace cleanup** | Standardize all scripts to `Wayblazer` namespace | Low |
 | **WFC activation** | Enable WFC tile painting once tileset metadata is configured | Low |
-| **Unit tests** | ✅ `Wayblazer.GameLogic.Tests` created — 86 deterministic tests covering Sprints 3–11 | Done |
+| **Unit tests** | ✅ `Wayblazer.Core.Tests` — 209 deterministic tests | Done |
 | **Input mapping** | Add proper input actions for scan (right-click), place machine, open research UI | High |
 
 ---
 
 ## 8. Deterministic Test Suite
 
-A pure C# test project (`Wayblazer.GameLogic` + `Wayblazer.GameLogic.Tests`) provides **86 deterministic tests** that define acceptance criteria for each remaining sprint. These tests run without the Godot runtime.
+A pure C# test project (`Wayblazer.Core` + `tests/Wayblazer.Core.Tests`) provides **209 deterministic tests** that define acceptance criteria for each remaining sprint. These tests run without the Godot runtime.
 
-**Run tests:** `dotnet test src/Wayblazer.GameLogic.Tests`
+**Run tests:** `dotnet test tests/Wayblazer.Core.Tests`
 
 | Test Class | Sprint | Tests | Validates |
 |------------|--------|-------|-----------|
